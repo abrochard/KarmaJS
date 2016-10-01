@@ -17,7 +17,9 @@ var Deck = function(x, y, maxRender) {
     this.render = function(ctx) {
         var i = 0;
         while(i < maxRender && i < this.cards.length) {
-            this.cards[i].render(ctx);
+            // offset the top cards
+            this.cards[this.cards.length - 1 - i].setPosition(this.x + 1 * i, this.y + 1 * i);
+            this.cards[this.cards.length - 1 - i].render(ctx);
             i += 1;
         }
     };

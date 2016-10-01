@@ -53,4 +53,14 @@ var Player = function(human) {
             this.hand.push(card);
         }
     };
+
+    this.isDone = function() {
+        return (this.faceDownCards.length == 0 && this.faceUpCards.length == 0 && this.hand.length == 0);
+    };
+
+    this.play = function() {
+        this.faceDownCards.pop();
+        this.faceUpCards.pop();
+        this.hand.pop();
+    };
 };

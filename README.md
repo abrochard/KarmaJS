@@ -1,2 +1,2 @@
 # KarmaJS
-Javascript base Karma card game
+Javascript based Karma card game
