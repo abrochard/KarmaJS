@@ -40,8 +40,20 @@ var Card = function(value, suit, x, y, faceUp) {
         this.faceUp = !(this.faceUp);
     };
 
+    this.setFaceUp = function(faceUp){
+        this.faceUp = faceUp;
+    }
+
     this.setPosition = function(x, y) {
         this.x = x;
         this.y = y;
+    };
+
+    this.compareTo = function(card) {
+        if (card == null) {
+            return 1;
+        }
+
+        return this.value - card.value;
     };
 };

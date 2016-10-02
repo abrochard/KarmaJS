@@ -42,6 +42,12 @@ var Deck = function(x, y, maxRender) {
         return this.cards.pop();
     };
 
+    this.pickUp = function() {
+        var cards = this.cards;
+        this.cards = [];
+        return cards;
+    };
+
     this.place = function(card) {
         card.setPosition(this.x, this.y);
         this.cards.push(card);
@@ -49,5 +55,15 @@ var Deck = function(x, y, maxRender) {
 
     this.isEmpty = function() {
         return this.cards.length == 0;
+    };
+
+    this.peek = function() {
+        if (this.cards.length == 0) {
+            return null;
+        } else if (this.cards[this.cards.length - 1].faceUp) {
+            return this.cards[this.cards.length - 1];
+        } else {
+            return null;
+        }
     };
 };

@@ -81,9 +81,14 @@ var Game = function(canvas) {
         var p = game.players[index];
 
         if (!p.isDone()) {
-            var card = p.play();
-            card.flip();
-            game.pile.place(card);
+            var card = p.play(game.pile.peek());
+
+            if (card == null) { // could not play a card
+                p.addToHand(game.pile.pickUp());
+            } else {
+                card.setFaceUp(true);
+                game.pile.place(card);
+            }
 
             if (p.isDone()) {
                 // this was the winning move

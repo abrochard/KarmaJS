@@ -46,3 +46,5 @@ var GAME = {
     PLAYERS: 4,
     DELAY: 500
 };
+
+var DEBUG = true;
