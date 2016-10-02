@@ -80,6 +80,10 @@ var Game = function(canvas) {
                 card.setFaceUp(true);
                 game.pile.place(card);
 
+                if (game.pile.peek().value == SPECIAL.BURN) {
+                    game.pile.pickUp(); // discard the pile
+                }
+
                 if (game.deck.isEmpty() == false) {
                     p.addToHand([game.deck.draw()]);
                 }
@@ -142,6 +146,10 @@ var Game = function(canvas) {
                 card.setFaceUp(true);
                 this.pile.place(card);
 
+                if (this.pile.peek().value == SPECIAL.BURN) {
+                    this.pile.pickUp(); // discard the pile
+                }
+
                 if (this.deck.isEmpty() == false) {
                     human.addToHand([this.deck.draw()]);
                 }
@@ -168,7 +176,15 @@ var Game = function(canvas) {
     };
 
     this.validPlay = function(card, top) {
+        if (top == null) {
+            return true;
+        }
+
         if (card.isSpecial()) {
+            return true;
+        }
+
+        if (top.value == SPECIAL.RESET) {
             return true;
         }
 

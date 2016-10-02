@@ -96,7 +96,12 @@ var Player = function(human) {
         if (min != null) {
             return this.faceUpCards.splice(min, 1)[0];
         } else {
-            return this.playSpecial(this.faceUpCards);
+            var special = this.playSpecial(this.faceUpCards);
+            if (special != null) {
+                return special;
+            } else {
+                return this.faceUpCards.pop(); // just pick one
+            }
         }
     };
 
