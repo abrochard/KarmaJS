@@ -87,7 +87,7 @@ var Player = function(human) {
         if (min != null) {
             return this.hand.splice(min, 1)[0];
         } else {
-            return null;
+            return this.playSpecial(this.hand);
         }
     };
 
@@ -96,15 +96,24 @@ var Player = function(human) {
         if (min != null) {
             return this.faceUpCards.splice(min, 1)[0];
         } else {
-            return null;
+            return this.playSpecial(this.faceUpCards);
         }
     };
 
     this.findMinAbove = function(top, cards) {
         // assume the cards are sorted
         for(var i = 0; i < cards.length; i++) {
-            if (cards[i].compareTo(top) >= 0) {
+            if (cards[i].compareTo(top) >= 0 && !cards[i].isSpecial()) {
                 return i;
+            }
+        }
+        return null;
+    };
+
+    this.playSpecial = function(cards) {
+        for(var i = 0; i < cards.length; i++) {
+            if (cards[i].isSpecial()) {
+                return cards.splice(i, 1)[0];
             }
         }
         return null;

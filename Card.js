@@ -56,4 +56,10 @@ var Card = function(value, suit, x, y, faceUp) {
 
         return this.value - card.value;
     };
+
+    this.isSpecial = function() {
+        return (this.value == SPECIAL.RESET
+                || this.value == SPECIAL.INVISIBLE
+                || this.value == SPECIAL.BURN);
+    };
 };

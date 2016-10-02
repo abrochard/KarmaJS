@@ -73,7 +73,7 @@ var Game = function(canvas) {
 
             if (card == null) { // could not play a card
                 p.addToHand(game.pile.pickUp());
-            } else if (game.validPlay(card, game.pile.peek())) { // not valid card
+            } else if (game.validPlay(card, game.pile.peek()) == false) { // not valid card
                 p.addToHand(game.pile.pickUp());
                 p.addToHand([card]);
             } else {
@@ -168,6 +168,10 @@ var Game = function(canvas) {
     };
 
     this.validPlay = function(card, top) {
+        if (card.isSpecial()) {
+            return true;
+        }
+
         return card.compareTo(top) >= 0;
     };
 

@@ -13,6 +13,12 @@ var FACE = {
     ACE: 14
 };
 
+var SPECIAL = {
+    RESET: 2,
+    INVISIBLE: 3,
+    BURN: 10
+};
+
 var CARD = {
     HEIGHT: 70,
     WIDTH: 50,
