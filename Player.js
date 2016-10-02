@@ -11,21 +11,21 @@ var Player = function(human) {
 
     this.render = function(ctx) {
         // render face down cards
-        for(var i = 0; i < this.faceDownCards.length; i++) {
+        for (var i = 0; i < this.faceDownCards.length; i++) {
             this.faceDownCards[i].render(ctx);
         }
         // render face up cards
-        for(var i = 0; i < this.faceUpCards.length; i++) {
+        for (var i = 0; i < this.faceUpCards.length; i++) {
             this.faceUpCards[i].render(ctx);
         }
         // render hand
-        for(var i = 0; i < this.hand.length; i++) {
+        for (var i = 0; i < this.hand.length; i++) {
             this.hand[i].render(ctx);
         }
     };
 
     this.addToFaceDown = function(cards) {
-        for(var i = 0; i < cards.length; i++) {
+        for (var i = 0; i < cards.length; i++) {
             var card = cards[i];
             card.setPosition(this.x + PLAYER.CARDSPREAD * i, this.y - PLAYER.FACEUPDIST);
             this.faceDownCards.push(card);
@@ -33,7 +33,7 @@ var Player = function(human) {
     };
 
     this.addToFaceUps = function(cards) {
-        for(var i = 0; i < cards.length; i++) {
+        for (var i = 0; i < cards.length; i++) {
             var card = cards[i];
             card.setPosition(
                 this.x + PLAYER.CARDSPREAD * i + PLAYER.FACEUPXOFF,
@@ -44,7 +44,7 @@ var Player = function(human) {
     };
 
     this.addToHand = function(cards) {
-        for(var i = 0; i < cards.length; i++) {
+        for (var i = 0; i < cards.length; i++) {
             var card = cards[i];
             if (this.human) {
                 card.flip();

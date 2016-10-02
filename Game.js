@@ -9,10 +9,20 @@ var Game = function(canvas) {
     // EVENTS
     this.pointX = 0;
     this.pointY = 0;
-    this.canvas.onmousedown = function (e) {
-        this.pointX = e.x;
-        this.pointY = e.y;
-    };
+    canvas.addEventListener('mousedown', function (e) {
+        this.pointX = e.x - this.canvas.width / 2;
+        this.pointY = e.y - this.canvas.height / 2;
+
+        if (this.pointX > this.deck.x && this.pointX < this.deck.x + CARD.WIDTH) {
+            if (this.pointY > this.deck.y && this.pointY < this.deck.y + CARD.HEIGHT) {
+                var card = this.deck.draw();
+                card.flip();
+                this.pile.place(card);
+                this.render();
+                this.loop();
+            }
+        }
+    }.bind(this));
 
     this.init = function(nPlayers) {
         this.ctx = this.canvas.getContext('2d');
@@ -24,13 +34,13 @@ var Game = function(canvas) {
 
         // PLAYERS
         this.players = [];
-        for(var i = 0; i < nPlayers; i++) {
+        for (var i = 0; i < nPlayers; i++) {
             var p = new Player(i == 0);
 
             var faceDowns = [];
             var faceUps = [];
             var hand = [];
-            for(var j = 0; j < 3; j++) {
+            for (var j = 0; j < 3; j++) {
                 faceDowns.push(this.deck.draw());
 
                 var c = this.deck.draw();
@@ -54,43 +64,47 @@ var Game = function(canvas) {
         x.flip();
         this.pile.place(x);
 
-        // Game loop
-        while(this.winners.length != nPlayers) {
-
-            for(var i = 0; i < this.players.length; i++) {
-                var p = this.players[i];
-
-                if (!p.isDone()) {
-                    p.play();
-
-                    if (p.isDone()) {
-                        // this was the winning move
-                        this.winners.push(i);
-                    }
-                }
-
-                this.ctx.translate(this.canvas.height / 2, this.canvas.width / 2); // recenter
-                this.ctx.clearRect( // clear the board
-                        -this.canvas.height / 2,
-                        -this.canvas.width / 2,
-                    this.canvas.width,
-                    this.canvas.height
-                );
-                this.deck.render(this.ctx);
-                this.pile.render(this.ctx);
-
-                // render all players
-                for(var j = 0; j < this.players.length; j++) {
-                    this.players[j].render(this.ctx);
-                    // rotate the canvas for each player
-                    this.ctx.rotate((360 / nPlayers) * Math.PI / 180);
-                }
-                this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-            }
-        }
+        this.render();
 
         console.log('done');
 
+    };
+
+    this.loop = function() {
+        // make all the AI players take their turns
+        for (var i = 1; i < this.players.length; i++) {
+            var p = this.players[i];
+
+            if (!p.isDone()) {
+                p.play();
+
+                if (p.isDone()) {
+                    // this was the winning move
+                    this.winners.push(i);
+                }
+            }
+            this.render();
+        }
+    };
+
+    this.render = function() {
+        this.ctx.translate(this.canvas.height / 2, this.canvas.width / 2); // recenter
+        this.ctx.clearRect( // clear the board
+            -this.canvas.height / 2,
+            -this.canvas.width / 2,
+            this.canvas.width,
+            this.canvas.height
+        );
+        this.deck.render(this.ctx);
+        this.pile.render(this.ctx);
+
+        // render all players
+        for (var j = 0; j < this.players.length; j++) {
+            this.players[j].render(this.ctx);
+            // rotate the canvas for each player
+            this.ctx.rotate((360 / this.players.length) * Math.PI / 180);
+        }
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
     };
 
 };

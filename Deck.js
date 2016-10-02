@@ -15,12 +15,12 @@ var Deck = function(x, y, maxRender) {
     };
 
     this.render = function(ctx) {
-        var i = 0;
-        while(i < maxRender && i < this.cards.length) {
+        var count = 0;
+        for(var i = Math.max(0, this.cards.length - maxRender); i < this.cards.length; i++) {
             // offset the top cards
-            this.cards[this.cards.length - 1 - i].setPosition(this.x + 1 * i, this.y + 1 * i);
-            this.cards[this.cards.length - 1 - i].render(ctx);
-            i += 1;
+            this.cards[i].setPosition(this.x + 1 * count, this.y + 1 * count);
+            this.cards[i].render(ctx);
+            count += 1;
         }
     };
 
@@ -45,5 +45,5 @@ var Deck = function(x, y, maxRender) {
     this.place = function(card) {
         card.setPosition(this.x, this.y);
         this.cards.push(card);
-    }
+    };
 };
