@@ -43,5 +43,6 @@ var PLAYER = {
 };
 
 var GAME = {
-    PLAYERS: 4
+    PLAYERS: 4,
+    DELAY: 500
 };

@@ -46,4 +46,8 @@ var Deck = function(x, y, maxRender) {
         card.setPosition(this.x, this.y);
         this.cards.push(card);
     };
+
+    this.isEmpty = function() {
+        return this.cards.length == 0;
+    };
 };

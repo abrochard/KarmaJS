@@ -5,6 +5,7 @@ var Game = function(canvas) {
     this.pile = null;
     this.players = [];
     this.winners = [];
+    this.acceptInput = false;
 
     // EVENTS
     this.pointX = 0;
@@ -13,13 +14,17 @@ var Game = function(canvas) {
         this.pointX = e.x - this.canvas.width / 2;
         this.pointY = e.y - this.canvas.height / 2;
 
-        if (this.pointX > this.deck.x && this.pointX < this.deck.x + CARD.WIDTH) {
-            if (this.pointY > this.deck.y && this.pointY < this.deck.y + CARD.HEIGHT) {
-                var card = this.deck.draw();
-                card.flip();
-                this.pile.place(card);
-                this.render();
-                this.loop();
+        if (this.acceptInput) {
+            if (this.pointX > this.deck.x && this.pointX < this.deck.x + CARD.WIDTH) {
+                if (this.pointY > this.deck.y && this.pointY < this.deck.y + CARD.HEIGHT) {
+                    if (!this.deck.isEmpty()) {
+                        var card = this.deck.draw();
+                        card.flip();
+                        this.pile.place(card);
+                        this.render();
+                        this.loop();
+                    }
+                }
             }
         }
     }.bind(this));
@@ -59,31 +64,38 @@ var Game = function(canvas) {
         // PILE
         this.pile = new Deck(PILE.X, PILE.Y, PILE.MAXRENDER);
 
-        // TEST
-        var x = this.deck.draw();
-        x.flip();
-        this.pile.place(x);
-
         this.render();
 
+        this.acceptInput = true;
         console.log('done');
-
     };
 
     this.loop = function() {
-        // make all the AI players take their turns
-        for (var i = 1; i < this.players.length; i++) {
-            var p = this.players[i];
+        // trigger the AI playing loop
+        this.acceptInput = false;
+        window.setTimeout(this.playAI, GAME.DELAY, this, 1);
+    };
 
-            if (!p.isDone()) {
-                p.play();
+    this.playAI = function(game, index) {
+        // timeout cascade function
+        var p = game.players[index];
 
-                if (p.isDone()) {
-                    // this was the winning move
-                    this.winners.push(i);
-                }
+        if (!p.isDone()) {
+            var card = p.play();
+            card.flip();
+            game.pile.place(card);
+
+            if (p.isDone()) {
+                // this was the winning move
+                game.winners.push(index);
             }
-            this.render();
+        }
+        game.render();
+
+        if (index < game.players.length - 1) {
+            window.setTimeout(game.playAI, GAME.DELAY, game, index + 1);
+        } else {
+            game.acceptInput = true;
         }
     };
 

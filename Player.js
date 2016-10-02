@@ -59,8 +59,15 @@ var Player = function(human) {
     };
 
     this.play = function() {
-        this.faceDownCards.pop();
-        this.faceUpCards.pop();
-        this.hand.pop();
+        var card = null;
+        if (this.hand.length > 0) {
+            card = this.hand.pop();
+        } else if (this.faceUpCards.length > 0) {
+            card = this.faceUpCards.pop();
+            card.flip();
+        } else {
+            card = this.faceDownCards.pop();
+        }
+        return card;
     };
 };
