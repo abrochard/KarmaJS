@@ -8,26 +8,14 @@ var Game = function(canvas) {
     this.acceptInput = false;
 
     // EVENTS
-    this.pointX = 0;
-    this.pointY = 0;
     canvas.addEventListener('mousedown', function (e) {
-        this.pointX = e.x - this.canvas.width / 2;
-        this.pointY = e.y - this.canvas.height / 2;
-
+        var x = e.x - this.canvas.width / 2;
+        var y = e.y - this.canvas.height / 2;
         if (this.acceptInput) {
-            if (this.pointX > this.deck.x && this.pointX < this.deck.x + CARD.WIDTH) {
-                if (this.pointY > this.deck.y && this.pointY < this.deck.y + CARD.HEIGHT) {
-                    if (!this.deck.isEmpty()) {
-                        var card = this.deck.draw();
-                        card.flip();
-                        this.pile.place(card);
-                        this.render();
-                        this.loop();
-                    }
-                }
-            }
+            this.detectSelection(x, y);
         }
     }.bind(this));
+
 
     this.init = function(nPlayers) {
         this.ctx = this.canvas.getContext('2d');
@@ -85,17 +73,24 @@ var Game = function(canvas) {
 
             if (card == null) { // could not play a card
                 p.addToHand(game.pile.pickUp());
+            } else if (game.validPlay(card, game.pile.peek())) { // not valid card
+                p.addToHand(game.pile.pickUp());
+                p.addToHand([card]);
             } else {
                 card.setFaceUp(true);
                 game.pile.place(card);
+
+                if (game.deck.isEmpty() == false) {
+                    p.addToHand([game.deck.draw()]);
+                }
             }
 
             if (p.isDone()) {
                 // this was the winning move
                 game.winners.push(index);
             }
+            game.render();
         }
-        game.render();
 
         if (index < game.players.length - 1) {
             window.setTimeout(game.playAI, GAME.DELAY, game, index + 1);
@@ -122,6 +117,58 @@ var Game = function(canvas) {
             this.ctx.rotate((360 / this.players.length) * Math.PI / 180);
         }
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+    };
+
+    this.detectSelection = function(x, y) {
+        var human = this.players[0];
+        var card = null;
+        if (human.emptyHand() == false) {
+            // detect hand cards
+            card = human.pickFromHand(x, y);
+        } else if (human.noFaceUps() == false) {
+            // detect face up cards
+            card = human.pickFromFaceUps(x, y);
+        } else {
+            // detect facedown
+            card = human.pickFromFaceDowns(x, y);
+        }
+
+        // if (this.detectDeckClick(x, y)) {
+        //     card = this.deck.draw();
+        // }
+
+        if (card != null) {
+            if (this.validPlay(card, this.pile.peek())) {
+                card.setFaceUp(true);
+                this.pile.place(card);
+
+                if (this.deck.isEmpty() == false) {
+                    human.addToHand([this.deck.draw()]);
+                }
+
+            } else {
+                human.addToHand([card]);
+                human.addToHand(this.pile.pickUp());
+            }
+            this.render();
+            this.loop();
+        }
+
+    };
+
+    this.detectDeckClick = function(x, y) {
+        if (x > this.deck.x && x < this.deck.x + CARD.WIDTH) {
+            if (y > this.deck.y && y < this.deck.y + CARD.HEIGHT) {
+                if (!this.deck.isEmpty()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+
+    this.validPlay = function(card, top) {
+        return card.compareTo(top) >= 0;
     };
 
 };
