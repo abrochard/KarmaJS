@@ -1,6 +1,9 @@
 # KarmaJS
 Javascript based Karma card game
 
+## Demo
+Latest version playable at [https://abrochard.github.io/](https://abrochard.github.io/)
+
 ## Rules
 
 ## TODO

@@ -53,4 +53,4 @@ var GAME = {
     DELAY: 500
 };
 
-var DEBUG = true;
+var DEBUG = false;
