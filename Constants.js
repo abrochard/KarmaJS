@@ -54,3 +54,4 @@ var GAME = {
 };
 
 var DEBUG = false;
+var LOG = true;

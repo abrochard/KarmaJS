@@ -9,7 +9,7 @@ Latest version playable at [https://abrochard.github.io/](https://abrochard.gith
 ## TODO
   * better graphics for card
   * play multiple cards of the same value
-  * invisible card (3)
+  * 7 or under
   * 4 of a kind = burn
   * AI plays until the end
   * scoreboard at the end

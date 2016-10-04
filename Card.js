@@ -1,4 +1,4 @@
-var Card = function(value, suit, x, y, faceUp) {
+var Card = function(value, suit, x, y, faceUp, transparent) {
 
     // base attributes
     this.value = value;
@@ -14,12 +14,13 @@ var Card = function(value, suit, x, y, faceUp) {
     this.faceUp = faceUp;
     this.backColor = CARD.BACKCOLOR;
     this.borderColor = CARD.BORDERCOLOR;
+    this.transparent = transparent;
 
     this.render = function(ctx) {
-        if (this.faceUp == false) {
+        if (this.faceUp == false && this.transparent == false) {
             ctx.fillStyle = this.backColor;
             ctx.fillRect(this.x, this.y, this.width, this.height);
-        } else {
+        } else if(this.transparent == false) {
             ctx.fillStyle = "white";
             ctx.fillRect(this.x, this.y, this.width, this.height);
 
@@ -30,6 +31,8 @@ var Card = function(value, suit, x, y, faceUp) {
             ctx.fillText(this.value, centerX, centerY);
             ctx.fillStyle = "red";
             ctx.fillText(Object.keys(SUIT)[this.suit][0], centerX, centerY + 20);
+        } else {
+            //  do nothing we just draw the boder
         }
 
         ctx.fillStyle = this.borderColor;
@@ -42,7 +45,11 @@ var Card = function(value, suit, x, y, faceUp) {
 
     this.setFaceUp = function(faceUp){
         this.faceUp = faceUp;
-    }
+    };
+
+    this.setTransparent = function(transparent) {
+        this.transparent = transparent;
+    };
 
     this.setPosition = function(x, y) {
         this.x = x;

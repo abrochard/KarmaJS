@@ -9,7 +9,7 @@ var Deck = function(x, y, maxRender) {
         this.cards = [];
         for (var suit in SUIT) {
             for(var value = 2; value < FACE.ACE; value++) {
-                this.cards.push(new Card(value, SUIT[suit], this.x, this.y, faceUp));
+                this.cards.push(new Card(value, SUIT[suit], this.x, this.y, faceUp, false));
             }
         }
     };
@@ -45,6 +45,12 @@ var Deck = function(x, y, maxRender) {
     this.pickUp = function() {
         var cards = this.cards;
         this.cards = [];
+
+        // because nobody wants to pick up transparent cards
+        for(var i = 0; i < cards.length; i++) {
+            cards[i].setTransparent(false);
+        }
+
         return cards;
     };
 
@@ -65,5 +71,56 @@ var Deck = function(x, y, maxRender) {
         } else {
             return null;
         }
+    };
+
+    this.sameLastFour = function() {
+        if (this.cards.length < 4) {
+            return false;
+        }
+
+        var i = this.cards.length - 1;
+        var value = this.cards[i].value;
+        var count = 1;
+
+        if (value == SPECIAL.INVISIBLE) {
+            // if top is 3, want all of them to be a 3
+            if (this.cards[i - 1] == SPECIAL.INVISIBLE
+                && this.cards[i - 2] == SPECIAL.INVISIBLE
+                && this.cards[i - 3] == SPECIAL.INVISIBLE) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        var top = 4;
+        while (count <= top && i - count >= 0) {
+            var card = this.cards[i - count];
+            if (card.value == SPECIAL.INVISIBLE) {
+                // skip
+                top += 1;
+                count += 1;
+            } else if (card.value != value) {
+                return false;
+            } else {
+                count += 1;
+            }
+        }
+        return true;
+    };
+
+    this.topValue = function() {
+        // gets the top on the pile, excluding INVISIBLE
+        var i = this.cards.length - 1;
+        while(i >= 0 && this.cards[i].value == SPECIAL.INVISIBLE) {
+            i -= 1;
+        }
+
+        if (i < 0) {            // there are only INVISIBLE or no pile
+            return 0;
+        } else {
+            return this.cards[i].value;
+        }
+
     };
 };

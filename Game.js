@@ -68,21 +68,28 @@ var Game = function(canvas) {
         // timeout cascade function
         var p = game.players[index];
 
+        if (LOG) {
+            console.log("Player " + index);
+        }
+
         if (!p.isDone()) {
-            var card = p.play(game.pile.peek());
+            var card = p.play(game.pile.topValue());
 
             if (card == null) { // could not play a card
                 p.addToHand(game.pile.pickUp());
-            } else if (game.validPlay(card, game.pile.peek()) == false) { // not valid card
+
+                if (LOG) {
+                    console.log("picked up");
+                }
+            } else if (game.validPlay(card, game.pile.topValue()) == false) { // not valid card
+                if (LOG) {
+                    console.log("Invalid play: " + card.value + " on " + game.pile.topValue());
+                }
+
                 p.addToHand(game.pile.pickUp());
                 p.addToHand([card]);
             } else {
-                card.setFaceUp(true);
-                game.pile.place(card);
-
-                if (game.pile.peek().value == SPECIAL.BURN) {
-                    game.pile.pickUp(); // discard the pile
-                }
+                game.applyCard(card);
 
                 if (game.deck.isEmpty() == false) {
                     p.addToHand([game.deck.draw()]);
@@ -101,6 +108,30 @@ var Game = function(canvas) {
         } else {
             game.acceptInput = true;
         }
+    };
+
+    this.applyCard = function(card) {
+        if (LOG) {
+            var top = this.pile.isEmpty() ? "nothing": this.pile.peek().value;
+            console.log("Played " + card.value + " on " + top);
+        }
+
+        card.setFaceUp(true);
+
+        if (card.value == SPECIAL.INVISIBLE && this.pile.isEmpty() == false) {
+            card.setTransparent(true);
+        }
+
+        this.pile.place(card);
+
+        if (this.pile.peek().value == SPECIAL.BURN) {
+            this.pile.pickUp(); // discard the pile
+        }
+
+        if (this.pile.sameLastFour()) {
+            this.pile.pickUp(); // discard the pile
+        }
+
     };
 
     this.render = function() {
@@ -142,19 +173,22 @@ var Game = function(canvas) {
         // }
 
         if (card != null) {
-            if (this.validPlay(card, this.pile.peek())) {
-                card.setFaceUp(true);
-                this.pile.place(card);
 
-                if (this.pile.peek().value == SPECIAL.BURN) {
-                    this.pile.pickUp(); // discard the pile
-                }
+            if (LOG) {
+                console.log("Human player");
+            }
+
+            if (this.validPlay(card, this.pile.topValue())) {
+                this.applyCard(card);
 
                 if (this.deck.isEmpty() == false) {
                     human.addToHand([this.deck.draw()]);
                 }
 
-            } else {
+            } else { // invalid play
+                if (LOG) {
+                    console.log("Invalid play: " + card.value + " on " + this.pile.topValue());
+                }
                 human.addToHand([card]);
                 human.addToHand(this.pile.pickUp());
             }
@@ -175,8 +209,8 @@ var Game = function(canvas) {
         return false;
     };
 
-    this.validPlay = function(card, top) {
-        if (top == null) {
+    this.validPlay = function(card, topValue) {
+        if (topValue == null || topValue == 0) {
             return true;
         }
 
@@ -184,11 +218,11 @@ var Game = function(canvas) {
             return true;
         }
 
-        if (top.value == SPECIAL.RESET) {
+        if (topValue == SPECIAL.RESET) {
             return true;
         }
 
-        return card.compareTo(top) >= 0;
+        return card.value >= topValue;
     };
 
 };

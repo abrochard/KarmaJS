@@ -108,7 +108,7 @@ var Player = function(human) {
     this.findMinAbove = function(top, cards) {
         // assume the cards are sorted
         for(var i = 0; i < cards.length; i++) {
-            if (cards[i].compareTo(top) >= 0 && !cards[i].isSpecial()) {
+            if (cards[i].value >= top && !cards[i].isSpecial()) {
                 return i;
             }
         }
