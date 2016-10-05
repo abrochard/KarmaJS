@@ -57,6 +57,10 @@ var Player = function(human) {
         return this.hand.length == 0;
     };
 
+    this.cardsInHand = function() {
+        return this.hand.length;
+    };
+
     this.noFaceUps = function() {
         return this.faceUpCards.length == 0;
     };

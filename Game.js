@@ -91,7 +91,7 @@ var Game = function(canvas) {
             } else {
                 game.applyCard(card);
 
-                if (game.deck.isEmpty() == false) {
+                if (game.deck.isEmpty() == false && p.cardsInHand() < 3) {
                     p.addToHand([game.deck.draw()]);
                 }
             }
@@ -181,7 +181,7 @@ var Game = function(canvas) {
             if (this.validPlay(card, this.pile.topValue())) {
                 this.applyCard(card);
 
-                if (this.deck.isEmpty() == false) {
+                if (this.deck.isEmpty() == false && human.cardsInHand() < 3) {
                     human.addToHand([this.deck.draw()]);
                 }
 

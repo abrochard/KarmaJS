@@ -32,7 +32,11 @@ var Card = function(value, suit, x, y, faceUp, transparent) {
             ctx.fillStyle = "red";
             ctx.fillText(Object.keys(SUIT)[this.suit][0], centerX, centerY + 20);
         } else {
-            //  do nothing we just draw the boder
+            // draw with less opacity
+            ctx.globalAlpha = CARD.INVISIBLE;
+            ctx.fillStyle = "red";
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+            ctx.globalAlpha = 1;
         }
 
         ctx.fillStyle = this.borderColor;

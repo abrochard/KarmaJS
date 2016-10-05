@@ -24,7 +24,8 @@ var CARD = {
     WIDTH: 50,
     BACKCOLOR: "rgb(200,0,0)",
     BORDERCOLOR: "black",
-    FONT: "18px serif"
+    FONT: "18px serif",
+    INVISIBLE: 0.5
 };
 
 var DECK = {
