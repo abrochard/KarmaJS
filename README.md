@@ -5,6 +5,7 @@ Javascript based Karma card game
 Latest version playable at [https://abrochard.github.io/](https://abrochard.github.io/)
 
 ## Rules
+
 ### Goal
 The goal of the game is to get rid of all your cards. For that you
 must play a card of value equal or greater to what is on top of the
@@ -14,10 +15,12 @@ all the cards in your hand, you have to play from the three face up
 cards in front of you. Once you have no more face up cards, you must
 randomly pick from the three face down cards and hope to beat the top
 card.
+
 ### Setup
 Each player is given 3 cards as a hand, 3 cards face up and visible to
 all, and 3 cards face down and unknown. The player is allowed before
 the game begins to swap cards between his hands and his face up cards.
+
 ### Typical turn
 On a typical turn, you would:
   * play a card from your hand/faceups/facedowns. If you have multiple
@@ -25,6 +28,7 @@ On a typical turn, you would:
   * pick up the pile if you cannot beat the top card
   * keep drawing from the deck if there are still cards in it and if
     you have less than 3 cards in hand.
+
 ### Special cards
 There are a few special rules and cards. Not all of them are
 implemented yet. See the TODO list below.
