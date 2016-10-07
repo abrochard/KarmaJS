@@ -10,6 +10,7 @@ var Player = function(human) {
     this.human = human;
 
     this.render = function(ctx) {
+        this.reorderHand();
         // render face down cards
         for (var i = 0; i < this.faceDownCards.length; i++) {
             this.faceDownCards[i].render(ctx);
@@ -83,13 +84,13 @@ var Player = function(human) {
         } else {
             card = this.faceDownCards.pop();
         }
-        return card;
+        return [card];
     };
 
     this.playHand = function(top) {
         var min = this.findMinAbove(top, this.hand);
         if (min != null) {
-            return this.hand.splice(min, 1)[0];
+            return this.hand.splice(min.index, min.total)[0];
         } else {
             return this.playSpecial(this.hand);
         }
@@ -98,7 +99,7 @@ var Player = function(human) {
     this.playFaceUp = function(top) {
         var min = this.findMinAbove(top, this.faceUpCards);
         if (min != null) {
-            return this.faceUpCards.splice(min, 1)[0];
+            return this.faceUpCards.splice(min.index, min.total)[0];
         } else {
             var special = this.playSpecial(this.faceUpCards);
             if (special != null) {
@@ -111,12 +112,21 @@ var Player = function(human) {
 
     this.findMinAbove = function(top, cards) {
         // assume the cards are sorted
+        var min = {index: null};
         for(var i = 0; i < cards.length; i++) {
             if (cards[i].value >= top && !cards[i].isSpecial()) {
-                return i;
+                if (min.index == null) {
+                    min.index = i;
+                    min.value = cards[i].value;
+                    min.total = 1;
+                } else if (cards[i].value == min.value) {
+                    min.total += 1;
+                } else {
+                    return min;
+                }
             }
         }
-        return null;
+        return min.index == null ? null : min;
     };
 
     this.playSpecial = function(cards) {
@@ -140,7 +150,6 @@ var Player = function(human) {
 
     this.pickFromHand = function(x, y) {
         var card = this.selectCard(x, y, this.hand);
-        this.reorderHand();
         return card;
     };
 

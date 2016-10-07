@@ -9,7 +9,7 @@ var SUIT = {
 var FACE = {
     JACK: 11,
     QUEEN: 12,
-    KIND: 13,
+    KING: 13,
     ACE: 14
 };
 
@@ -25,7 +25,7 @@ var CARD = {
     BACKCOLOR: "rgb(200,0,0)",
     BORDERCOLOR: "black",
     FONT: "18px serif",
-    INVISIBLE: 0.5
+    INVISIBLE: 0.3
 };
 
 var DECK = {

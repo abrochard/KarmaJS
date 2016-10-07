@@ -51,7 +51,6 @@ implemented yet. See the TODO list below.
 
 ## TODO
   * better graphics for card
-  * play multiple cards of the same value
   * 7 or under
   * 4 of a kind = burn
   * AI plays until the end

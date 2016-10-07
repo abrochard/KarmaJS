@@ -54,9 +54,12 @@ var Deck = function(x, y, maxRender) {
         return cards;
     };
 
-    this.place = function(card) {
-        card.setPosition(this.x, this.y);
-        this.cards.push(card);
+    this.place = function(cards) {
+        for(var i = 0; i < cards.length; i++) {
+            var card = cards[i];
+            card.setPosition(this.x, this.y);
+            this.cards.push(card);
+        }
     };
 
     this.isEmpty = function() {

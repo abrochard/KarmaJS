@@ -28,7 +28,20 @@ var Card = function(value, suit, x, y, faceUp, transparent) {
             var centerY = this.y + this.height / 2;
             ctx.fillStyle = "black";
             ctx.font = CARD.FONT;
-            ctx.fillText(this.value, centerX, centerY);
+
+            var face = "";
+            if (this.value < FACE.JACK) {
+                face = this.value;
+            } else if (this.value == FACE.JACK) {
+                face = 'J';
+            } else if (this.value == FACE.QUEEN) {
+                face = 'Q';
+            } else if (this.value == FACE.KING) {
+                face = 'K';
+            } else {
+                face = 'A';
+            }
+            ctx.fillText(face, centerX, centerY);
             ctx.fillStyle = "red";
             ctx.fillText(Object.keys(SUIT)[this.suit][0], centerX, centerY + 20);
         } else {
