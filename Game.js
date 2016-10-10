@@ -31,8 +31,8 @@ var Game = function(canvas) {
             }
 
             // add the card clicked on
-            var x = e.x - this.canvas.width / 2;
-            var y = e.y - this.canvas.height / 2;
+            var x = e.offsetX - this.canvas.width / 2;
+            var y = e.offsetY - this.canvas.height / 2;
             this.detectSelection(x, y);
 
             if (this.inputType == 'facedown') {
@@ -46,8 +46,8 @@ var Game = function(canvas) {
     canvas.addEventListener('mousemove', function (e) {
         if (this.acceptMove) {
             // detects what cards are being hovered over
-            var x = e.x - this.canvas.width / 2;
-            var y = e.y - this.canvas.height / 2;
+            var x = e.offsetX - this.canvas.width / 2;
+            var y = e.offsetY - this.canvas.height / 2;
             this.detectSelection(x, y);
         }
     }.bind(this));
