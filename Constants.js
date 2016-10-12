@@ -23,9 +23,17 @@ var CARD = {
     HEIGHT: 70,
     WIDTH: 50,
     BACKCOLOR: "rgb(200,0,0)",
+    BACKGROUNDCOLOR: "white",
     BORDERCOLOR: "black",
+    VALUECOLOR: "black",
     FONT: "18px serif",
-    INVISIBLE: 0.3
+    INVISIBLE: {
+        COLOR: "red",
+        OPACITY: 0.3
+    },
+    SELECTED: {
+        COLOR: "rgb(0,200,0)"
+    }
 };
 
 var DECK = {
