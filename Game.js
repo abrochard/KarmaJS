@@ -43,6 +43,7 @@ var Game = function(canvas) {
             }
         }
     }.bind(this));
+
     canvas.addEventListener('mousemove', function (e) {
         if (this.acceptMove) {
             // detects what cards are being hovered over
@@ -51,6 +52,7 @@ var Game = function(canvas) {
             this.detectSelection(x, y);
         }
     }.bind(this));
+
     canvas.addEventListener('mouseup', function (e) {
         if (this.acceptMove) {
             // stop listening for hovering and play cards
@@ -213,7 +215,7 @@ var Game = function(canvas) {
         var card = null;
         if (this.inputType == 'hand') {
             // detect hand cards
-            card = human.pickFromHand(x, y, false);
+            card = human.pickFromHand(x, y);
         } else if (this.inputType == 'faceup') {
             // detect face up cards
             card = human.pickFromFaceUps(x, y);
