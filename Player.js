@@ -170,6 +170,10 @@ var Player = function(human) {
         return false;
     }
 
+    this.pickCard = function(x, y, cards) {
+
+    };
+
     this.selectCard = function(x, y, cards) {
         var index = null;
         for(var i = 0; i < cards.length; i++) {
