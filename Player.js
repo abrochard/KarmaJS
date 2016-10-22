@@ -149,16 +149,16 @@ var Player = function(human) {
     };
 
     this.pickFromHand = function(x, y) {
-        var card = this.selectCard(x, y, this.hand);
+        var card = this.pickCard(x, y, this.hand);
         return card;
     };
 
     this.pickFromFaceUps = function(x, y) {
-        return this.selectCard(x, y, this.faceUpCards);
+        return this.pickCard(x, y, this.faceUpCards);
     };
 
     this.pickFromFaceDowns = function(x, y) {
-        return this.selectCard(x, y, this.faceDownCards);
+        return this.pickCard(x, y, this.faceDownCards);
     };
 
     function clickedCard(x, y, card) {
@@ -171,7 +171,12 @@ var Player = function(human) {
     }
 
     this.pickCard = function(x, y, cards) {
-
+        var index = this.selectCard(x, y, cards);
+        if (index != null) {
+            return cards.splice(index, 1)[0];
+        } else {
+            return null;
+        }
     };
 
     this.selectCard = function(x, y, cards) {
@@ -182,11 +187,6 @@ var Player = function(human) {
                 break;
             }
         }
-
-        if (index == null) {
-            return null;
-        } else {
-            return cards.splice(index, 1)[0];
-        }
+        return index;
     };
 };

@@ -11,8 +11,8 @@ var Game = function(canvas) {
     this.acceptMove = false;
     this.inputType = "";
 
-    // EVENTS
-    canvas.addEventListener('mousedown', function (e) {
+    // EVENT LISTENERS
+    function pickDown(e) {
         if (this.acceptInput) {
             // start listening for hovering
             this.acceptMove = true;
@@ -42,26 +42,37 @@ var Game = function(canvas) {
                 this.selectedCards = [];
             }
         }
-    }.bind(this));
+    }
 
-    canvas.addEventListener('mousemove', function (e) {
+    function pickMove(e) {
         if (this.acceptMove) {
             // detects what cards are being hovered over
             var x = e.offsetX - this.canvas.width / 2;
             var y = e.offsetY - this.canvas.height / 2;
             this.detectSelection(x, y);
         }
-    }.bind(this));
+    }
 
-    canvas.addEventListener('mouseup', function (e) {
+    function pickUp(e) {
         if (this.acceptMove) {
             // stop listening for hovering and play cards
             this.acceptMove = false;
             this.playCards();
             this.selectedCards = [];
         }
-    }.bind(this));
+    }
 
+    function swapDown(e) {
+
+    }
+
+    function swapMove(e) {
+
+    }
+
+    function swapUp(e) {
+
+    }
 
     this.init = function(nPlayers) {
         this.ctx = this.canvas.getContext('2d');
@@ -101,7 +112,13 @@ var Game = function(canvas) {
         this.render();
 
         this.acceptInput = true;
-        console.log('done');
+
+        // EVENTS
+        canvas.addEventListener('mousedown', pickDown.bind(this));
+
+        canvas.addEventListener('mousemove', pickMove.bind(this));
+
+        canvas.addEventListener('mouseup', pickUp.bind(this));
     };
 
     this.loop = function() {
@@ -159,7 +176,7 @@ var Game = function(canvas) {
     this.applyCards = function(cards) {
         if (LOG) {
             var top = this.pile.isEmpty() ? "nothing": this.pile.peek().value;
-            console.log("Played " + (cards.length + 1) + " " + cards[0].value + " on " + top);
+            console.log("Played " + cards.length + " " + cards[0].value + " on " + top);
         }
 
         for(var i = 0; i < cards.length; i++) {
