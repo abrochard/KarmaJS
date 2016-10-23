@@ -36,6 +36,7 @@ var Player = function(human) {
     this.addToFaceUps = function(cards) {
         for (var i = 0; i < cards.length; i++) {
             var card = cards[i];
+            card.setFaceUp(true);
             card.setPosition(
                 this.x + PLAYER.CARDSPREAD * i + PLAYER.FACEUPXOFF,
                 this.y - (PLAYER.FACEUPDIST - PLAYER.FACEUPYOFF)
