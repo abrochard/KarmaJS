@@ -12,6 +12,7 @@ var Game = function(canvas) {
     this.acceptMove = false;
     this.inputType = "";
     this.swapCards = false;
+    this.clickedOnPile = false;
 
     // EVENT LISTENERS
     function pickDown(e) {
@@ -56,7 +57,7 @@ var Game = function(canvas) {
     }
 
     function pickUp(e) {
-        if (this.acceptMove) {
+        if (this.acceptMove || this.clickedOnPile) {
             // stop listening for hovering and play cards
             this.acceptMove = false;
             this.playCards();
@@ -217,7 +218,7 @@ var Game = function(canvas) {
         var value = cards[0].value;
 
         if (value == SPECIAL.INVISIBLE && this.pile.isEmpty() == false) {
-            for(var i = 0; i < cards.length; i++) {
+            for(i = 0; i < cards.length; i++) {
                 cards[i].setTransparent(true);
             }
         }
@@ -262,9 +263,15 @@ var Game = function(canvas) {
         var human = this.players[0];
         var card = human.pickCard(x, y, this.inputType);
 
-        // if (this.detectDeckClick(x, y)) {
-        //     card = this.deck.draw();
-        // }
+        if (card == null && this.pickedCards.length == 0 && this.detectDeckClick(x, y)) {
+            this.pickedCards.push(this.deck.draw());
+            this.acceptMove = false;
+        }
+
+        if (card == null && this.pickedCards.length == 0 && this.detectPileClick(x, y)) {
+            this.clickedOnPile = true;
+            this.acceptMove = false;
+        }
 
         if (card != null) {
             this.pickedCards.push(card);
@@ -293,6 +300,14 @@ var Game = function(canvas) {
                 human.addToHand(this.pickedCards);
                 human.addToHand(this.pile.pickUp());
             }
+            this.render();
+            this.loop();
+        } else if (this.clickedOnPile) {
+            if (LOG) {
+                console.log("Picked up the pile");
+            }
+            human.addToHand(this.pile.pickUp());
+            this.clickedOnPile = false;
             this.render();
             this.loop();
         }

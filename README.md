@@ -25,7 +25,9 @@ the game begins to swap cards between his hands and his face up cards.
 On a typical turn, you would:
   * play a card from your hand/faceups/facedowns. If you have multiple
     cards of the same value, you can play them all together.
-  * pick up the pile if you cannot beat the top card
+  * If you cannot beat the top card you can:
+    * Directly pick up the pile
+    * Test your luck by drawing the first card of the deck
   * keep drawing from the deck if there are still cards in it and if
     you have less than 3 cards in hand.
 
@@ -50,7 +52,6 @@ There are a few special rules and cards.
 
 ## TODO
   * scoreboard at the end
-  * draw from pile if stuck
   * smarter AI
   * better feedback
   * debug the 4 of kind sequential
