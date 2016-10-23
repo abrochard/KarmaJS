@@ -172,7 +172,14 @@ var Game = function(canvas) {
         if (!p.isDone()) {
             var cards = p.play(game.pile.topValue());
 
-            if (cards[0] == null) { // could not play a card
+            if (cards[0] == null && game.deck.isEmpty() == false) { // could not play a card, attempt to flip
+                if (LOG) {
+                    console.log("AI flips deck");
+                }
+                cards[0] = game.deck.draw();
+            }
+
+            if (cards[0] == null) { // nothing in deck to flip...
                 p.addToHand(game.pile.pickUp());
 
                 if (LOG) {
@@ -297,11 +304,17 @@ var Game = function(canvas) {
         var card = human.pickCard(x, y, this.inputType);
 
         if (card == null && this.pickedCards.length == 0 && this.detectDeckClick(x, y)) {
+            if (LOG) {
+                console.log("Player tries to flip the deck");
+            }
             this.pickedCards.push(this.deck.draw());
             this.acceptMove = false;
         }
 
         if (card == null && this.pickedCards.length == 0 && this.detectPileClick(x, y)) {
+            if (LOG) {
+                console.log("Player picks up");
+            }
             this.clickedOnPile = true;
             this.acceptMove = false;
         }
