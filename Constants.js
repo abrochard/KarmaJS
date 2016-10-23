@@ -16,7 +16,8 @@ var FACE = {
 var SPECIAL = {
     RESET: 2,
     INVISIBLE: 3,
-    BURN: 10
+    BURN: 10,
+    REVERSE: 7
 };
 
 var CARD = {

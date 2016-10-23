@@ -343,6 +343,15 @@ var Game = function(canvas) {
             return true;
         }
 
+        // top is a 7
+        if (topValue == SPECIAL.REVERSE) {
+            if (cards[0].value <= SPECIAL.REVERSE) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
         // just compare values
         return value >= topValue;
     };

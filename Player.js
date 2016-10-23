@@ -88,7 +88,13 @@ var Player = function(human) {
     };
 
     this.playHand = function(top) {
-        var min = this.findMinAbove(top, this.hand);
+        var min = null;
+        if (top == SPECIAL.REVERSE) {
+            min = this.findMinUnder(top, this.hand);
+        } else {
+            min = this.findMinAbove(top, this.hand);
+        }
+
         if (min != null) {
             return this.hand.splice(min.index, min.total)[0];
         } else {
@@ -97,7 +103,13 @@ var Player = function(human) {
     };
 
     this.playFaceUp = function(top) {
-        var min = this.findMinAbove(top, this.faceUpCards);
+        var min = null;
+
+        if (top == SPECIAL.REVERSE) {
+            min = this.findMinUnder(target, this.faceUpCards);
+        } else {
+            min = this.findMinAbove(target, this.faceUpCards);
+        }
         if (min != null) {
             return this.faceUpCards.splice(min.index, min.total)[0];
         } else {
@@ -115,6 +127,25 @@ var Player = function(human) {
         var min = {index: null};
         for(var i = 0; i < cards.length; i++) {
             if (cards[i].value >= top && !cards[i].isSpecial()) {
+                if (min.index == null) {
+                    min.index = i;
+                    min.value = cards[i].value;
+                    min.total = 1;
+                } else if (cards[i].value == min.value) {
+                    min.total += 1;
+                } else {
+                    return min;
+                }
+            }
+        }
+        return min.index == null ? null : min;
+    };
+
+    this.findMinUnder = function(top, cards) {
+        // assume the cards are sorted
+        var min = {index: null};
+        for(var i = 0; i < cards.length; i++) {
+            if (cards[i].value <= top && !cards[i].isSpecial()) {
                 if (min.index == null) {
                     min.index = i;
                     min.value = cards[i].value;
