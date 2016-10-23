@@ -148,19 +148,6 @@ var Player = function(human) {
         }
     };
 
-    this.pickFromHand = function(x, y) {
-        var card = this.pickCard(x, y, this.hand);
-        return card;
-    };
-
-    this.pickFromFaceUps = function(x, y) {
-        return this.pickCard(x, y, this.faceUpCards);
-    };
-
-    this.pickFromFaceDowns = function(x, y) {
-        return this.pickCard(x, y, this.faceDownCards);
-    };
-
     function clickedCard(x, y, card) {
         if (x > card.x && x < card.x + CARD.WIDTH) {
             if (y > card.y && y < card.y + CARD.HEIGHT) {
@@ -170,8 +157,22 @@ var Player = function(human) {
         return false;
     }
 
-    this.pickCard = function(x, y, cards) {
-        var index = this.selectCard(x, y, cards);
+    this.getCards = function(type) {
+        var cards = [];
+        if (type == 'hand') {
+            cards = this.hand;
+        } else if (type == 'faceup') {
+            cards = this.faceUpCards;
+        } else if (type == 'facedown') {
+            cards = this.faceDownCards;
+        }
+        return cards;
+    };
+
+    this.pickCard = function(x, y, type) {
+        var index = this.selectCard(x, y, type);
+        var cards = this.getCards(type);
+
         if (index != null) {
             return cards.splice(index, 1)[0];
         } else {
@@ -179,7 +180,9 @@ var Player = function(human) {
         }
     };
 
-    this.selectCard = function(x, y, cards) {
+    this.selectCard = function(x, y, type) {
+        var cards = this.getCards(type);
+
         var index = null;
         for(var i = 0; i < cards.length; i++) {
             if (clickedCard(x, y, cards[i])) {
@@ -188,5 +191,16 @@ var Player = function(human) {
             }
         }
         return index;
+    };
+
+    this.swapCards = function(handIndex, faceUpIndex) {
+        var card = this.hand.splice(handIndex, 1)[0];
+        card = this.faceUpCards.splice(faceUpIndex, 1, card);
+        this.addToHand(card);
+        this.reorderHand();
+
+        // sneaky way to preserve order in among face up cards
+        var temp = this.faceUpCards.splice(0, this.faceUpCards.length);
+        this.addToFaceUps(temp);
     };
 };

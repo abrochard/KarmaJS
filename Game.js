@@ -6,10 +6,12 @@ var Game = function(canvas) {
     this.players = [];
     this.winners = [];
 
+    this.pickedCards = [];
     this.selectedCards = [];
     this.acceptInput = false;
     this.acceptMove = false;
     this.inputType = "";
+    this.swapCards = false;
 
     // EVENT LISTENERS
     function pickDown(e) {
@@ -39,7 +41,7 @@ var Game = function(canvas) {
                 // can only play one facedown card per turn
                 this.acceptMove = false;
                 this.playCards();
-                this.selectedCards = [];
+                this.pickedCards = [];
             }
         }
     }
@@ -58,20 +60,46 @@ var Game = function(canvas) {
             // stop listening for hovering and play cards
             this.acceptMove = false;
             this.playCards();
-            this.selectedCards = [];
+            this.pickedCards = [];
         }
     }
 
     function swapDown(e) {
+        if (this.swapCards == false) {
+            return;
+        }
 
-    }
+        var human = this.players[0];
+        var x = e.offsetX - this.canvas.width / 2;
+        var y = e.offsetY - this.canvas.height / 2;
 
-    function swapMove(e) {
+        if (this.detectDeckClick(x, y)) {
+            // start the game
+            this.swapCards = false;
+            this.canvas.removeEventListener('mousedown', swapDown); // why isn't this working?
+            this.canvas.addEventListener('mousedown', pickDown.bind(this));
+            this.canvas.addEventListener('mousemove', pickMove.bind(this));
+            this.canvas.addEventListener('mouseup', pickUp.bind(this));
+        } else {
+            // swap cards
+            var indices = [];
+            indices.push(human.selectCard(x, y, 'hand'));
+            indices.push(human.selectCard(x, y, 'faceup'));
 
-    }
+            for(var i = 0; i < indices.length; i++) {
+                var index = indices[i];
+                if (index != null) {
+                    this.selectedCards.push(index);
+                    break;
+                }
+            }
 
-    function swapUp(e) {
-
+            if (this.selectedCards.length == 2) {
+                human.swapCards(this.selectedCards[1], this.selectedCards[0]);
+                this.selectedCards = [];
+                this.render();
+            }
+        }
     }
 
     this.init = function(nPlayers) {
@@ -113,12 +141,9 @@ var Game = function(canvas) {
 
         this.acceptInput = true;
 
-        // EVENTS
-        canvas.addEventListener('mousedown', pickDown.bind(this));
-
-        canvas.addEventListener('mousemove', pickMove.bind(this));
-
-        canvas.addEventListener('mouseup', pickUp.bind(this));
+        // CARD SWAPPING
+        this.swapCards = true;
+        this.canvas.addEventListener('mousedown', swapDown.bind(this));
     };
 
     this.loop = function() {
@@ -229,37 +254,27 @@ var Game = function(canvas) {
 
     this.detectSelection = function(x, y) {
         var human = this.players[0];
-        var card = null;
-        if (this.inputType == 'hand') {
-            // detect hand cards
-            card = human.pickFromHand(x, y);
-        } else if (this.inputType == 'faceup') {
-            // detect face up cards
-            card = human.pickFromFaceUps(x, y);
-        } else {
-            // detect facedown
-            card = human.pickFromFaceDowns(x, y);
-        }
+        var card = human.pickCard(x, y, this.inputType);
 
         // if (this.detectDeckClick(x, y)) {
         //     card = this.deck.draw();
         // }
 
         if (card != null) {
-            this.selectedCards.push(card);
+            this.pickedCards.push(card);
         }
 
     };
 
     this.playCards = function() {
         var human = this.players[0];
-        if (this.selectedCards.length > 0) {
+        if (this.pickedCards.length > 0) {
             if (LOG) {
                 console.log("Human player");
             }
 
-            if (this.validPlay(this.selectedCards, this.pile.topValue())) {
-                this.applyCards(this.selectedCards);
+            if (this.validPlay(this.pickedCards, this.pile.topValue())) {
+                this.applyCards(this.pickedCards);
 
                 while (this.deck.isEmpty() == false && human.cardsInHand() < 3) {
                     human.addToHand([this.deck.draw()]);
@@ -267,9 +282,9 @@ var Game = function(canvas) {
 
             } else { // invalid play
                 if (LOG) {
-                    console.log("Invalid play: " + this.selectedCards[0].value + " on " + this.pile.topValue());
+                    console.log("Invalid play: " + this.pickedCards[0].value + " on " + this.pile.topValue());
                 }
-                human.addToHand(this.selectedCards);
+                human.addToHand(this.pickedCards);
                 human.addToHand(this.pile.pickUp());
             }
             this.render();
