@@ -81,32 +81,18 @@ var Deck = function(x, y, maxRender) {
             return false;
         }
 
-        var i = this.cards.length - 1;
-        var value = this.cards[i].value;
-        var count = 1;
-
-        if (value == SPECIAL.INVISIBLE) {
-            // if top is 3, want all of them to be a 3
-            if (this.cards[i - 1] == SPECIAL.INVISIBLE
-                && this.cards[i - 2] == SPECIAL.INVISIBLE
-                && this.cards[i - 3] == SPECIAL.INVISIBLE) {
-                return true;
-            } else {
+        var total = 4;
+        var value = this.cards[this.cards.length - 1].value;
+        for(var i = 1; i < total; i++) {
+            var index = this.cards.length - 1 - i;
+            if (index < 0) {
                 return false;
             }
-        }
 
-        var top = 4;
-        while (count <= top && i - count >= 0) {
-            var card = this.cards[i - count];
-            if (card.value == SPECIAL.INVISIBLE) {
-                // skip
-                top += 1;
-                count += 1;
-            } else if (card.value != value) {
+            if (this.cards[index].value != SPECIAL.INVISIBLE && this.cards[index].value != value) {
                 return false;
-            } else {
-                count += 1;
+            } else if (this.cards[index].value == SPECIAL.INVISIBLE) {
+                total += 1;
             }
         }
         return true;
