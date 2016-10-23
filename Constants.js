@@ -63,5 +63,13 @@ var GAME = {
     DELAY: 500
 };
 
+var BOARD = {
+    COLOR: "rgb(8, 132, 36)",
+    MESSAGEZONE1: {x: -120, y: 90},
+    MESSAGEZONE2: {x: 120, y: 270},
+    MESSAGEFONT: "20px serif",
+    MESSAGECOLOR: "black"
+};
+
 var DEBUG = false;
 var LOG = true;

@@ -51,7 +51,7 @@ There are a few special rules and cards.
     3 3 5 5 would still burn the pile.
 
 ## TODO
-  * scoreboard at the end
   * smarter AI
   * better feedback
   * debug the 4 of kind sequential
+  * AI should be able to flip top card of deck

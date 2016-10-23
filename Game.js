@@ -14,6 +14,8 @@ var Game = function(canvas) {
     this.swapCards = false;
     this.clickedOnPile = false;
 
+    this.finished = false;
+
     // EVENT LISTENERS
     function pickDown(e) {
         if (this.acceptInput) {
@@ -81,6 +83,7 @@ var Game = function(canvas) {
             this.canvas.addEventListener('mousedown', pickDown.bind(this));
             this.canvas.addEventListener('mousemove', pickMove.bind(this));
             this.canvas.addEventListener('mouseup', pickUp.bind(this));
+            this.render();
         } else {
             // swap cards
             var indices = [];
@@ -144,13 +147,12 @@ var Game = function(canvas) {
         // PILE
         this.pile = new Deck(PILE.X, PILE.Y, PILE.MAXRENDER);
 
-        this.render();
-
-        this.acceptInput = true;
-
         // CARD SWAPPING
+        this.acceptInput = true;
         this.swapCards = true;
         this.canvas.addEventListener('mousedown', swapDown.bind(this));
+
+        this.render();
     };
 
     this.loop = function() {
@@ -194,6 +196,10 @@ var Game = function(canvas) {
             if (p.isDone()) {
                 // this was the winning move
                 game.winners.push(index);
+
+                if (game.winners.length == 3) { // player got wrecked
+                    game.finished = true;
+                }
             }
             game.render();
         }
@@ -247,8 +253,26 @@ var Game = function(canvas) {
             this.canvas.width,
             this.canvas.height
         );
+
+        // render board
+        this.ctx.fillStyle = BOARD.COLOR;
+        this.ctx.fillRect(
+            -this.canvas.height / 2,
+            -this.canvas.width / 2,
+            this.canvas.width,
+            this.canvas.height
+        );
+
         this.deck.render(this.ctx);
         this.pile.render(this.ctx);
+
+        // show instructions
+        if (this.swapCards) {
+            this.ctx.fillStyle = BOARD.MESSAGECOLOR;
+            this.ctx.font = BOARD.MESSAGEFONT;
+            this.ctx.fillText("Click the deck to start playing", BOARD.MESSAGEZONE1.x, BOARD.MESSAGEZONE1.y);
+            this.ctx.fillText("Swap cards by clicking them", BOARD.MESSAGEZONE2.x, BOARD.MESSAGEZONE2.y);
+        }
 
         // render all players
         for (var j = 0; j < this.players.length; j++) {
@@ -256,6 +280,15 @@ var Game = function(canvas) {
             // rotate the canvas for each player
             this.ctx.rotate((360 / this.players.length) * Math.PI / 180);
         }
+
+        // show scoreboard
+        if (this.finished) {
+            var position = this.winners.length + 1;
+            this.ctx.fillStyle = BOARD.MESSAGECOLOR;
+            this.ctx.font = BOARD.MESSAGEFONT;
+            this.ctx.fillText("Congrats you finished #" + position, BOARD.MESSAGEZONE1.x, BOARD.MESSAGEZONE1.y);
+        }
+
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
     };
 
@@ -291,6 +324,12 @@ var Game = function(canvas) {
 
                 while (this.deck.isEmpty() == false && human.cardsInHand() < 3) {
                     human.addToHand([this.deck.draw()]);
+                }
+
+                if (human.isDone()) { // winning move
+                    this.finished = true;
+                    this.render();
+                    return;
                 }
 
             } else { // invalid play
