@@ -49,7 +49,6 @@ There are a few special rules and cards.
     3 3 5 5 would still burn the pile.
 
 ## TODO
-  * better graphics for card
   * scoreboard at the end
   * draw from pile if stuck
   * smarter AI
