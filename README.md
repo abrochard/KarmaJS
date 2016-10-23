@@ -30,8 +30,7 @@ On a typical turn, you would:
     you have less than 3 cards in hand.
 
 ### Special cards
-There are a few special rules and cards. Not all of them are
-implemented yet. See the TODO list below.
+There are a few special rules and cards.
   * The 2 can be played on top of any card and acts as a reset. The
     player after you can play anything on top.
   * The 3 can be played on top of any card and is considered
