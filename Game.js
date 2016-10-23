@@ -131,6 +131,12 @@ var Game = function(canvas) {
             p.addToFaceDown(faceDowns);
             p.addToFaceUps(faceUps);
             p.addToHand(hand);
+
+            // AI swap cards
+            if (i > 0) {
+                p.autoSwapCards();
+            }
+
             this.players.push(p);
         }
 

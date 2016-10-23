@@ -106,9 +106,9 @@ var Player = function(human) {
         var min = null;
 
         if (top == SPECIAL.REVERSE) {
-            min = this.findMinUnder(target, this.faceUpCards);
+            min = this.findMinUnder(top, this.faceUpCards);
         } else {
-            min = this.findMinAbove(target, this.faceUpCards);
+            min = this.findMinAbove(top, this.faceUpCards);
         }
         if (min != null) {
             return this.faceUpCards.splice(min.index, min.total)[0];
@@ -233,5 +233,34 @@ var Player = function(human) {
         // sneaky way to preserve order in among face up cards
         var temp = this.faceUpCards.splice(0, this.faceUpCards.length);
         this.addToFaceUps(temp);
+    };
+
+    function getSpecialIndex(cards) {
+        for(var i = 0; i < cards.length; i++) {
+            if (cards[i].isSpecial()) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    this.autoSwapCards = function() {
+        // tries to make the best swap possible,
+        // with special and high cards ending up as face up
+        this.reorderHand();
+        var specialInHand = getSpecialIndex(this.hand);
+        for(var i = 0; i < this.faceUpCards.length; i++) {
+            if (this.faceUpCards[i].isSpecial() == false) {
+                if (specialInHand >= 0) {
+                    this.swapCards(specialInHand, i);
+                    specialInHand = getSpecialIndex(this.hand);
+                } else if (this.faceUpCards[i].value < this.hand[this.hand.length - 1].value) {
+                    // no special cards in hand
+                    // just pick the biggest one
+                    this.swapCards(this.hand.length - 1, i);
+                }
+            }
+        }
+        this.reorderHand();
     };
 };

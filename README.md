@@ -52,7 +52,6 @@ implemented yet. See the TODO list below.
 ## TODO
   * better graphics for card
   * scoreboard at the end
-  * card swap at the beginning for the AI
   * draw from pile if stuck
   * smarter AI
   * better feedback
