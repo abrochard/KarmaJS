@@ -13,6 +13,7 @@ var Game = function(canvas) {
     this.inputType = "";
     this.swapCards = false;
     this.clickedOnPile = false;
+    this.clickedOnDeck = false;
 
     this.finished = false;
 
@@ -59,7 +60,7 @@ var Game = function(canvas) {
     }
 
     function pickUp(e) {
-        if (this.acceptMove || this.clickedOnPile) {
+        if (this.acceptMove || this.clickedOnPile || this.clickedOnDeck) {
             // stop listening for hovering and play cards
             this.acceptMove = false;
             this.playCards();
@@ -307,6 +308,7 @@ var Game = function(canvas) {
             if (LOG) {
                 console.log("Player tries to flip the deck");
             }
+            this.clickedOnDeck = true;
             this.pickedCards.push(this.deck.draw());
             this.acceptMove = false;
         }
@@ -331,6 +333,8 @@ var Game = function(canvas) {
             if (LOG) {
                 console.log("Human player");
             }
+
+            this.clickedOnDeck = false;
 
             if (this.validPlay(this.pickedCards, this.pile.topValue())) {
                 this.applyCards(this.pickedCards);

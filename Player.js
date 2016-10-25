@@ -127,7 +127,7 @@ var Player = function(human) {
         if (min != null) {
             indices = findAllCardsOfSameValue(this.faceUpCards, min.value);
             cards = [];
-            for(i = 0; i < indices.length; i++) {
+            for(i = indices.length - 1; i >= 0; i--) {
                 c = this.faceUpCards.splice(indices[i], 1)[0];
                 cards.push(c);
             }
