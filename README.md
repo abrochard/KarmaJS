@@ -53,3 +53,4 @@ There are a few special rules and cards.
 ## TODO
   * smarter AI
   * better feedback
+  * debug AI playing multiple face ups
