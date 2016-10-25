@@ -110,6 +110,9 @@ var Deck = function(x, y, maxRender) {
         } else {
             return this.cards[i].value;
         }
+    };
 
+    this.cardsRemaining = function() {
+        return this.cards.length;
     };
 };

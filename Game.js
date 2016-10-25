@@ -110,7 +110,7 @@ var Game = function(canvas) {
         this.ctx = this.canvas.getContext('2d');
 
         // DECK
-        this.deck = new Deck(DECK.X, DECK.Y, DECK.MAXRENDER);
+        this.deck = new Deck(DECK.X, DECK.Y, DECK.MAX_RENDER);
         this.deck.generate(false);
         this.deck.shuffle();
 
@@ -145,7 +145,7 @@ var Game = function(canvas) {
         }
 
         // PILE
-        this.pile = new Deck(PILE.X, PILE.Y, PILE.MAXRENDER);
+        this.pile = new Deck(PILE.X, PILE.Y, PILE.MAX_RENDER);
 
         // CARD SWAPPING
         this.acceptInput = true;
@@ -275,10 +275,10 @@ var Game = function(canvas) {
 
         // show instructions
         if (this.swapCards) {
-            this.ctx.fillStyle = BOARD.MESSAGECOLOR;
-            this.ctx.font = BOARD.MESSAGEFONT;
-            this.ctx.fillText("Click the deck to start playing", BOARD.MESSAGEZONE1.x, BOARD.MESSAGEZONE1.y);
-            this.ctx.fillText("Swap cards by clicking them", BOARD.MESSAGEZONE2.x, BOARD.MESSAGEZONE2.y);
+            this.ctx.fillStyle = MESSAGE.COLOR;
+            this.ctx.font = MESSAGE.FONT;
+            this.ctx.fillText("Click the deck to start playing", MESSAGE.ZONE1.x, MESSAGE.ZONE1.y);
+            this.ctx.fillText("Swap cards by clicking them", MESSAGE.ZONE2.x, MESSAGE.ZONE2.y);
         }
 
         // render all players
@@ -293,7 +293,7 @@ var Game = function(canvas) {
             var position = this.winners.length + 1;
             this.ctx.fillStyle = BOARD.MESSAGECOLOR;
             this.ctx.font = BOARD.MESSAGEFONT;
-            this.ctx.fillText("Congrats you finished #" + position, BOARD.MESSAGEZONE1.x, BOARD.MESSAGEZONE1.y);
+            this.ctx.fillText("Congrats you finished #" + position, MESSAGE.ZONE1.x, MESSAGE.ZONE1.y);
         }
 
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -429,4 +429,14 @@ var Game = function(canvas) {
         return value >= topValue;
     };
 
+    this.encodeGame = function() {
+        var game = {};
+        game.nPlayers = this.players.length;
+        game.deck = this.deck.cardsRemaining();
+        game.pile = this.pile.cardsRemaining();
+        game.players = [];
+        for(var i = 0; i < this.players.length; i++) {
+            game.players.push(this.players[i].encode());
+        }
+    };
 };

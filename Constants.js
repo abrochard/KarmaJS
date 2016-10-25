@@ -23,11 +23,7 @@ var SPECIAL = {
 var CARD = {
     HEIGHT: 70,
     WIDTH: 50,
-    BACKCOLOR: "rgb(200,0,0)",
-    BACKGROUNDCOLOR: "white",
-    BORDERCOLOR: "black",
-    VALUECOLOR: "black",
-    FONT: "18px serif",
+    BORDER_COLOR: "black",
     INVISIBLE: {
         COLOR: "red",
         OPACITY: 0.3
@@ -38,13 +34,13 @@ var CARD = {
 };
 
 var DECK = {
-    MAXRENDER: 3,
+    MAX_RENDER: 3,
     X: -50,
     Y: -35
 };
 
 var PILE = {
-    MAXRENDER: 3,
+    MAX_RENDER: 3,
     X: 10,
     Y: -35
 };
@@ -52,10 +48,10 @@ var PILE = {
 var PLAYER = {
     X: -80,
     Y: 300,
-    FACEUPDIST: 100,
-    CARDSPREAD: 55,
-    FACEUPXOFF: 3,
-    FACEUPYOFF: 4
+    FACEUP_DIST: 100,
+    CARD_SPREAD: 55,
+    FACEUP_X_OFF: 3,
+    FACEUP_Y_OFF: 4
 };
 
 var GAME = {
@@ -64,11 +60,20 @@ var GAME = {
 };
 
 var BOARD = {
-    COLOR: "rgb(8, 132, 36)",
-    MESSAGEZONE1: {x: -120, y: 90},
-    MESSAGEZONE2: {x: 120, y: 270},
-    MESSAGEFONT: "20px serif",
-    MESSAGECOLOR: "black"
+    COLOR: "rgb(8, 132, 36)"
+};
+
+var MESSAGE = {
+    ZONE1: {
+        x: -120,
+        y: 90
+    },
+    ZONE2: {
+        x: -350,
+        y: 270
+    },
+    FONT: "20px serif",
+    COLOR: "black"
 };
 
 var DEBUG = false;

@@ -56,7 +56,7 @@ var Card = function(value, suit, x, y, faceUp, transparent) {
     this.render = function(ctx) {
         if (this.faceUp == false) {
             // render back of card
-            this.drawCard(ctx, BACKNAME, BACKSPRITE);
+            this.drawCard(ctx, BACK_NAME, BACK_SPRITE);
         } else if (this.transparent == true) {
             // render as transparent
             ctx.globalAlpha = CARD.INVISIBLE.OPACITY;
@@ -65,11 +65,11 @@ var Card = function(value, suit, x, y, faceUp, transparent) {
             ctx.globalAlpha = 1;
         } else {
             // normal face up card
-            this.drawCard(ctx, this.name, FRONTSPRITE);
+            this.drawCard(ctx, this.name, FRONT_SPRITE);
         }
 
         // in all cases draw the border
-        ctx.fillStyle = CARD.BORDERCOLOR;
+        ctx.fillStyle = CARD.BORDER_COLOR;
         ctx.strokeRect(this.x, this.y, this.width, this.height);
     };
 

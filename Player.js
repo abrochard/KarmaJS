@@ -16,11 +16,11 @@ var Player = function(human) {
             this.faceDownCards[i].render(ctx);
         }
         // render face up cards
-        for (var i = 0; i < this.faceUpCards.length; i++) {
+        for (i = 0; i < this.faceUpCards.length; i++) {
             this.faceUpCards[i].render(ctx);
         }
         // render hand
-        for (var i = 0; i < this.hand.length; i++) {
+        for (i = 0; i < this.hand.length; i++) {
             this.hand[i].render(ctx);
         }
     };
@@ -28,7 +28,7 @@ var Player = function(human) {
     this.addToFaceDown = function(cards) {
         for (var i = 0; i < cards.length; i++) {
             var card = cards[i];
-            card.setPosition(this.x + PLAYER.CARDSPREAD * i, this.y - PLAYER.FACEUPDIST);
+            card.setPosition(this.x + PLAYER.CARD_SPREAD * i, this.y - PLAYER.FACEUP_DIST);
             this.faceDownCards.push(card);
         }
     };
@@ -38,8 +38,8 @@ var Player = function(human) {
             var card = cards[i];
             card.setFaceUp(true);
             card.setPosition(
-                this.x + PLAYER.CARDSPREAD * i + PLAYER.FACEUPXOFF,
-                this.y - (PLAYER.FACEUPDIST - PLAYER.FACEUPYOFF)
+                this.x + PLAYER.CARD_SPREAD * i + PLAYER.FACEUP_X_OFF,
+                this.y - (PLAYER.FACEUP_DIST - PLAYER.FACEUP_Y_OFF)
             );
             this.faceUpCards.push(card);
         }
@@ -174,9 +174,9 @@ var Player = function(human) {
         this.hand.sort(function (a, b) {
             return a.compareTo(b);
         });
-        var offset = (this.hand.length - 3) / 2 * PLAYER.CARDSPREAD * (-1);
+        var offset = (this.hand.length - 3) / 2 * PLAYER.CARD_SPREAD * (-1);
         for(var i = 0; i < this.hand.length; i++) {
-            this.hand[i].setPosition(this.x + PLAYER.CARDSPREAD * i + offset, this.y);
+            this.hand[i].setPosition(this.x + PLAYER.CARD_SPREAD * i + offset, this.y);
         }
     };
 
@@ -263,5 +263,13 @@ var Player = function(human) {
             }
         }
         this.reorderHand();
+    };
+
+    this.encode = function() {
+        var p = {};
+        p.hand = this.hand.length;
+        p.faceUpCards = this.faceUpCards.length;
+        p.faceDownCards = this.faceDownCards.length;
+        return p;
     };
 };

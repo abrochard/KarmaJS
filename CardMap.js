@@ -1,9 +1,9 @@
 // card sprite sheet thanks to http://opengameart.org/users/kenney
 
-var FRONTSPRITE = "front";
+var FRONT_SPRITE = "front";
 
-var BACKSPRITE= "back";
-var BACKNAME = "cardBack_red2";
+var BACK_SPRITE= "back";
+var BACK_NAME = "cardBack_red2";
 
 var cardMap = {
   SpadesQ: {
