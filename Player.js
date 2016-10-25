@@ -76,16 +76,15 @@ var Player = function(human) {
     };
 
     this.play = function(top) {
-        var card = null;
         if (this.hand.length > 0) {
-            card = this.playHand(top);
+            var cards = this.playHand(top);
             this.reorderHand();
+            return cards;
         } else if (this.faceUpCards.length > 0) {
-            card = this.playFaceUp(top);
+            return this.playFaceUp(top);
         } else {
-            card = this.faceDownCards.pop();
+            return [this.faceDownCards.pop()];
         }
-        return [card];
     };
 
     this.playHand = function(top) {
@@ -97,14 +96,28 @@ var Player = function(human) {
         }
 
         if (min != null) {
-            return this.hand.splice(min.index, min.total)[0];
+            return this.hand.splice(min.index, min.total);
         } else {
             return this.playSpecial(this.hand);
         }
     };
 
+    function findAllCardsOfSameValue(cards, value) {
+        var indices = [];
+        for(var i = 0; i < cards.length; i++) {
+            if (cards[i].value == value) {
+                indices.push(i);
+            }
+        }
+        return indices;
+    }
+
     this.playFaceUp = function(top) {
         var min = null;
+        var indices = [];
+        var i = 0;
+        var cards = [];
+        var c = null;
 
         if (top == SPECIAL.REVERSE) {
             min = this.findMinUnder(top, this.faceUpCards);
@@ -112,13 +125,26 @@ var Player = function(human) {
             min = this.findMinAbove(top, this.faceUpCards);
         }
         if (min != null) {
-            return this.faceUpCards.splice(min.index, min.total)[0];
+            indices = findAllCardsOfSameValue(this.faceUpCards, min.value);
+            cards = [];
+            for(i = 0; i < indices.length; i++) {
+                c = this.faceUpCards.splice(indices[i], 1)[0];
+                cards.push(c);
+            }
+            return cards;
         } else {
             var special = this.playSpecial(this.faceUpCards);
-            if (special != null) {
-                return special;
+            if (special[0] != null) {
+                special = special[0];
+                indices = findAllCardsOfSameValue(this.faceUpCards, special.value);
+                cards = [special];
+                for(i = 0; i < indices.length; i++) {
+                    c = this.faceUpCards.splice(indices[i], 1)[0];
+                    cards.push(c);
+                }
+                return cards;
             } else {
-                return this.faceUpCards.pop(); // just pick one
+                return [this.faceUpCards.pop()]; // just pick one
             }
         }
     };
@@ -164,10 +190,10 @@ var Player = function(human) {
     this.playSpecial = function(cards) {
         for(var i = 0; i < cards.length; i++) {
             if (cards[i].isSpecial()) {
-                return cards.splice(i, 1)[0];
+                return cards.splice(i, 1);
             }
         }
-        return null;
+        return [null];
     };
 
     this.reorderHand = function() {
