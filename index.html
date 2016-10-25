@@ -4,6 +4,12 @@
         <title>
             KarmaJS
         </title>
+        <script type="text/javascript" src="Constants.js"></script>
+        <script type="text/javascript" src="CardMap.js"></script>
+        <script type="text/javascript" src="Card.js"></script>
+        <script type="text/javascript" src="Deck.js"></script>
+        <script type="text/javascript" src="Player.js"></script>
+        <script type="text/javascript" src="Game.js"></script>
         <script type="text/javascript" src="Karma.js"></script>
         <style type="text/css">
          canvas { border: 1px solid black; }
@@ -12,6 +18,10 @@
         <link href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAABILAAASCwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADMzMx0zMzNSMzMzAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEtLSwFLS0sBS0tLAUtLSwFLS0sBNTU1CjMzM31FRUX0V1dX/zMzM2AAAAAAAAAAAAAAAAAAAAAAAAAAAExMTCBTU1PnW1tb91tbW/daWlr3RERE9z09Pfp3d3f/r6+v/6mpqf89PT3mMzMzDgAAAAAAAAAAAAAAAAAAAABMTExDeHh4/7Ozs/+ampr/VFRU/2NjY/+mpqb/s7Oz/7Ozs/+zs7P/fHx8/zMzM4gAAAAAAAAAAAAAAAAAAAAATExMQ3h4eP90dHT/UlJS/5iYmP+zs7P/s7Oz/6urq/9zc3P/mpqa/6urq/9JSUn4MzMzJAAAAAAAAAAAAAAAAExMTEN4eHj/WVlZ/5aWlv+zs7P/s7Oz/7Kysv9mZmb/YmJi/2VlZf9mZmb/jY2N/zMzM680NDQAAAAAAAAAAABMTExDeHh4/46Ojv9QUFD/srKy/7Ozs/+zs7P/ampq/3l5ef9/f3//aGho/7CwsP9aWlr+MzMzRQAAAAAAAAAATExMQ3h4eP95eXn/UVFR/4WFhf+zs7P/qKio/1paWv9wcHD/f39//29vb/+zs7P/oKCg/zc3N9MzMzMEAAAAAExMTEN4eHj/e3t7/3h4eP9GRkb/ra2t/56env9UVFT/YWFh/2RkZP9xcXH/s7Oz/7Ozs/9ubm7/MzMzbAAAAABMTExDeHh4/6urq/90dHT/XV1d/3Fxcf+Ghob/fX19/39/f/93d3f/ioqK/7Ozs/+zs7P/rKys/0BAQOszMzMTTExMQ3h4eP+zs7P/mZmZ/3Nzc/9DQ0P/k5OT/3Fxcf9ubm7/eXl5/46Ojv+zs7P/s7Oz/7Ozs/92dnb/MzMzd0xMTEN4eHj/s7Oz/7Ozs/+bm5v/eXl5/11dXf+zs7P/mpqa/4mJif+ysrL/s7Oz/6urq/9sbGz/Nzc30DMzMypMTExDeHh4/7Ozs/+zs7P/s7Oz/7Ozs/9YWFj/k5OT/7Ozs/+zs7P/sbGx/4CAgP8/Pz/qMzMzaDMzMwMAAAAATExMPWhoaP+NjY3/jY2N/42Njf+NjY3/eXl5/0tLS/+ysrL/k5OT/0xMTPozMzOPMzMzEQAAAAAAAAAAAAAAAExMTANMTExlTExMdkxMTHZMTEx2TExMdkxMTHY4ODiuTExM/zQ0NLYzMzMpAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMzMzBDMzMyczMzMBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/x8AAIAfAAAADwAAAA8AAAAHAAAAAwAAAAMAAAABAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAAHAAAAHwAA/j8AAA==" rel="icon" type="image/x-icon">
     </head>
     <body onload="Karma();">
+        <div style="display:none;">
+            <img id="front" src="playingCards.png">
+            <img id="back" src="playingCardBacks.png">
+        </div>
         <canvas id="board" width="750" height="750"></canvas>
     </body>
 </html>
