@@ -1,90 +1,93 @@
 var Game = function(canvas) {
-    this.canvas = canvas;
-    this.ctx = null;
-    this.deck = null;
-    this.pile = null;
-    this.players = [];
-    this.winners = [];
 
-    this.pickedCards = [];
-    this.selectedCards = [];
-    this.acceptInput = false;
-    this.acceptMove = false;
-    this.inputType = "";
-    this.swapCards = false;
-    this.clickedOnPile = false;
-    this.clickedOnDeck = false;
+    var self = this;
 
-    this.finished = false;
+    self.canvas = canvas;
+    self.ctx = null;
+    self.deck = null;
+    self.pile = null;
+    self.players = [];
+    self.winners = [];
+
+    self.pickedCards = [];
+    self.selectedCards = [];
+    self.acceptInput = false;
+    self.acceptMove = false;
+    self.inputType = "";
+    self.swapCards = false;
+    self.clickedOnPile = false;
+    self.clickedOnDeck = false;
+
+    self.finished = false;
 
     // EVENT LISTENERS
     function pickDown(e) {
-        if (this.acceptInput) {
+        if (self.acceptInput) {
             // start listening for hovering
-            this.acceptMove = true;
+            self.acceptMove = true;
 
             // determines which cards can be picked
-            var human = this.players[0];
+            var human = self.players[0];
             if (human.emptyHand() == false) {
                 // detect hand cards
-                this.inputType = 'hand';
+                self.inputType = 'hand';
             } else if (human.noFaceUps() == false) {
                 // detect face up cards
-                this.inputType = 'faceup';
+                self.inputType = 'faceup';
             } else {
                 // detect facedown
-                this.inputType = 'facedown';
+                self.inputType = 'facedown';
             }
 
             // add the card clicked on
-            var x = e.offsetX - this.canvas.width / 2;
-            var y = e.offsetY - this.canvas.height / 2;
-            this.detectSelection(x, y);
+            var x = e.offsetX - self.canvas.width / 2;
+            var y = e.offsetY - self.canvas.height / 2;
+            self.detectSelection(x, y);
 
-            if (this.inputType == 'facedown') {
+            if (self.inputType == 'facedown') {
                 // can only play one facedown card per turn
-                this.acceptMove = false;
-                this.playCards();
-                this.pickedCards = [];
+                self.acceptMove = false;
+                self.playCards();
+                self.pickedCards = [];
             }
         }
     }
 
     function pickMove(e) {
-        if (this.acceptMove) {
+        if (self.acceptMove) {
             // detects what cards are being hovered over
-            var x = e.offsetX - this.canvas.width / 2;
-            var y = e.offsetY - this.canvas.height / 2;
-            this.detectSelection(x, y);
+            var x = e.offsetX - self.canvas.width / 2;
+            var y = e.offsetY - self.canvas.height / 2;
+            self.detectSelection(x, y);
         }
     }
 
     function pickUp(e) {
-        if (this.acceptMove || this.clickedOnPile || this.clickedOnDeck) {
+        if (self.acceptMove || self.clickedOnPile || self.clickedOnDeck) {
             // stop listening for hovering and play cards
-            this.acceptMove = false;
-            this.playCards();
-            this.pickedCards = [];
+            self.acceptMove = false;
+            self.playCards();
+            self.pickedCards = [];
         }
     }
 
     function swapDown(e) {
-        if (this.swapCards == false) {
+        if (self.swapCards == false) {
             return;
         }
 
-        var human = this.players[0];
-        var x = e.offsetX - this.canvas.width / 2;
-        var y = e.offsetY - this.canvas.height / 2;
+        var human = self.players[0];
+        var x = e.offsetX - self.canvas.width / 2;
+        var y = e.offsetY - self.canvas.height / 2;
 
-        if (this.detectDeckClick(x, y)) {
+        if (self.detectDeckClick(x, y)) {
             // start the game
-            this.swapCards = false;
-            this.canvas.removeEventListener('mousedown', swapDown); // why isn't this working?
-            this.canvas.addEventListener('mousedown', pickDown.bind(this));
-            this.canvas.addEventListener('mousemove', pickMove.bind(this));
-            this.canvas.addEventListener('mouseup', pickUp.bind(this));
-            this.render();
+            self.swapCards = false;
+            self.canvas.removeEventListener('mousedown', swapDown); // why isn't self working?
+            self.canvas.addEventListener('mousedown', pickDown.bind(self));
+            self.canvas.addEventListener('mousemove', pickMove.bind(self));
+            self.canvas.addEventListener('mouseup', pickUp.bind(self));
+            self.render();
         } else {
             // swap cards
             var indices = [];
@@ -94,29 +97,29 @@ var Game = function(canvas) {
             for(var i = 0; i < indices.length; i++) {
                 var index = indices[i];
                 if (index != null) {
-                    this.selectedCards.push(index);
+                    self.selectedCards.push(index);
                     break;
                 }
             }
 
-            if (this.selectedCards.length == 2) {
-                human.swapCards(this.selectedCards[1], this.selectedCards[0]);
-                this.selectedCards = [];
-                this.render();
+            if (self.selectedCards.length == 2) {
+                human.swapCards(self.selectedCards[1], self.selectedCards[0]);
+                self.selectedCards = [];
+                self.render();
             }
         }
     }
 
-    this.init = function(nPlayers) {
-        this.ctx = this.canvas.getContext('2d');
+    self.init = function(nPlayers) {
+        self.ctx = self.canvas.getContext('2d');
 
         // DECK
-        this.deck = new Deck(DECK.X, DECK.Y, DECK.MAX_RENDER);
-        this.deck.generate(false);
-        this.deck.shuffle();
+        self.deck = new Deck(DECK.X, DECK.Y, DECK.MAX_RENDER);
+        self.deck.generate(false);
+        self.deck.shuffle();
 
         // PLAYERS
-        this.players = [];
+        self.players = [];
         for (var i = 0; i < nPlayers; i++) {
             var p = new Player(i == 0);
 
@@ -124,13 +127,13 @@ var Game = function(canvas) {
             var faceUps = [];
             var hand = [];
             for (var j = 0; j < 3; j++) {
-                faceDowns.push(this.deck.draw());
+                faceDowns.push(self.deck.draw());
 
-                var c = this.deck.draw();
+                var c = self.deck.draw();
                 c.flip();
                 faceUps.push(c);
 
-                hand.push(this.deck.draw());
+                hand.push(self.deck.draw());
             }
 
             p.addToFaceDown(faceDowns);
@@ -142,27 +145,27 @@ var Game = function(canvas) {
                 p.autoSwapCards();
             }
 
-            this.players.push(p);
+            self.players.push(p);
         }
 
         // PILE
-        this.pile = new Deck(PILE.X, PILE.Y, PILE.MAX_RENDER);
+        self.pile = new Deck(PILE.X, PILE.Y, PILE.MAX_RENDER);
 
         // CARD SWAPPING
-        this.acceptInput = true;
-        this.swapCards = true;
-        this.canvas.addEventListener('mousedown', swapDown.bind(this));
+        self.acceptInput = true;
+        self.swapCards = true;
+        self.canvas.addEventListener('mousedown', swapDown.bind(self));
 
-        this.render();
+        self.render();
     };
 
-    this.loop = function() {
+    self.loop = function() {
         // trigger the AI playing loop
-        this.acceptInput = false;
-        window.setTimeout(this.playAI, GAME.DELAY, this, 1);
+        self.acceptInput = false;
+        window.setTimeout(self.playAI, GAME.DELAY, self, 1);
     };
 
-    this.playAI = function(game, index) {
+    self.playAI = function(game, index) {
         // timeout cascade function
         var p = game.players[index];
 
@@ -202,7 +205,7 @@ var Game = function(canvas) {
             }
 
             if (p.isDone()) {
-                // this was the winning move
+                // self was the winning move
                 game.winners.push(index);
 
                 if (game.winners.length == 3) { // player got wrecked
@@ -219,9 +222,9 @@ var Game = function(canvas) {
         }
     };
 
-    this.applyCards = function(cards) {
+    self.applyCards = function(cards) {
         if (LOG) {
-            var top = this.pile.isEmpty() ? "nothing": this.pile.peek().value;
+            var top = self.pile.isEmpty() ? "nothing": self.pile.peek().value;
             console.log("Played " + cards.length + " " + cards[0].value + " on " + top);
         }
 
@@ -231,148 +234,148 @@ var Game = function(canvas) {
 
         var value = cards[0].value;
 
-        if (value == SPECIAL.INVISIBLE && this.pile.isEmpty() == false) {
+        if (value == SPECIAL.INVISIBLE && self.pile.isEmpty() == false) {
             for(i = 0; i < cards.length; i++) {
                 cards[i].setTransparent(true);
             }
         }
 
-        this.pile.place(cards);
+        self.pile.place(cards);
 
-        if (this.pile.peek().value == SPECIAL.BURN) {
-            this.pile.pickUp(); // discard the pile
+        if (self.pile.peek().value == SPECIAL.BURN) {
+            self.pile.pickUp(); // discard the pile
         }
 
         if (cards.length == 4) {
-            this.pile.pickUp(); // discard the pile
+            self.pile.pickUp(); // discard the pile
         }
 
-        if (this.pile.sameLastFour()) {
-            this.pile.pickUp(); // discard the pile
+        if (self.pile.sameLastFour()) {
+            self.pile.pickUp(); // discard the pile
         }
 
     };
 
-    this.render = function() {
-        this.ctx.translate(this.canvas.height / 2, this.canvas.width / 2); // recenter
-        this.ctx.clearRect( // clear the board
-            -this.canvas.height / 2,
-            -this.canvas.width / 2,
-            this.canvas.width,
-            this.canvas.height
+    self.render = function() {
+        self.ctx.translate(self.canvas.height / 2, self.canvas.width / 2); // recenter
+        self.ctx.clearRect( // clear the board
+            -self.canvas.height / 2,
+            -self.canvas.width / 2,
+            self.canvas.width,
+            self.canvas.height
         );
 
         // render board
-        this.ctx.fillStyle = BOARD.COLOR;
-        this.ctx.fillRect(
-            -this.canvas.height / 2,
-            -this.canvas.width / 2,
-            this.canvas.width,
-            this.canvas.height
+        self.ctx.fillStyle = BOARD.COLOR;
+        self.ctx.fillRect(
+            -self.canvas.height / 2,
+            -self.canvas.width / 2,
+            self.canvas.width,
+            self.canvas.height
         );
 
-        this.deck.render(this.ctx);
-        this.pile.render(this.ctx);
+        self.deck.render(self.ctx);
+        self.pile.render(self.ctx);
 
         // show instructions
-        if (this.swapCards) {
-            this.ctx.fillStyle = MESSAGE.COLOR;
-            this.ctx.font = MESSAGE.FONT;
-            this.ctx.fillText("Click the deck to start playing", MESSAGE.ZONE1.x, MESSAGE.ZONE1.y);
-            this.ctx.fillText("Swap cards by clicking them", MESSAGE.ZONE2.x, MESSAGE.ZONE2.y);
+        if (self.swapCards) {
+            self.ctx.fillStyle = MESSAGE.COLOR;
+            self.ctx.font = MESSAGE.FONT;
+            self.ctx.fillText("Click the deck to start playing", MESSAGE.ZONE1.x, MESSAGE.ZONE1.y);
+            self.ctx.fillText("Swap cards by clicking them", MESSAGE.ZONE2.x, MESSAGE.ZONE2.y);
         }
 
         // render all players
-        for (var j = 0; j < this.players.length; j++) {
-            this.players[j].render(this.ctx);
+        for (var j = 0; j < self.players.length; j++) {
+            self.players[j].render(self.ctx);
             // rotate the canvas for each player
-            this.ctx.rotate((360 / this.players.length) * Math.PI / 180);
+            self.ctx.rotate((360 / self.players.length) * Math.PI / 180);
         }
 
         // show scoreboard
-        if (this.finished) {
-            var position = this.winners.length + 1;
-            this.ctx.fillStyle = BOARD.MESSAGECOLOR;
-            this.ctx.font = BOARD.MESSAGEFONT;
-            this.ctx.fillText("Congrats you finished #" + position, MESSAGE.ZONE1.x, MESSAGE.ZONE1.y);
+        if (self.finished) {
+            var position = self.winners.length + 1;
+            self.ctx.fillStyle = BOARD.MESSAGECOLOR;
+            self.ctx.font = BOARD.MESSAGEFONT;
+            self.ctx.fillText("Congrats you finished #" + position, MESSAGE.ZONE1.x, MESSAGE.ZONE1.y);
         }
 
-        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        self.ctx.setTransform(1, 0, 0, 1, 0, 0);
     };
 
-    this.detectSelection = function(x, y) {
-        var human = this.players[0];
-        var card = human.pickCard(x, y, this.inputType);
+    self.detectSelection = function(x, y) {
+        var human = self.players[0];
+        var card = human.pickCard(x, y, self.inputType);
 
-        if (card == null && this.pickedCards.length == 0 && this.detectDeckClick(x, y)) {
+        if (card == null && self.pickedCards.length == 0 && self.detectDeckClick(x, y)) {
             if (LOG) {
                 console.log("Player tries to flip the deck");
             }
-            this.clickedOnDeck = true;
-            this.pickedCards.push(this.deck.draw());
-            this.acceptMove = false;
+            self.clickedOnDeck = true;
+            self.pickedCards.push(self.deck.draw());
+            self.acceptMove = false;
         }
 
-        if (card == null && this.pickedCards.length == 0 && this.detectPileClick(x, y)) {
+        if (card == null && self.pickedCards.length == 0 && self.detectPileClick(x, y)) {
             if (LOG) {
                 console.log("Player picks up");
             }
-            this.clickedOnPile = true;
-            this.acceptMove = false;
+            self.clickedOnPile = true;
+            self.acceptMove = false;
         }
 
         if (card != null) {
-            this.pickedCards.push(card);
+            self.pickedCards.push(card);
         }
 
     };
 
-    this.playCards = function() {
-        var human = this.players[0];
-        if (this.pickedCards.length > 0) {
+    self.playCards = function() {
+        var human = self.players[0];
+        if (self.pickedCards.length > 0) {
             if (LOG) {
                 console.log("Human player");
             }
 
-            this.clickedOnDeck = false;
+            self.clickedOnDeck = false;
 
-            if (this.validPlay(this.pickedCards, this.pile.topValue())) {
-                this.applyCards(this.pickedCards);
+            if (self.validPlay(self.pickedCards, self.pile.topValue())) {
+                self.applyCards(self.pickedCards);
 
-                while (this.deck.isEmpty() == false && human.cardsInHand() < 3) {
-                    human.addToHand([this.deck.draw()]);
+                while (self.deck.isEmpty() == false && human.cardsInHand() < 3) {
+                    human.addToHand([self.deck.draw()]);
                 }
 
                 if (human.isDone()) { // winning move
-                    this.finished = true;
-                    this.render();
+                    self.finished = true;
+                    self.render();
                     return;
                 }
 
             } else { // invalid play
                 if (LOG) {
-                    console.log("Invalid play: " + this.pickedCards[0].value + " on " + this.pile.topValue());
+                    console.log("Invalid play: " + self.pickedCards[0].value + " on " + self.pile.topValue());
                 }
-                human.addToHand(this.pickedCards);
-                human.addToHand(this.pile.pickUp());
+                human.addToHand(self.pickedCards);
+                human.addToHand(self.pile.pickUp());
             }
-            this.render();
-            this.loop();
-        } else if (this.clickedOnPile) {
+            self.render();
+            self.loop();
+        } else if (self.clickedOnPile) {
             if (LOG) {
                 console.log("Picked up the pile");
             }
-            human.addToHand(this.pile.pickUp());
-            this.clickedOnPile = false;
-            this.render();
-            this.loop();
+            human.addToHand(self.pile.pickUp());
+            self.clickedOnPile = false;
+            self.render();
+            self.loop();
         }
     };
 
-    this.detectDeckClick = function(x, y) {
-        if (x > this.deck.x && x < this.deck.x + CARD.WIDTH) {
-            if (y > this.deck.y && y < this.deck.y + CARD.HEIGHT) {
-                if (!this.deck.isEmpty()) {
+    self.detectDeckClick = function(x, y) {
+        if (x > self.deck.x && x < self.deck.x + CARD.WIDTH) {
+            if (y > self.deck.y && y < self.deck.y + CARD.HEIGHT) {
+                if (!self.deck.isEmpty()) {
                     return true;
                 }
             }
@@ -380,10 +383,10 @@ var Game = function(canvas) {
         return false;
     };
 
-    this.detectPileClick = function(x, y) {
-        if (x > this.pile.x && x < this.pile.x + CARD.WIDTH) {
-            if (y > this.pile.y && y < this.pile.y + CARD.HEIGHT) {
-                if (!this.pile.isEmpty()) {
+    self.detectPileClick = function(x, y) {
+        if (x > self.pile.x && x < self.pile.x + CARD.WIDTH) {
+            if (y > self.pile.y && y < self.pile.y + CARD.HEIGHT) {
+                if (!self.pile.isEmpty()) {
                     return true;
                 }
             }
@@ -391,7 +394,7 @@ var Game = function(canvas) {
         return false;
     };
 
-    this.validPlay = function(cards, topValue) {
+    self.validPlay = function(cards, topValue) {
         // make sure all cards are of the same value
         var value = cards[0].value;
         for(var i = 1; i < cards.length; i++) {
@@ -433,14 +436,14 @@ var Game = function(canvas) {
         return value >= topValue;
     };
 
-    this.encodeGame = function() {
+    self.encodeGame = function() {
         var game = {};
-        game.nPlayers = this.players.length;
-        game.deck = this.deck.cardsRemaining();
-        game.pile = this.pile.cardsRemaining();
+        game.nPlayers = self.players.length;
+        game.deck = self.deck.cardsRemaining();
+        game.pile = self.pile.cardsRemaining();
         game.players = [];
-        for(var i = 0; i < this.players.length; i++) {
-            game.players.push(this.players[i].encode());
+        for(var i = 0; i < self.players.length; i++) {
+            game.players.push(self.players[i].encode());
         }
     };
 };

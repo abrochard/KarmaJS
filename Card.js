@@ -1,21 +1,23 @@
 var Card = function(value, suit, x, y, faceUp, transparent) {
 
+    var self = this;
+
     // base attributes
-    this.value = value;
-    this.suit = suit;
+    self.value = value;
+    self.suit = suit;
 
     // geometry attributes
-    this.x = x;
-    this.y = y;
-    this.height = CARD.HEIGHT;
-    this.width = CARD.WIDTH;
+    self.x = x;
+    self.y = y;
+    self.height = CARD.HEIGHT;
+    self.width = CARD.WIDTH;
 
     // visual attributes
-    this.faceUp = faceUp != null ? faceUp: false;
-    this.transparent = transparent != null ? transparent: false;
+    self.faceUp = faceUp != null ? faceUp: false;
+    self.transparent = transparent != null ? transparent: false;
 
     // name in sprite sheet map
-    this.name = getName(suit, value);
+    self.name = getName(suit, value);
 
     function getName(suit, value) {
         var name = "";
@@ -53,67 +55,67 @@ var Card = function(value, suit, x, y, faceUp, transparent) {
         return name;
     }
 
-    this.render = function(ctx) {
-        if (this.faceUp == false) {
+    self.render = function(ctx) {
+        if (self.faceUp == false) {
             // render back of card
-            this.drawCard(ctx, BACK_NAME, BACK_SPRITE);
-        } else if (this.transparent == true) {
+            self.drawCard(ctx, BACK_NAME, BACK_SPRITE);
+        } else if (self.transparent == true) {
             // render as transparent
             ctx.globalAlpha = CARD.INVISIBLE.OPACITY;
             ctx.fillStyle = CARD.INVISIBLE.COLOR;
-            ctx.fillRect(this.x, this.y, this.width, this.height);
+            ctx.fillRect(self.x, self.y, self.width, self.height);
             ctx.globalAlpha = 1;
         } else {
             // normal face up card
-            this.drawCard(ctx, this.name, FRONT_SPRITE);
+            self.drawCard(ctx, self.name, FRONT_SPRITE);
         }
 
         // in all cases draw the border
         ctx.fillStyle = CARD.BORDER_COLOR;
-        ctx.strokeRect(this.x, this.y, this.width, this.height);
+        ctx.strokeRect(self.x, self.y, self.width, self.height);
     };
 
-    this.drawCard = function(ctx, cardMapName, elementId) {
+    self.drawCard = function(ctx, cardMapName, elementId) {
         var position = cardMap[cardMapName];
         var sx = position.x;
         var sy = position.y;
         var sWidth = position.width;
         var sHeight = position.height;
-        var dx = this.x;
-        var dy = this.y;
-        var dWidth = this.width;
-        var dHeight = this.height;
+        var dx = self.x;
+        var dy = self.y;
+        var dWidth = self.width;
+        var dHeight = self.height;
         ctx.drawImage(document.getElementById(elementId), sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
     };
 
-    this.flip = function() {
-        this.faceUp = !(this.faceUp);
+    self.flip = function() {
+        self.faceUp = !(self.faceUp);
     };
 
-    this.setFaceUp = function(faceUp){
-        this.faceUp = faceUp;
+    self.setFaceUp = function(faceUp){
+        self.faceUp = faceUp;
     };
 
-    this.setTransparent = function(transparent) {
-        this.transparent = transparent;
+    self.setTransparent = function(transparent) {
+        self.transparent = transparent;
     };
 
-    this.setPosition = function(x, y) {
-        this.x = x;
-        this.y = y;
+    self.setPosition = function(x, y) {
+        self.x = x;
+        self.y = y;
     };
 
-    this.compareTo = function(card) {
+    self.compareTo = function(card) {
         if (card == null) {
             return 1;
         }
 
-        return this.value - card.value;
+        return self.value - card.value;
     };
 
-    this.isSpecial = function() {
-        return (this.value == SPECIAL.RESET
-                || this.value == SPECIAL.INVISIBLE
-                || this.value == SPECIAL.BURN);
+    self.isSpecial = function() {
+        return (self.value == SPECIAL.RESET
+                || self.value == SPECIAL.INVISIBLE
+                || self.value == SPECIAL.BURN);
     };
 };

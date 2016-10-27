@@ -1,104 +1,106 @@
 var Player = function(human) {
 
-    this.faceDownCards = [];
-    this.faceUpCards = [];
-    this.hand = [];
+    var self = this;
 
-    this.x = PLAYER.X;
-    this.y = PLAYER.Y;
+    self.faceDownCards = [];
+    self.faceUpCards = [];
+    self.hand = [];
 
-    this.human = human;
+    self.x = PLAYER.X;
+    self.y = PLAYER.Y;
 
-    this.render = function(ctx) {
-        this.reorderHand();
+    self.human = human;
+
+    self.render = function(ctx) {
+        self.reorderHand();
         // render face down cards
-        for (var i = 0; i < this.faceDownCards.length; i++) {
-            this.faceDownCards[i].render(ctx);
+        for (var i = 0; i < self.faceDownCards.length; i++) {
+            self.faceDownCards[i].render(ctx);
         }
         // render face up cards
-        for (i = 0; i < this.faceUpCards.length; i++) {
-            this.faceUpCards[i].render(ctx);
+        for (i = 0; i < self.faceUpCards.length; i++) {
+            self.faceUpCards[i].render(ctx);
         }
         // render hand
-        for (i = 0; i < this.hand.length; i++) {
-            this.hand[i].render(ctx);
+        for (i = 0; i < self.hand.length; i++) {
+            self.hand[i].render(ctx);
         }
     };
 
-    this.addToFaceDown = function(cards) {
+    self.addToFaceDown = function(cards) {
         for (var i = 0; i < cards.length; i++) {
             var card = cards[i];
-            card.setPosition(this.x + PLAYER.CARD_SPREAD * i, this.y - PLAYER.FACEUP_DIST);
-            this.faceDownCards.push(card);
+            card.setPosition(self.x + PLAYER.CARD_SPREAD * i, self.y - PLAYER.FACEUP_DIST);
+            self.faceDownCards.push(card);
         }
     };
 
-    this.addToFaceUps = function(cards) {
+    self.addToFaceUps = function(cards) {
         for (var i = 0; i < cards.length; i++) {
             var card = cards[i];
             card.setFaceUp(true);
             card.setPosition(
-                this.x + PLAYER.CARD_SPREAD * i + PLAYER.FACEUP_X_OFF,
-                this.y - (PLAYER.FACEUP_DIST - PLAYER.FACEUP_Y_OFF)
+                self.x + PLAYER.CARD_SPREAD * i + PLAYER.FACEUP_X_OFF,
+                self.y - (PLAYER.FACEUP_DIST - PLAYER.FACEUP_Y_OFF)
             );
-            this.faceUpCards.push(card);
+            self.faceUpCards.push(card);
         }
     };
 
-    this.addToHand = function(cards) {
+    self.addToHand = function(cards) {
         var card = null;
         for (var i = 0; i < cards.length; i++) {
             card = cards[i];
-            card.setFaceUp(this.human || DEBUG);
-            this.hand.push(card);
+            card.setFaceUp(self.human || DEBUG);
+            self.hand.push(card);
         }
-        this.reorderHand();
+        self.reorderHand();
     };
 
-    this.emptyHand = function() {
-        return this.hand.length == 0;
+    self.emptyHand = function() {
+        return self.hand.length == 0;
     };
 
-    this.cardsInHand = function() {
-        return this.hand.length;
+    self.cardsInHand = function() {
+        return self.hand.length;
     };
 
-    this.noFaceUps = function() {
-        return this.faceUpCards.length == 0;
+    self.noFaceUps = function() {
+        return self.faceUpCards.length == 0;
     };
 
-    this.noFaceDowns = function() {
-        return this.faceDownCards.length == 0;
+    self.noFaceDowns = function() {
+        return self.faceDownCards.length == 0;
     };
 
-    this.isDone = function() {
-        return (this.noFaceDowns() && this.noFaceUps() && this.emptyHand());
+    self.isDone = function() {
+        return (self.noFaceDowns() && self.noFaceUps() && self.emptyHand());
     };
 
-    this.play = function(top) {
-        if (this.hand.length > 0) {
-            var cards = this.playHand(top);
-            this.reorderHand();
+    self.play = function(top) {
+        if (self.hand.length > 0) {
+            var cards = self.playHand(top);
+            self.reorderHand();
             return cards;
-        } else if (this.faceUpCards.length > 0) {
-            return this.playFaceUp(top);
+        } else if (self.faceUpCards.length > 0) {
+            return self.playFaceUp(top);
         } else {
-            return [this.faceDownCards.pop()];
+            return [self.faceDownCards.pop()];
         }
     };
 
-    this.playHand = function(top) {
+    self.playHand = function(top) {
         var min = null;
         if (top == SPECIAL.REVERSE) {
-            min = this.findMinUnder(top, this.hand);
+            min = self.findMinUnder(top, self.hand);
         } else {
-            min = this.findMinAbove(top, this.hand);
+            min = self.findMinAbove(top, self.hand);
         }
 
         if (min != null) {
-            return this.hand.splice(min.index, min.total);
+            return self.hand.splice(min.index, min.total);
         } else {
-            return this.playSpecial(this.hand);
+            return self.playSpecial(self.hand);
         }
     };
 
@@ -112,7 +114,7 @@ var Player = function(human) {
         return indices;
     }
 
-    this.playFaceUp = function(top) {
+    self.playFaceUp = function(top) {
         var min = null;
         var indices = [];
         var i = 0;
@@ -120,36 +122,36 @@ var Player = function(human) {
         var c = null;
 
         if (top == SPECIAL.REVERSE) {
-            min = this.findMinUnder(top, this.faceUpCards);
+            min = self.findMinUnder(top, self.faceUpCards);
         } else {
-            min = this.findMinAbove(top, this.faceUpCards);
+            min = self.findMinAbove(top, self.faceUpCards);
         }
         if (min != null) {
-            indices = findAllCardsOfSameValue(this.faceUpCards, min.value);
+            indices = findAllCardsOfSameValue(self.faceUpCards, min.value);
             cards = [];
             for(i = indices.length - 1; i >= 0; i--) {
-                c = this.faceUpCards.splice(indices[i], 1)[0];
+                c = self.faceUpCards.splice(indices[i], 1)[0];
                 cards.push(c);
             }
             return cards;
         } else {
-            var special = this.playSpecial(this.faceUpCards);
+            var special = self.playSpecial(self.faceUpCards);
             if (special[0] != null) {
                 special = special[0];
-                indices = findAllCardsOfSameValue(this.faceUpCards, special.value);
+                indices = findAllCardsOfSameValue(self.faceUpCards, special.value);
                 cards = [special];
                 for(i = 0; i < indices.length; i++) {
-                    c = this.faceUpCards.splice(indices[i], 1)[0];
+                    c = self.faceUpCards.splice(indices[i], 1)[0];
                     cards.push(c);
                 }
                 return cards;
             } else {
-                return [this.faceUpCards.pop()]; // just pick one
+                return [self.faceUpCards.pop()]; // just pick one
             }
         }
     };
 
-    this.findMinAbove = function(top, cards) {
+    self.findMinAbove = function(top, cards) {
         // assume the cards are sorted
         var min = {index: null};
         for(var i = 0; i < cards.length; i++) {
@@ -168,7 +170,7 @@ var Player = function(human) {
         return min.index == null ? null : min;
     };
 
-    this.findMinUnder = function(top, cards) {
+    self.findMinUnder = function(top, cards) {
         // assume the cards are sorted
         var min = {index: null};
         for(var i = 0; i < cards.length; i++) {
@@ -187,7 +189,7 @@ var Player = function(human) {
         return min.index == null ? null : min;
     };
 
-    this.playSpecial = function(cards) {
+    self.playSpecial = function(cards) {
         for(var i = 0; i < cards.length; i++) {
             if (cards[i].isSpecial()) {
                 return cards.splice(i, 1);
@@ -196,13 +198,13 @@ var Player = function(human) {
         return [null];
     };
 
-    this.reorderHand = function() {
-        this.hand.sort(function (a, b) {
+    self.reorderHand = function() {
+        self.hand.sort(function (a, b) {
             return a.compareTo(b);
         });
-        var offset = (this.hand.length - 3) / 2 * PLAYER.CARD_SPREAD * (-1);
-        for(var i = 0; i < this.hand.length; i++) {
-            this.hand[i].setPosition(this.x + PLAYER.CARD_SPREAD * i + offset, this.y);
+        var offset = (self.hand.length - 3) / 2 * PLAYER.CARD_SPREAD * (-1);
+        for(var i = 0; i < self.hand.length; i++) {
+            self.hand[i].setPosition(self.x + PLAYER.CARD_SPREAD * i + offset, self.y);
         }
     };
 
@@ -215,21 +217,21 @@ var Player = function(human) {
         return false;
     }
 
-    this.getCards = function(type) {
+    self.getCards = function(type) {
         var cards = [];
         if (type == 'hand') {
-            cards = this.hand;
+            cards = self.hand;
         } else if (type == 'faceup') {
-            cards = this.faceUpCards;
+            cards = self.faceUpCards;
         } else if (type == 'facedown') {
-            cards = this.faceDownCards;
+            cards = self.faceDownCards;
         }
         return cards;
     };
 
-    this.pickCard = function(x, y, type) {
-        var index = this.selectCard(x, y, type);
-        var cards = this.getCards(type);
+    self.pickCard = function(x, y, type) {
+        var index = self.selectCard(x, y, type);
+        var cards = self.getCards(type);
 
         if (index != null) {
             return cards.splice(index, 1)[0];
@@ -238,8 +240,8 @@ var Player = function(human) {
         }
     };
 
-    this.selectCard = function(x, y, type) {
-        var cards = this.getCards(type);
+    self.selectCard = function(x, y, type) {
+        var cards = self.getCards(type);
 
         var index = null;
         for(var i = 0; i < cards.length; i++) {
@@ -251,15 +253,15 @@ var Player = function(human) {
         return index;
     };
 
-    this.swapCards = function(handIndex, faceUpIndex) {
-        var card = this.hand.splice(handIndex, 1)[0];
-        card = this.faceUpCards.splice(faceUpIndex, 1, card);
-        this.addToHand(card);
-        this.reorderHand();
+    self.swapCards = function(handIndex, faceUpIndex) {
+        var card = self.hand.splice(handIndex, 1)[0];
+        card = self.faceUpCards.splice(faceUpIndex, 1, card);
+        self.addToHand(card);
+        self.reorderHand();
 
         // sneaky way to preserve order in among face up cards
-        var temp = this.faceUpCards.splice(0, this.faceUpCards.length);
-        this.addToFaceUps(temp);
+        var temp = self.faceUpCards.splice(0, self.faceUpCards.length);
+        self.addToFaceUps(temp);
     };
 
     function getSpecialIndex(cards) {
@@ -271,31 +273,31 @@ var Player = function(human) {
         return -1;
     }
 
-    this.autoSwapCards = function() {
+    self.autoSwapCards = function() {
         // tries to make the best swap possible,
         // with special and high cards ending up as face up
-        this.reorderHand();
-        var specialInHand = getSpecialIndex(this.hand);
-        for(var i = 0; i < this.faceUpCards.length; i++) {
-            if (this.faceUpCards[i].isSpecial() == false) {
+        self.reorderHand();
+        var specialInHand = getSpecialIndex(self.hand);
+        for(var i = 0; i < self.faceUpCards.length; i++) {
+            if (self.faceUpCards[i].isSpecial() == false) {
                 if (specialInHand >= 0) {
-                    this.swapCards(specialInHand, i);
-                    specialInHand = getSpecialIndex(this.hand);
-                } else if (this.faceUpCards[i].value < this.hand[this.hand.length - 1].value) {
+                    self.swapCards(specialInHand, i);
+                    specialInHand = getSpecialIndex(self.hand);
+                } else if (self.faceUpCards[i].value < self.hand[self.hand.length - 1].value) {
                     // no special cards in hand
                     // just pick the biggest one
-                    this.swapCards(this.hand.length - 1, i);
+                    self.swapCards(self.hand.length - 1, i);
                 }
             }
         }
-        this.reorderHand();
+        self.reorderHand();
     };
 
-    this.encode = function() {
+    self.encode = function() {
         var p = {};
-        p.hand = this.hand.length;
-        p.faceUpCards = this.faceUpCards.length;
-        p.faceDownCards = this.faceDownCards.length;
+        p.hand = self.hand.length;
+        p.faceUpCards = self.faceUpCards.length;
+        p.faceDownCards = self.faceDownCards.length;
         return p;
     };
 };

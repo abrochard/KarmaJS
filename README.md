@@ -53,3 +53,5 @@ There are a few special rules and cards.
 ## TODO
   * smarter AI
   * better animation
+  * mobile compatibility
+  * adding controls description
