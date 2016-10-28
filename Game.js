@@ -292,6 +292,11 @@ var Game = function(canvas) {
             self.ctx.rotate((360 / self.players.length) * Math.PI / 180);
         }
 
+        // render picked cards
+        for(var i = 0; i < self.pickedCards.length; i++) {
+            self.pickedCards[i].render(self.ctx);
+        }
+
         // show scoreboard
         if (self.finished) {
             var position = self.winners.length + 1;
