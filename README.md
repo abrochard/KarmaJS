@@ -55,3 +55,6 @@ There are a few special rules and cards.
   * better animation
   * mobile compatibility
   * adding controls description
+  * play face up multiple cards
+  * too many cards in hands
+  * self flip animation

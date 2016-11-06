@@ -173,47 +173,65 @@ var Game = function(canvas) {
             console.log("Player " + index);
         }
 
-        if (!p.isDone()) {
-            var cards = p.play(game.pile.topValue());
-
-            if (cards[0] == null && game.deck.isEmpty() == false) { // could not play a card, attempt to flip
-                if (LOG) {
-                    console.log("AI flips deck");
-                }
-                cards[0] = game.deck.draw();
-            }
-
-            if (cards[0] == null) { // nothing in deck to flip...
-                p.addToHand(game.pile.pickUp());
-
-                if (LOG) {
-                    console.log("picked up");
-                }
-            } else if (game.validPlay(cards, game.pile.topValue()) == false) { // not valid card
-                if (LOG) {
-                    console.log("Invalid play: " + cards[0].value + " on " + game.pile.topValue());
-                }
-
-                p.addToHand(game.pile.pickUp());
-                p.addToHand(cards);
+        if (p.isDone()) {
+            if (index < game.players.length - 1) {
+                window.setTimeout(game.playAI, GAME.DELAY, game, index + 1);
             } else {
-                game.applyCards(cards);
+                game.acceptInput = true;
+            }
+        } else {
+            var total = p.play(game.pile.topValue());
 
-                while (game.deck.isEmpty() == false && p.cardsInHand() < 3) {
-                    p.addToHand([game.deck.draw()]);
-                }
+            if (total == 0 && !game.deck.isEmpty()) {
+                game.deck.flipTop();
             }
 
-            if (p.isDone()) {
-                // self was the winning move
-                game.winners.push(index);
-
-                if (game.winners.length == 3) { // player got wrecked
-                    game.finished = true;
-                }
-            }
-            game.render();
+            game.render(game.ctx);
+            window.setTimeout(self.playAICallback, GAME.DELAY2, game, index);
         }
+    };
+
+    self.playAICallback = function(game, index) {
+        var p = game.players[index];
+        var cards = p.playCallback();
+
+        if (cards[0] == null && game.deck.isEmpty() == false) { // could not play a card, attempt to flip
+            if (LOG) {
+                console.log("AI flips deck");
+            }
+            cards[0] = game.deck.draw();
+        }
+
+        if (cards[0] == null) { // nothing in deck to flip...
+            p.addToHand(game.pile.pickUp());
+
+            if (LOG) {
+                console.log("picked up");
+            }
+        } else if (game.validPlay(cards, game.pile.topValue()) == false) { // not valid card
+            if (LOG) {
+                console.log("Invalid play: " + cards[0].value + " on " + game.pile.topValue());
+            }
+
+            p.addToHand(game.pile.pickUp());
+            p.addToHand(cards);
+        } else {
+            game.applyCards(cards);
+
+            while (game.deck.isEmpty() == false && p.cardsInHand() < 3) {
+                p.addToHand([game.deck.draw()]);
+            }
+        }
+
+        if (p.isDone()) {
+            // self was the winning move
+            game.winners.push(index);
+
+            if (game.winners.length == 3) { // player got wrecked
+                game.finished = true;
+            }
+        }
+        game.render();
 
         if (index < game.players.length - 1) {
             window.setTimeout(game.playAI, GAME.DELAY, game, index + 1);

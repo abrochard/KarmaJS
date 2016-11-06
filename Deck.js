@@ -117,4 +117,8 @@ var Deck = function(x, y, maxRender) {
     self.cardsRemaining = function() {
         return self.cards.length;
     };
+
+    self.flipTop = function() {
+        self.cards[self.cards.length - 1].flip();
+    };
 };

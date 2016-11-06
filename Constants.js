@@ -56,7 +56,8 @@ var PLAYER = {
 
 var GAME = {
     PLAYERS: 4,
-    DELAY: 500
+    DELAY: 500,
+    DELAY2: 800
 };
 
 var BOARD = {
