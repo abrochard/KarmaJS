@@ -52,9 +52,11 @@ There are a few special rules and cards.
 
 ## TODO
   * smarter AI
-  * better animation
   * mobile compatibility
   * adding controls description
-  * play face up multiple cards
+  * AI play face up multiple cards
   * too many cards in hands
   * self flip animation
+  * hand reoder is not stable
+  * invisible card duplicate rendering bug?
+  * AI not picking best faceup value
