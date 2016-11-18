@@ -4,6 +4,17 @@ Javascript based Karma card game
 ## Demo
 Latest version playable at [https://abrochard.github.io/](https://abrochard.github.io/)
 
+## How to play
+For rules see below.
+
+Click on a card to play it. Drag with the mouse on multiple cards of
+the same value to play them together.
+
+At the beginning of the game you are allowed to swap cards between
+your hand and your face up cards. To do so, click on a card to select
+it and then on another one to swap it with the selected card. When you
+are done swapping, click on the deck to begin the game.
+
 ## Rules
 
 ### Goal
@@ -53,10 +64,10 @@ There are a few special rules and cards.
 ## TODO
   * smarter AI
   * mobile compatibility
-  * adding controls description
   * AI play face up multiple cards
   * too many cards in hands
   * self flip animation
   * hand reoder is not stable
   * invisible card duplicate rendering bug?
   * AI not picking best faceup value
+  * visual select for card swapping
