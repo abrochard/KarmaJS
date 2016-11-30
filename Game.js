@@ -181,13 +181,16 @@ var Game = function(canvas) {
       }
     } else {
       var total = p.play(game.pile.topValue());
+      var delay = GAME.DELAY2;
 
       if (total == 0 && !game.deck.isEmpty()) {
         game.deck.flipTop();
+      } else if (total == 0) {
+        delay = 0;// don't wait and just pick up the card
       }
 
       game.render(game.ctx);
-      window.setTimeout(self.playAICallback, GAME.DELAY2, game, index);
+      window.setTimeout(self.playAICallback, delay, game, index);
     }
   };
 
