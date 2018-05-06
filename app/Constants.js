@@ -1,26 +1,26 @@
 
-var SUIT = {
+export const SUIT = {
   SPADE: 0,
   DIAMOND: 1,
   CLOVER: 2,
   HEART: 3
 };
 
-var FACE = {
+export const FACE = {
   JACK: 11,
   QUEEN: 12,
   KING: 13,
   ACE: 14
 };
 
-var SPECIAL = {
+export const SPECIAL = {
   RESET: 2,
   INVISIBLE: 3,
   BURN: 10,
   REVERSE: 7
 };
 
-var CARD = {
+export const CARD = {
   HEIGHT: 70,
   WIDTH: 50,
   BORDER_COLOR: 'black',
@@ -33,19 +33,19 @@ var CARD = {
   }
 };
 
-var DECK = {
+export const DECK = {
   MAX_RENDER: 3,
   X: -50,
   Y: -35
 };
 
-var PILE = {
+export const PILE = {
   MAX_RENDER: 3,
   X: 10,
   Y: -35
 };
 
-var PLAYER = {
+export const PLAYER = {
   X: -80,
   Y: 300,
   FACEUP_DIST: 100,
@@ -54,17 +54,17 @@ var PLAYER = {
   FACEUP_Y_OFF: 4
 };
 
-var GAME = {
+export const GAME = {
   PLAYERS: 4,
   DELAY: 500,
   DELAY2: 800
 };
 
-var BOARD = {
+export const BOARD = {
   COLOR: 'rgb(8, 132, 36)'
 };
 
-var MESSAGE = {
+export const MESSAGE = {
   ZONE1: {
     x: -120,
     y: 90
@@ -77,5 +77,5 @@ var MESSAGE = {
   COLOR: 'black'
 };
 
-var DEBUG = false;
-var LOG = true;
+export const DEBUG = true;
+export const LOG = true;

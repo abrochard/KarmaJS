@@ -1,11 +1,11 @@
 // card sprite sheet thanks to http://opengameart.org/users/kenney
 
-var FRONT_SPRITE = 'front';
+export const FRONT_SPRITE = 'front';
 
-var BACK_SPRITE = 'back';
-var BACK_NAME = 'cardBack_red2';
+export const BACK_SPRITE = 'back';
+export const BACK_NAME = 'cardBack_red2';
 
-var cardMap = {
+export const cardMap = {
   SpadesQ: {
     height: 190,
     width: 140,
