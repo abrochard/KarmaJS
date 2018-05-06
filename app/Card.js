@@ -74,8 +74,8 @@ class Card {
     }
 
     // in all cases draw the border
-    ctx.fillStyle = CARD.BORDER_COLOR;
-    ctx.strokeRect(this.x, this.y, this.width, this.height);
+    // ctx.fillStyle = CARD.BORDER_COLOR;
+    // ctx.strokeRect(this.x, this.y, this.width, this.height);
   }
 
   drawCard(ctx, cardMapName, elementId) {
@@ -110,7 +110,7 @@ class Card {
     this.faceUp = faceUp;
   }
 
-  setTransparetn(transparent) {
+  setTransparent(transparent) {
     this.transparent = transparent;
   }
 

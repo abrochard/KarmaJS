@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { GAME, SPECIAL, PILE, CARD, LOG, BOARD, DECK, MESSAGE } from './Constants';
 import Deck from './Deck';
 import Player from './Player';
@@ -21,6 +22,9 @@ class Game {
     this.clickedOnDeck = false;
 
     this.finished = false;
+
+    this.playAI = this.playAI.bind(this);
+    this.playAICallback = this.playAICallback.bind(this);
   }
 
   // EVENT LISTENERS
@@ -123,14 +127,13 @@ class Game {
 
     // PLAYERS
     this.players = [];
-    // nPlayers = 0; // no players DEBUG
-    for (var i = 0; i < nPlayers; i++) {
+    _.range(nPlayers).forEach(i => {
       var p = new Player(i == 0);
 
       var faceDowns = [];
       var faceUps = [];
       var hand = [];
-      for (var j = 0; j < 3; j++) {
+      _.range(3).forEach(() => {
         faceDowns.push(this.deck.draw());
 
         var c = this.deck.draw();
@@ -138,7 +141,7 @@ class Game {
         faceUps.push(c);
 
         hand.push(this.deck.draw());
-      }
+      });
 
       p.addToFaceDown(faceDowns);
       p.addToFaceUps(faceUps);
@@ -150,7 +153,7 @@ class Game {
       }
 
       this.players.push(p);
-    }
+    });
 
     // PILE
     this.pile = new Deck(PILE.X, PILE.Y, PILE.MAX_RENDER);
@@ -255,16 +258,22 @@ class Game {
                   cards[0].value + ' on ' + top);
     }
 
-    for (var i = 0; i < cards.length; i++) {
-      cards[i].setFaceUp(true);
-    }
+    // for (var i = 0; i < cards.length; i++) {
+      // cards[i].setFaceUp(true);
+    // }
+    cards.forEach(c => {
+      c.setFaceUp(true);
+    });
 
     var value = cards[0].value;
 
     if (value == SPECIAL.INVISIBLE && this.pile.isEmpty() == false) {
-      for (i = 0; i < cards.length; i++) {
-        cards[i].setTransparent(true);
-      }
+      // for (i = 0; i < cards.length; i++) {
+        // cards[i].setTransparent(true);
+      // }
+      cards.forEach(c => {
+        c.setTransparent(true);
+      });
     }
 
     this.pile.place(cards);
@@ -330,9 +339,12 @@ class Game {
     }
 
     // render picked cards
-    for (var i = 0; i < this.pickedCards.length; i++) {
-      this.pickedCards[i].render(this.ctx);
-    }
+    this.pickedCards.forEach(c => {
+      c.render(this.ctx);
+    });
+    // for (var i = 0; i < this.pickedCards.length; i++) {
+      // this.pickedCards[i].render(this.ctx);
+    // }
 
     // show scoreboard
     if (this.finished) {
@@ -493,9 +505,12 @@ class Game {
     game.deck = this.deck.cardsRemaining();
     game.pile = this.pile.cardsRemaining();
     game.players = [];
-    for (var i = 0; i < this.players.length; i++) {
-      game.players.push(this.players[i].encode());
-    }
+    this.players.forEach(p => {
+      game.players.push(p.encode());
+    });
+    // for (var i = 0; i < this.players.length; i++) {
+      // game.players.push(this.players[i].encode());
+    // }
   }
 }
 
