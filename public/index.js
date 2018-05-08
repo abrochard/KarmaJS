@@ -187,8 +187,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 function Karma() {
   var canvas = document.getElementById('board');
-  canvas.width = document.body.clientWidth - 2;
-  canvas.height = document.body.clientHeight - 2;
+  canvas.width = document.body.clientWidth;
+  canvas.height = document.body.clientHeight;
   if (canvas.getContext) {
     var game = new __WEBPACK_IMPORTED_MODULE_0__Game__["a" /* default */](canvas);
     game.init();
@@ -236,6 +236,8 @@ class Game {
 
     this.playAI = this.playAI.bind(this);
     this.playAICallback = this.playAICallback.bind(this);
+
+    this.selected = false;
   }
 
   // EVENT LISTENERS
@@ -372,9 +374,38 @@ class Game {
     // CARD SWAPPING
     this.acceptInput = true;
     this.swapCards = true;
-    this.canvas.addEventListener('mousedown', this.swapDown.bind(this));
+    // this.canvas.addEventListener('mousedown', this.swapDown.bind(this));
+
+    // TEST
+    this.canvas.addEventListener('mousedown', this.selectCard.bind(this));
+    this.canvas.addEventListener('mousemove', this.moveCard.bind(this));
+    this.canvas.addEventListener('mouseup', this.dropCard.bind(this));
 
     this.render();
+  }
+
+  selectCard(e) {
+    var x = e.offsetX - this.canvas.width / 2;
+    var y = e.offsetY - this.canvas.height / 2;
+    var i = this.players[0].selectCard(x, y, 'hand');
+
+    if (i) {
+      this.selected = i;
+    }
+  }
+
+  moveCard(e) {
+    if (this.selected) {
+      console.log(e);
+      var x = e.offsetX - this.canvas.width / 2;
+      var y = e.offsetY - this.canvas.height / 2;
+      this.players[0].hand[this.selected].setPosition(x, y);
+      this.render();
+    }
+  }
+
+  dropCard(e) {
+    this.selected = false;
   }
 
   loop() {
@@ -526,19 +557,16 @@ class Game {
     }
 
     // render all players
-    for (var j = 0; j < this.players.length; j++) {
-      this.players[j].render(this.ctx);
+    this.players.forEach(p => {
+      p.render(this.ctx);
       // rotate the canvas for each player
       this.ctx.rotate(360 / this.players.length * Math.PI / 180);
-    }
+    });
 
     // render picked cards
     this.pickedCards.forEach(c => {
       c.render(this.ctx);
     });
-    // for (var i = 0; i < this.pickedCards.length; i++) {
-    // this.pickedCards[i].render(this.ctx);
-    // }
 
     // show scoreboard
     if (this.finished) {
@@ -18575,7 +18603,10 @@ const cardMap = {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Constants__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Constants__ = __webpack_require__(0);
+
 
 
 class Player {
@@ -18584,8 +18615,8 @@ class Player {
     this.faceUpCards = [];
     this.hand = [];
 
-    this.x = __WEBPACK_IMPORTED_MODULE_0__Constants__["j" /* PLAYER */].X;
-    this.y = __WEBPACK_IMPORTED_MODULE_0__Constants__["j" /* PLAYER */].Y;
+    this.x = __WEBPACK_IMPORTED_MODULE_1__Constants__["j" /* PLAYER */].X;
+    this.y = __WEBPACK_IMPORTED_MODULE_1__Constants__["j" /* PLAYER */].Y;
 
     this.human = human;
 
@@ -18598,25 +18629,26 @@ class Player {
   }
 
   render(ctx) {
-    this.reorderHand();
+    var r = c => {
+      c.render(ctx);
+    };
+
+    // this.reorderHand();
+
     // render face down cards
-    for (var i = 0; i < this.faceDownCards.length; i++) {
-      this.faceDownCards[i].render(ctx);
-    }
+    this.faceDownCards.forEach(r);
+
     // render face up cards
-    for (i = 0; i < this.faceUpCards.length; i++) {
-      this.faceUpCards[i].render(ctx);
-    }
+    this.faceUpCards.forEach(r);
+
     // render hand
-    for (i = 0; i < this.hand.length; i++) {
-      this.hand[i].render(ctx);
-    }
+    this.hand.forEach(r);
   }
 
   addToFaceDown(cards) {
     for (var i = 0; i < cards.length; i++) {
       var card = cards[i];
-      card.setPosition(this.x + __WEBPACK_IMPORTED_MODULE_0__Constants__["j" /* PLAYER */].CARD_SPREAD * i, this.y - __WEBPACK_IMPORTED_MODULE_0__Constants__["j" /* PLAYER */].FACEUP_DIST);
+      card.setPosition(this.x + __WEBPACK_IMPORTED_MODULE_1__Constants__["j" /* PLAYER */].CARD_SPREAD * i, this.y - __WEBPACK_IMPORTED_MODULE_1__Constants__["j" /* PLAYER */].FACEUP_DIST);
       this.faceDownCards.push(card);
     }
   }
@@ -18625,7 +18657,7 @@ class Player {
     for (var i = 0; i < cards.length; i++) {
       var card = cards[i];
       card.setFaceUp(true);
-      card.setPosition(this.x + __WEBPACK_IMPORTED_MODULE_0__Constants__["j" /* PLAYER */].CARD_SPREAD * i + __WEBPACK_IMPORTED_MODULE_0__Constants__["j" /* PLAYER */].FACEUP_X_OFF, this.y - (__WEBPACK_IMPORTED_MODULE_0__Constants__["j" /* PLAYER */].FACEUP_DIST - __WEBPACK_IMPORTED_MODULE_0__Constants__["j" /* PLAYER */].FACEUP_Y_OFF));
+      card.setPosition(this.x + __WEBPACK_IMPORTED_MODULE_1__Constants__["j" /* PLAYER */].CARD_SPREAD * i + __WEBPACK_IMPORTED_MODULE_1__Constants__["j" /* PLAYER */].FACEUP_X_OFF, this.y - (__WEBPACK_IMPORTED_MODULE_1__Constants__["j" /* PLAYER */].FACEUP_DIST - __WEBPACK_IMPORTED_MODULE_1__Constants__["j" /* PLAYER */].FACEUP_Y_OFF));
       this.faceUpCards.push(card);
     }
   }
@@ -18634,7 +18666,7 @@ class Player {
     var card = null;
     for (var i = 0; i < cards.length; i++) {
       card = cards[i];
-      card.setFaceUp(this.human || __WEBPACK_IMPORTED_MODULE_0__Constants__["c" /* DEBUG */]);
+      card.setFaceUp(this.human || __WEBPACK_IMPORTED_MODULE_1__Constants__["c" /* DEBUG */]);
       this.hand.push(card);
     }
     this.reorderHand();
@@ -18692,7 +18724,7 @@ class Player {
 
   playHand(top) {
     var min = null;
-    if (top == __WEBPACK_IMPORTED_MODULE_0__Constants__["k" /* SPECIAL */].REVERSE) {
+    if (top == __WEBPACK_IMPORTED_MODULE_1__Constants__["k" /* SPECIAL */].REVERSE) {
       min = this.findMinUnder(top, this.hand);
     } else {
       min = this.findMinAbove(top, this.hand);
@@ -18726,7 +18758,7 @@ class Player {
   playFaceUp(top) {
     var min = null;
 
-    if (top == __WEBPACK_IMPORTED_MODULE_0__Constants__["k" /* SPECIAL */].REVERSE) {
+    if (top == __WEBPACK_IMPORTED_MODULE_1__Constants__["k" /* SPECIAL */].REVERSE) {
       min = this.findMinUnder(top, this.faceUpCards);
     } else {
       min = this.findMinAbove(top, this.faceUpCards);
@@ -18839,15 +18871,15 @@ class Player {
     this.hand.sort(function (a, b) {
       return a.compareTo(b);
     });
-    var offset = (this.hand.length - 3) / 2 * __WEBPACK_IMPORTED_MODULE_0__Constants__["j" /* PLAYER */].CARD_SPREAD * -1;
+    var offset = (this.hand.length - 3) / 2 * __WEBPACK_IMPORTED_MODULE_1__Constants__["j" /* PLAYER */].CARD_SPREAD * -1;
     for (var i = 0; i < this.hand.length; i++) {
-      this.hand[i].setPosition(this.x + __WEBPACK_IMPORTED_MODULE_0__Constants__["j" /* PLAYER */].CARD_SPREAD * i + offset, this.y);
+      this.hand[i].setPosition(this.x + __WEBPACK_IMPORTED_MODULE_1__Constants__["j" /* PLAYER */].CARD_SPREAD * i + offset, this.y);
     }
   }
 
   clickedCard(x, y, card) {
-    if (x > card.x && x < card.x + __WEBPACK_IMPORTED_MODULE_0__Constants__["b" /* CARD */].WIDTH) {
-      if (y > card.y && y < card.y + __WEBPACK_IMPORTED_MODULE_0__Constants__["b" /* CARD */].HEIGHT) {
+    if (x > card.x && x < card.x + __WEBPACK_IMPORTED_MODULE_1__Constants__["b" /* CARD */].WIDTH) {
+      if (y > card.y && y < card.y + __WEBPACK_IMPORTED_MODULE_1__Constants__["b" /* CARD */].HEIGHT) {
         return true;
       }
     }

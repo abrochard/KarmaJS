@@ -25,6 +25,8 @@ class Game {
 
     this.playAI = this.playAI.bind(this);
     this.playAICallback = this.playAICallback.bind(this);
+
+    this.selected = false;
   }
 
   // EVENT LISTENERS
@@ -161,10 +163,40 @@ class Game {
     // CARD SWAPPING
     this.acceptInput = true;
     this.swapCards = true;
-    this.canvas.addEventListener('mousedown', this.swapDown.bind(this));
+    // this.canvas.addEventListener('mousedown', this.swapDown.bind(this));
+
+    // TEST
+    this.canvas.addEventListener('mousedown', this.selectCard.bind(this));
+    this.canvas.addEventListener('mousemove', this.moveCard.bind(this));
+    this.canvas.addEventListener('mouseup', this.dropCard.bind(this));
+
 
     this.render();
   };
+
+  selectCard(e) {
+    var x = e.offsetX - this.canvas.width / 2;
+    var y = e.offsetY - this.canvas.height / 2;
+    var i = this.players[0].selectCard(x, y, 'hand');
+
+    if (i) {
+      this.selected = i;
+    }
+  }
+
+  moveCard(e) {
+    if (this.selected) {
+      console.log(e);
+      var x = e.offsetX - this.canvas.width / 2;
+      var y = e.offsetY - this.canvas.height / 2;
+      this.players[0].hand[this.selected].setPosition(x, y);
+      this.render();
+    }
+  }
+
+  dropCard(e) {
+    this.selected = false;
+  }
 
   loop() {
     // trigger the AI playing loop
@@ -332,19 +364,17 @@ class Game {
     }
 
     // render all players
-    for (var j = 0; j < this.players.length; j++) {
-      this.players[j].render(this.ctx);
+    this.players.forEach(p => {
+      p.render(this.ctx);
       // rotate the canvas for each player
       this.ctx.rotate((360 / this.players.length) * Math.PI / 180);
-    }
+    });
 
     // render picked cards
     this.pickedCards.forEach(c => {
       c.render(this.ctx);
     });
-    // for (var i = 0; i < this.pickedCards.length; i++) {
-      // this.pickedCards[i].render(this.ctx);
-    // }
+
 
     // show scoreboard
     if (this.finished) {

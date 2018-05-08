@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import { PLAYER, DEBUG, CARD, SPECIAL } from './Constants';
 
 class Player {
@@ -20,19 +21,20 @@ class Player {
   }
 
   render(ctx) {
-    this.reorderHand();
+    var r = c => {
+      c.render(ctx);
+    };
+
+    // this.reorderHand();
+
     // render face down cards
-    for (var i = 0; i < this.faceDownCards.length; i++) {
-      this.faceDownCards[i].render(ctx);
-    }
+    this.faceDownCards.forEach(r);
+
     // render face up cards
-    for (i = 0; i < this.faceUpCards.length; i++) {
-      this.faceUpCards[i].render(ctx);
-    }
+    this.faceUpCards.forEach(r);
+
     // render hand
-    for (i = 0; i < this.hand.length; i++) {
-      this.hand[i].render(ctx);
-    }
+    this.hand.forEach(r);
   }
 
   addToFaceDown(cards) {
