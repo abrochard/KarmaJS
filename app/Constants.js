@@ -70,7 +70,7 @@ export const MESSAGE = {
     y: 90
   },
   ZONE2: {
-    x: -350,
+    x: -250,
     y: 270
   },
   FONT: '20px serif',

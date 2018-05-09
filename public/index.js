@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -158,7 +158,7 @@ const MESSAGE = {
     y: 90
   },
   ZONE2: {
-    x: -350,
+    x: -250,
     y: 270
   },
   FONT: '20px serif',
@@ -176,561 +176,6 @@ const LOG = true;
 
 /***/ }),
 /* 1 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Game__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Constants__ = __webpack_require__(0);
-
-
-
-function Karma() {
-  var canvas = document.getElementById('board');
-  canvas.width = document.body.clientWidth;
-  canvas.height = document.body.clientHeight;
-  if (canvas.getContext) {
-    var game = new __WEBPACK_IMPORTED_MODULE_0__Game__["a" /* default */](canvas);
-    game.init();
-  }
-}
-
-document.addEventListener("DOMContentLoaded", function (event) {
-  Karma();
-});
-
-/***/ }),
-/* 2 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Constants__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Deck__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Player__ = __webpack_require__(9);
-
-
-
-
-
-class Game {
-  constructor(canvas) {
-    this.canvas = canvas;
-    this.ctx = null;
-    this.deck = null;
-    this.pile = null;
-    this.players = [];
-    this.winners = [];
-
-    this.pickedCards = [];
-    this.selectedCards = [];
-    this.acceptInput = false;
-    this.acceptMove = false;
-    this.inputType = '';
-    this.swapCards = false;
-    this.clickedOnPile = false;
-    this.clickedOnDeck = false;
-
-    this.finished = false;
-
-    this.playAI = this.playAI.bind(this);
-    this.playAICallback = this.playAICallback.bind(this);
-
-    this.selected = false;
-  }
-
-  // EVENT LISTENERS
-  pickDown(e) {
-    if (this.acceptInput) {
-      // start listening for hovering
-      this.acceptMove = true;
-
-      // determines which cards can be picked
-      var human = this.players[0];
-      if (human.emptyHand() == false) {
-        // detect hand cards
-        this.inputType = 'hand';
-      } else if (human.noFaceUps() == false) {
-        // detect face up cards
-        this.inputType = 'faceup';
-      } else {
-        // detect facedown
-        this.inputType = 'facedown';
-      }
-
-      // add the card clicked on
-      var x = e.offsetX - this.canvas.width / 2;
-      var y = e.offsetY - this.canvas.height / 2;
-      this.detectSelection(x, y);
-
-      if (this.inputType == 'facedown') {
-        // can only play one facedown card per turn
-        this.acceptMove = false;
-        this.playCards();
-        this.pickedCards = [];
-      }
-    }
-  }
-
-  pickMove(e) {
-    if (this.acceptMove) {
-      // detects what cards are being hovered over
-      var x = e.offsetX - this.canvas.width / 2;
-      var y = e.offsetY - this.canvas.height / 2;
-      this.detectSelection(x, y);
-    }
-  }
-
-  pickUp(e) {
-    if (this.acceptMove || this.clickedOnPile || this.clickedOnDeck) {
-      // stop listening for hovering and play cards
-      this.acceptMove = false;
-      this.playCards();
-      this.pickedCards = [];
-    }
-  }
-
-  swapDown(e) {
-    if (this.swapCards == false) {
-      return;
-    }
-
-    var human = this.players[0];
-    var x = e.offsetX - this.canvas.width / 2;
-    var y = e.offsetY - this.canvas.height / 2;
-
-    if (this.detectDeckClick(x, y)) {
-      // start the game
-      this.swapCards = false;
-      this.canvas.removeEventListener('mousedown', this.swapDown.bind(this));
-      this.canvas.addEventListener('mousedown', this.pickDown.bind(this));
-      this.canvas.addEventListener('mousemove', this.pickMove.bind(this));
-      this.canvas.addEventListener('mouseup', this.pickUp.bind(this));
-      this.render();
-    } else {
-      // swap cards
-      var indices = [];
-      indices.push(human.selectCard(x, y, 'hand'));
-      indices.push(human.selectCard(x, y, 'faceup'));
-
-      for (var i = 0; i < indices.length; i++) {
-        var index = indices[i];
-        if (index != null) {
-          this.selectedCards.push(index);
-          break;
-        }
-      }
-
-      if (this.selectedCards.length == 2) {
-        human.swapCards(this.selectedCards[1], this.selectedCards[0]);
-        this.selectedCards = [];
-        this.render();
-      }
-    }
-  }
-
-  init(nPlayers = __WEBPACK_IMPORTED_MODULE_1__Constants__["f" /* GAME */].PLAYERS) {
-    this.ctx = this.canvas.getContext('2d');
-
-    // DECK
-    this.deck = new __WEBPACK_IMPORTED_MODULE_2__Deck__["a" /* default */](__WEBPACK_IMPORTED_MODULE_1__Constants__["d" /* DECK */].X, __WEBPACK_IMPORTED_MODULE_1__Constants__["d" /* DECK */].Y, __WEBPACK_IMPORTED_MODULE_1__Constants__["d" /* DECK */].MAX_RENDER);
-    this.deck.generate(false);
-    this.deck.shuffle();
-
-    // PLAYERS
-    this.players = [];
-    __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.range(nPlayers).forEach(i => {
-      var p = new __WEBPACK_IMPORTED_MODULE_3__Player__["a" /* default */](i == 0);
-
-      var faceDowns = [];
-      var faceUps = [];
-      var hand = [];
-      __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.range(3).forEach(() => {
-        faceDowns.push(this.deck.draw());
-
-        var c = this.deck.draw();
-        c.flip();
-        faceUps.push(c);
-
-        hand.push(this.deck.draw());
-      });
-
-      p.addToFaceDown(faceDowns);
-      p.addToFaceUps(faceUps);
-      p.addToHand(hand);
-
-      // AI swap cards
-      if (i > 0) {
-        p.autoSwapCards();
-      }
-
-      this.players.push(p);
-    });
-
-    // PILE
-    this.pile = new __WEBPACK_IMPORTED_MODULE_2__Deck__["a" /* default */](__WEBPACK_IMPORTED_MODULE_1__Constants__["i" /* PILE */].X, __WEBPACK_IMPORTED_MODULE_1__Constants__["i" /* PILE */].Y, __WEBPACK_IMPORTED_MODULE_1__Constants__["i" /* PILE */].MAX_RENDER);
-
-    // CARD SWAPPING
-    this.acceptInput = true;
-    this.swapCards = true;
-    // this.canvas.addEventListener('mousedown', this.swapDown.bind(this));
-
-    // TEST
-    this.canvas.addEventListener('mousedown', this.selectCard.bind(this));
-    this.canvas.addEventListener('mousemove', this.moveCard.bind(this));
-    this.canvas.addEventListener('mouseup', this.dropCard.bind(this));
-
-    this.render();
-  }
-
-  selectCard(e) {
-    var x = e.offsetX - this.canvas.width / 2;
-    var y = e.offsetY - this.canvas.height / 2;
-    var i = this.players[0].selectCard(x, y, 'hand');
-
-    if (i) {
-      this.selected = i;
-    }
-  }
-
-  moveCard(e) {
-    if (this.selected) {
-      console.log(e);
-      var x = e.offsetX - this.canvas.width / 2;
-      var y = e.offsetY - this.canvas.height / 2;
-      this.players[0].hand[this.selected].setPosition(x, y);
-      this.render();
-    }
-  }
-
-  dropCard(e) {
-    this.selected = false;
-  }
-
-  loop() {
-    // trigger the AI playing loop
-    this.acceptInput = false;
-    window.setTimeout(this.playAI, __WEBPACK_IMPORTED_MODULE_1__Constants__["f" /* GAME */].DELAY, this, 1);
-  }
-
-  playAI(game, index) {
-    // timeout cascade function
-    var p = game.players[index];
-
-    if (__WEBPACK_IMPORTED_MODULE_1__Constants__["g" /* LOG */]) {
-      console.log('Player ' + index);
-    }
-
-    if (p.isDone()) {
-      if (index < game.players.length - 1) {
-        window.setTimeout(game.playAI, __WEBPACK_IMPORTED_MODULE_1__Constants__["f" /* GAME */].DELAY, game, index + 1);
-      } else {
-        game.acceptInput = true;
-      }
-    } else {
-      var total = p.play(game.pile.topValue());
-      var delay = __WEBPACK_IMPORTED_MODULE_1__Constants__["f" /* GAME */].DELAY2;
-
-      if (total == 0 && !game.deck.isEmpty()) {
-        game.deck.flipTop();
-      } else if (total == 0) {
-        delay = 0; // don't wait and just pick up the card
-      }
-
-      game.render(game.ctx);
-      window.setTimeout(this.playAICallback, delay, game, index);
-    }
-  }
-
-  playAICallback(game, index) {
-    var p = game.players[index];
-    var cards = p.playCallback();
-
-    if (cards[0] == null && game.deck.isEmpty() == false) {
-      // could not play a card, attempt to flip
-      if (__WEBPACK_IMPORTED_MODULE_1__Constants__["g" /* LOG */]) {
-        console.log('AI flips deck');
-      }
-      cards[0] = game.deck.draw();
-    }
-
-    if (cards[0] == null) {
-      // nothing in deck to flip...
-      p.addToHand(game.pile.pickUp());
-
-      if (__WEBPACK_IMPORTED_MODULE_1__Constants__["g" /* LOG */]) {
-        console.log('picked up');
-      }
-    } else if (game.validPlay(cards, game.pile.topValue()) == false) {
-      // not valid card
-      if (__WEBPACK_IMPORTED_MODULE_1__Constants__["g" /* LOG */]) {
-        console.log('Invalid play: ' + cards[0].value + ' on ' + game.pile.topValue());
-      }
-
-      p.addToHand(game.pile.pickUp());
-      p.addToHand(cards);
-    } else {
-      game.applyCards(cards);
-
-      while (game.deck.isEmpty() == false && p.cardsInHand() < 3) {
-        p.addToHand([game.deck.draw()]);
-      }
-    }
-
-    if (p.isDone()) {
-      // this was the winning move
-      game.winners.push(index);
-
-      if (game.winners.length == 3) {
-        // player got wrecked
-        game.finished = true;
-      }
-    }
-    game.render();
-
-    if (index < game.players.length - 1) {
-      window.setTimeout(game.playAI, __WEBPACK_IMPORTED_MODULE_1__Constants__["f" /* GAME */].DELAY, game, index + 1);
-    } else {
-      game.acceptInput = true;
-    }
-  }
-
-  applyCards(cards) {
-    if (__WEBPACK_IMPORTED_MODULE_1__Constants__["g" /* LOG */]) {
-      var top = this.pile.isEmpty() ? 'nothing' : this.pile.peek().value;
-      console.log('Played ' + cards.length + ' ' + cards[0].value + ' on ' + top);
-    }
-
-    // for (var i = 0; i < cards.length; i++) {
-    // cards[i].setFaceUp(true);
-    // }
-    cards.forEach(c => {
-      c.setFaceUp(true);
-    });
-
-    var value = cards[0].value;
-
-    if (value == __WEBPACK_IMPORTED_MODULE_1__Constants__["k" /* SPECIAL */].INVISIBLE && this.pile.isEmpty() == false) {
-      // for (i = 0; i < cards.length; i++) {
-      // cards[i].setTransparent(true);
-      // }
-      cards.forEach(c => {
-        c.setTransparent(true);
-      });
-    }
-
-    this.pile.place(cards);
-
-    if (this.pile.peek().value == __WEBPACK_IMPORTED_MODULE_1__Constants__["k" /* SPECIAL */].BURN) {
-      this.pile.pickUp(); // discard the pile
-    }
-
-    if (cards.length == 4) {
-      this.pile.pickUp(); // discard the pile
-    }
-
-    if (this.pile.sameLastFour()) {
-      this.pile.pickUp(); // discard the pile
-    }
-  }
-
-  render() {
-    // recenter
-    this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
-    // clear the board
-    this.ctx.clearRect(-this.canvas.height / 2, -this.canvas.width / 2, this.canvas.width, this.canvas.height);
-
-    // render board
-    this.ctx.fillStyle = __WEBPACK_IMPORTED_MODULE_1__Constants__["a" /* BOARD */].COLOR;
-    this.ctx.fillRect(-this.canvas.width / 2, -this.canvas.height / 2, this.canvas.width, this.canvas.height);
-
-    this.deck.render(this.ctx);
-    this.pile.render(this.ctx);
-
-    // show instructions
-    if (this.swapCards) {
-      this.ctx.fillStyle = __WEBPACK_IMPORTED_MODULE_1__Constants__["h" /* MESSAGE */].COLOR;
-      this.ctx.font = __WEBPACK_IMPORTED_MODULE_1__Constants__["h" /* MESSAGE */].FONT;
-      this.ctx.fillText('Click the deck to start playing', __WEBPACK_IMPORTED_MODULE_1__Constants__["h" /* MESSAGE */].ZONE1.x, __WEBPACK_IMPORTED_MODULE_1__Constants__["h" /* MESSAGE */].ZONE1.y);
-      this.ctx.fillText('Swap cards by clicking them', __WEBPACK_IMPORTED_MODULE_1__Constants__["h" /* MESSAGE */].ZONE2.x, __WEBPACK_IMPORTED_MODULE_1__Constants__["h" /* MESSAGE */].ZONE2.y);
-    }
-
-    // render all players
-    this.players.forEach(p => {
-      p.render(this.ctx);
-      // rotate the canvas for each player
-      this.ctx.rotate(360 / this.players.length * Math.PI / 180);
-    });
-
-    // render picked cards
-    this.pickedCards.forEach(c => {
-      c.render(this.ctx);
-    });
-
-    // show scoreboard
-    if (this.finished) {
-      var position = this.winners.length + 1;
-      this.ctx.fillStyle = __WEBPACK_IMPORTED_MODULE_1__Constants__["a" /* BOARD */].MESSAGECOLOR;
-      this.ctx.font = __WEBPACK_IMPORTED_MODULE_1__Constants__["a" /* BOARD */].MESSAGEFONT;
-      this.ctx.fillText('Congrats you finished #' + position, __WEBPACK_IMPORTED_MODULE_1__Constants__["h" /* MESSAGE */].ZONE1.x, __WEBPACK_IMPORTED_MODULE_1__Constants__["h" /* MESSAGE */].ZONE1.y);
-    }
-
-    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-  }
-
-  detectSelection(x, y) {
-    var human = this.players[0];
-    var card = human.pickCard(x, y, this.inputType);
-
-    if (card == null && this.pickedCards.length == 0 && this.detectDeckClick(x, y)) {
-      if (__WEBPACK_IMPORTED_MODULE_1__Constants__["g" /* LOG */]) {
-        console.log('Player tries to flip the deck');
-      }
-      this.clickedOnDeck = true;
-      this.pickedCards.push(this.deck.draw());
-      this.acceptMove = false;
-    }
-
-    if (card == null && this.pickedCards.length == 0 && this.detectPileClick(x, y)) {
-      if (__WEBPACK_IMPORTED_MODULE_1__Constants__["g" /* LOG */]) {
-        console.log('Player picks up');
-      }
-      this.clickedOnPile = true;
-      this.acceptMove = false;
-    }
-
-    if (card != null) {
-      this.pickedCards.push(card);
-    }
-  }
-
-  playCards() {
-    var human = this.players[0];
-    if (this.pickedCards.length > 0) {
-      if (__WEBPACK_IMPORTED_MODULE_1__Constants__["g" /* LOG */]) {
-        console.log('Human player');
-      }
-
-      this.clickedOnDeck = false;
-
-      if (this.validPlay(this.pickedCards, this.pile.topValue())) {
-        this.applyCards(this.pickedCards);
-
-        while (this.deck.isEmpty() == false && human.cardsInHand() < 3) {
-          human.addToHand([this.deck.draw()]);
-        }
-
-        if (human.isDone()) {
-          // winning move
-          this.finished = true;
-          this.render();
-          return;
-        }
-      } else {
-        // invalid play
-        if (__WEBPACK_IMPORTED_MODULE_1__Constants__["g" /* LOG */]) {
-          console.log('Invalid play: ' + this.pickedCards[0].value + ' on ' + this.pile.topValue());
-        }
-        human.addToHand(this.pickedCards);
-        human.addToHand(this.pile.pickUp());
-      }
-      this.render();
-      this.loop();
-    } else if (this.clickedOnPile) {
-      if (__WEBPACK_IMPORTED_MODULE_1__Constants__["g" /* LOG */]) {
-        console.log('Picked up the pile');
-      }
-      human.addToHand(this.pile.pickUp());
-      this.clickedOnPile = false;
-      this.render();
-      this.loop();
-    }
-  }
-
-  detectDeckClick(x, y) {
-    if (x > this.deck.x && x < this.deck.x + __WEBPACK_IMPORTED_MODULE_1__Constants__["b" /* CARD */].WIDTH) {
-      if (y > this.deck.y && y < this.deck.y + __WEBPACK_IMPORTED_MODULE_1__Constants__["b" /* CARD */].HEIGHT) {
-        if (!this.deck.isEmpty()) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  detectPileClick(x, y) {
-    if (x > this.pile.x && x < this.pile.x + __WEBPACK_IMPORTED_MODULE_1__Constants__["b" /* CARD */].WIDTH) {
-      if (y > this.pile.y && y < this.pile.y + __WEBPACK_IMPORTED_MODULE_1__Constants__["b" /* CARD */].HEIGHT) {
-        if (!this.pile.isEmpty()) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  validPlay(cards, topValue) {
-    // make sure all cards are of the same value
-    var value = cards[0].value;
-    for (var i = 1; i < cards.length; i++) {
-      if (cards[i].value != value) {
-        return false;
-      }
-    }
-
-    // played four of a kind
-    if (cards.length == 4) {
-      return true;
-    }
-
-    // nothing on pile
-    if (topValue == null || topValue == 0) {
-      return true;
-    }
-
-    // played a special card
-    if (cards[0].isSpecial()) {
-      return true;
-    }
-
-    // played on top of a two
-    if (topValue == __WEBPACK_IMPORTED_MODULE_1__Constants__["k" /* SPECIAL */].RESET) {
-      return true;
-    }
-
-    // top is a 7
-    if (topValue == __WEBPACK_IMPORTED_MODULE_1__Constants__["k" /* SPECIAL */].REVERSE) {
-      if (cards[0].value <= __WEBPACK_IMPORTED_MODULE_1__Constants__["k" /* SPECIAL */].REVERSE) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-
-    // just compare values
-    return value >= topValue;
-  }
-
-  encodeGame() {
-    var game = {};
-    game.nPlayers = this.players.length;
-    game.deck = this.deck.cardsRemaining();
-    game.pile = this.pile.cardsRemaining();
-    game.players = [];
-    this.players.forEach(p => {
-      game.players.push(p.encode());
-    });
-    // for (var i = 0; i < this.players.length; i++) {
-    // game.players.push(this.players[i].encode());
-    // }
-  }
-}
-
-/* harmony default export */ __webpack_exports__["a"] = (Game);
-
-/***/ }),
-/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -17843,6 +17288,561 @@ class Game {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4), __webpack_require__(5)(module)))
 
 /***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Game__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Constants__ = __webpack_require__(0);
+
+
+
+function Karma() {
+  var canvas = document.getElementById('board');
+  canvas.width = document.body.clientWidth;
+  canvas.height = document.body.clientHeight;
+  if (canvas.getContext) {
+    var game = new __WEBPACK_IMPORTED_MODULE_0__Game__["a" /* default */](canvas);
+    game.init();
+  }
+}
+
+document.addEventListener("DOMContentLoaded", function (event) {
+  Karma();
+});
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Constants__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Deck__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Player__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__SwapEventListeners__ = __webpack_require__(10);
+
+
+
+
+
+
+
+class Game {
+  constructor(canvas) {
+    this.canvas = canvas;
+    this.ctx = null;
+    this.deck = null;
+    this.pile = null;
+    this.players = [];
+    this.winners = [];
+
+    this.pickedCards = [];
+    this.selectedCards = [];
+    this.acceptInput = false;
+    this.acceptMove = false;
+    this.inputType = '';
+    this.swapCards = false;
+    this.clickedOnPile = false;
+    this.clickedOnDeck = false;
+
+    this.finished = false;
+
+    this.playAI = this.playAI.bind(this);
+    this.playAICallback = this.playAICallback.bind(this);
+    this.render = this.render.bind(this);
+
+    this.selected = false;
+    this.engaged = false;
+    this.highligted = null;
+    this.lastPosition = {};
+
+    this.swapEL = null;
+  }
+
+  // EVENT LISTENERS
+  pickDown(e) {
+    if (this.acceptInput) {
+      // start listening for hovering
+      this.acceptMove = true;
+
+      // determines which cards can be picked
+      var human = this.players[0];
+      if (human.emptyHand() == false) {
+        // detect hand cards
+        this.inputType = 'hand';
+      } else if (human.noFaceUps() == false) {
+        // detect face up cards
+        this.inputType = 'faceup';
+      } else {
+        // detect facedown
+        this.inputType = 'facedown';
+      }
+
+      // add the card clicked on
+      var x = e.offsetX - this.canvas.width / 2;
+      var y = e.offsetY - this.canvas.height / 2;
+      this.detectSelection(x, y);
+
+      if (this.inputType == 'facedown') {
+        // can only play one facedown card per turn
+        this.acceptMove = false;
+        this.playCards();
+        this.pickedCards = [];
+      }
+    }
+  }
+
+  pickMove(e) {
+    if (this.acceptMove) {
+      // detects what cards are being hovered over
+      var x = e.offsetX - this.canvas.width / 2;
+      var y = e.offsetY - this.canvas.height / 2;
+      this.detectSelection(x, y);
+    }
+  }
+
+  pickUp(e) {
+    if (this.acceptMove || this.clickedOnPile || this.clickedOnDeck) {
+      // stop listening for hovering and play cards
+      this.acceptMove = false;
+      this.playCards();
+      this.pickedCards = [];
+    }
+  }
+
+  swapDown(e) {
+    if (this.swapCards == false) {
+      return;
+    }
+
+    var human = this.players[0];
+    var x = e.offsetX - this.canvas.width / 2;
+    var y = e.offsetY - this.canvas.height / 2;
+
+    if (this.detectDeckClick(x, y)) {
+      // start the game
+      this.swapCards = false;
+      this.canvas.removeEventListener('mousedown', this.swapDown.bind(this));
+      this.canvas.addEventListener('mousedown', this.pickDown.bind(this));
+      this.canvas.addEventListener('mousemove', this.pickMove.bind(this));
+      this.canvas.addEventListener('mouseup', this.pickUp.bind(this));
+      this.render();
+    } else {
+      // swap cards
+      var indices = [];
+      indices.push(human.selectCard(x, y, 'hand'));
+      indices.push(human.selectCard(x, y, 'faceup'));
+
+      for (var i = 0; i < indices.length; i++) {
+        var index = indices[i];
+        if (index != null) {
+          this.selectedCards.push(index);
+          break;
+        }
+      }
+
+      if (this.selectedCards.length == 2) {
+        human.swapCards(this.selectedCards[1], this.selectedCards[0]);
+        this.selectedCards = [];
+        this.render();
+      }
+    }
+  }
+
+  init(nPlayers = __WEBPACK_IMPORTED_MODULE_1__Constants__["f" /* GAME */].PLAYERS) {
+    this.ctx = this.canvas.getContext('2d');
+
+    // DECK
+    this.deck = new __WEBPACK_IMPORTED_MODULE_2__Deck__["a" /* default */](__WEBPACK_IMPORTED_MODULE_1__Constants__["d" /* DECK */].X, __WEBPACK_IMPORTED_MODULE_1__Constants__["d" /* DECK */].Y, __WEBPACK_IMPORTED_MODULE_1__Constants__["d" /* DECK */].MAX_RENDER);
+    this.deck.generate(false);
+    this.deck.shuffle();
+
+    // PLAYERS
+    this.players = [];
+    __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.range(nPlayers).forEach(i => {
+      var p = new __WEBPACK_IMPORTED_MODULE_3__Player__["a" /* default */](i == 0);
+
+      var faceDowns = [];
+      var faceUps = [];
+      var hand = [];
+      __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.range(3).forEach(() => {
+        faceDowns.push(this.deck.draw());
+
+        var c = this.deck.draw();
+        c.flip();
+        faceUps.push(c);
+
+        hand.push(this.deck.draw());
+      });
+
+      p.addToFaceDown(faceDowns);
+      p.addToFaceUps(faceUps);
+      p.addToHand(hand);
+
+      // AI swap cards
+      if (i > 0) {
+        p.autoSwapCards();
+      }
+
+      this.players.push(p);
+    });
+
+    // PILE
+    this.pile = new __WEBPACK_IMPORTED_MODULE_2__Deck__["a" /* default */](__WEBPACK_IMPORTED_MODULE_1__Constants__["i" /* PILE */].X, __WEBPACK_IMPORTED_MODULE_1__Constants__["i" /* PILE */].Y, __WEBPACK_IMPORTED_MODULE_1__Constants__["i" /* PILE */].MAX_RENDER);
+
+    // CARD SWAPPING
+    this.acceptInput = true;
+    this.swapCards = true;
+    // this.canvas.addEventListener('mousedown', this.swapDown.bind(this));
+
+    // NEW
+    var swapFct = (handCard, faceUpCard) => {
+      var human = this.players[0];
+      var handIndex = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.indexOf(human.hand, handCard);
+      var faceUpIndex = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.indexOf(human.faceUpCards, faceUpCard);
+      human.swapCards(handIndex, faceUpIndex);
+    };
+
+    this.swapEL = new __WEBPACK_IMPORTED_MODULE_4__SwapEventListeners__["a" /* default */](this.canvas.width, this.canvas.height, this.render, (x, y) => {
+      var i = this.players[0].selectCard(x, y, 'hand');
+      if (i >= 0 && i !== null) {
+        return this.players[0].hand[i];
+      }
+      return null;
+    }, (x, y) => {
+      var i = this.players[0].selectCard(x, y, 'faceup');
+      if (i >= 0 && i !== null) {
+        return this.players[0].faceUpCards[i];
+      }
+      return null;
+    }, swapFct);
+
+    this.canvas.addEventListener('mousedown', this.swapEL.onMouseDown);
+    this.canvas.addEventListener('mousemove', this.swapEL.onMouseMove);
+    this.canvas.addEventListener('mouseup', this.swapEL.onMouseUp);
+
+    this.render();
+  }
+
+  loop() {
+    // trigger the AI playing loop
+    this.acceptInput = false;
+    window.setTimeout(this.playAI, __WEBPACK_IMPORTED_MODULE_1__Constants__["f" /* GAME */].DELAY, this, 1);
+  }
+
+  playAI(game, index) {
+    // timeout cascade function
+    var p = game.players[index];
+
+    if (__WEBPACK_IMPORTED_MODULE_1__Constants__["g" /* LOG */]) {
+      console.log('Player ' + index);
+    }
+
+    if (p.isDone()) {
+      if (index < game.players.length - 1) {
+        window.setTimeout(game.playAI, __WEBPACK_IMPORTED_MODULE_1__Constants__["f" /* GAME */].DELAY, game, index + 1);
+      } else {
+        game.acceptInput = true;
+      }
+    } else {
+      var total = p.play(game.pile.topValue());
+      var delay = __WEBPACK_IMPORTED_MODULE_1__Constants__["f" /* GAME */].DELAY2;
+
+      if (total == 0 && !game.deck.isEmpty()) {
+        game.deck.flipTop();
+      } else if (total == 0) {
+        delay = 0; // don't wait and just pick up the card
+      }
+
+      game.render(game.ctx);
+      window.setTimeout(this.playAICallback, delay, game, index);
+    }
+  }
+
+  playAICallback(game, index) {
+    var p = game.players[index];
+    var cards = p.playCallback();
+
+    if (cards[0] == null && game.deck.isEmpty() == false) {
+      // could not play a card, attempt to flip
+      if (__WEBPACK_IMPORTED_MODULE_1__Constants__["g" /* LOG */]) {
+        console.log('AI flips deck');
+      }
+      cards[0] = game.deck.draw();
+    }
+
+    if (cards[0] == null) {
+      // nothing in deck to flip...
+      p.addToHand(game.pile.pickUp());
+
+      if (__WEBPACK_IMPORTED_MODULE_1__Constants__["g" /* LOG */]) {
+        console.log('picked up');
+      }
+    } else if (game.validPlay(cards, game.pile.topValue()) == false) {
+      // not valid card
+      if (__WEBPACK_IMPORTED_MODULE_1__Constants__["g" /* LOG */]) {
+        console.log('Invalid play: ' + cards[0].value + ' on ' + game.pile.topValue());
+      }
+
+      p.addToHand(game.pile.pickUp());
+      p.addToHand(cards);
+    } else {
+      game.applyCards(cards);
+
+      while (game.deck.isEmpty() == false && p.cardsInHand() < 3) {
+        p.addToHand([game.deck.draw()]);
+      }
+    }
+
+    if (p.isDone()) {
+      // this was the winning move
+      game.winners.push(index);
+
+      if (game.winners.length == 3) {
+        // player got wrecked
+        game.finished = true;
+      }
+    }
+    game.render();
+
+    if (index < game.players.length - 1) {
+      window.setTimeout(game.playAI, __WEBPACK_IMPORTED_MODULE_1__Constants__["f" /* GAME */].DELAY, game, index + 1);
+    } else {
+      game.acceptInput = true;
+    }
+  }
+
+  applyCards(cards) {
+    if (__WEBPACK_IMPORTED_MODULE_1__Constants__["g" /* LOG */]) {
+      var top = this.pile.isEmpty() ? 'nothing' : this.pile.peek().value;
+      console.log('Played ' + cards.length + ' ' + cards[0].value + ' on ' + top);
+    }
+
+    cards.forEach(c => {
+      c.setFaceUp(true);
+    });
+
+    var value = cards[0].value;
+
+    if (value == __WEBPACK_IMPORTED_MODULE_1__Constants__["k" /* SPECIAL */].INVISIBLE && this.pile.isEmpty() == false) {
+      cards.forEach(c => {
+        c.setTransparent(true);
+      });
+    }
+
+    this.pile.place(cards);
+
+    if (this.pile.peek().value == __WEBPACK_IMPORTED_MODULE_1__Constants__["k" /* SPECIAL */].BURN) {
+      this.pile.pickUp(); // discard the pile
+    }
+
+    if (cards.length == 4) {
+      this.pile.pickUp(); // discard the pile
+    }
+
+    if (this.pile.sameLastFour()) {
+      this.pile.pickUp(); // discard the pile
+    }
+  }
+
+  render() {
+    // recenter
+    this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
+    // clear the board
+    this.ctx.clearRect(-this.canvas.height / 2, -this.canvas.width / 2, this.canvas.width, this.canvas.height);
+
+    // render board
+    this.ctx.fillStyle = __WEBPACK_IMPORTED_MODULE_1__Constants__["a" /* BOARD */].COLOR;
+    this.ctx.fillRect(-this.canvas.width / 2, -this.canvas.height / 2, this.canvas.width, this.canvas.height);
+
+    this.deck.render(this.ctx);
+    this.pile.render(this.ctx);
+
+    // show instructions
+    if (this.swapCards) {
+      this.ctx.fillStyle = __WEBPACK_IMPORTED_MODULE_1__Constants__["h" /* MESSAGE */].COLOR;
+      this.ctx.font = __WEBPACK_IMPORTED_MODULE_1__Constants__["h" /* MESSAGE */].FONT;
+      this.ctx.fillText('Click the deck to start playing', __WEBPACK_IMPORTED_MODULE_1__Constants__["h" /* MESSAGE */].ZONE1.x, __WEBPACK_IMPORTED_MODULE_1__Constants__["h" /* MESSAGE */].ZONE1.y);
+      this.ctx.fillText('Swap cards first', __WEBPACK_IMPORTED_MODULE_1__Constants__["h" /* MESSAGE */].ZONE2.x, __WEBPACK_IMPORTED_MODULE_1__Constants__["h" /* MESSAGE */].ZONE2.y);
+    }
+
+    // render all players
+    this.players.forEach(p => {
+      p.render(this.ctx);
+      // rotate the canvas for each player
+      this.ctx.rotate(360 / this.players.length * Math.PI / 180);
+    });
+
+    // HACKY
+    this.players[0].render(this.ctx);
+
+    // render picked cards
+    this.pickedCards.forEach(c => {
+      c.render(this.ctx);
+    });
+
+    // show scoreboard
+    if (this.finished) {
+      var position = this.winners.length + 1;
+      this.ctx.fillStyle = __WEBPACK_IMPORTED_MODULE_1__Constants__["a" /* BOARD */].MESSAGECOLOR;
+      this.ctx.font = __WEBPACK_IMPORTED_MODULE_1__Constants__["a" /* BOARD */].MESSAGEFONT;
+      this.ctx.fillText('Congrats you finished #' + position, __WEBPACK_IMPORTED_MODULE_1__Constants__["h" /* MESSAGE */].ZONE1.x, __WEBPACK_IMPORTED_MODULE_1__Constants__["h" /* MESSAGE */].ZONE1.y);
+    }
+
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+  }
+
+  detectSelection(x, y) {
+    var human = this.players[0];
+    var card = human.pickCard(x, y, this.inputType);
+
+    if (card == null && this.pickedCards.length == 0 && this.detectDeckClick(x, y)) {
+      if (__WEBPACK_IMPORTED_MODULE_1__Constants__["g" /* LOG */]) {
+        console.log('Player tries to flip the deck');
+      }
+      this.clickedOnDeck = true;
+      this.pickedCards.push(this.deck.draw());
+      this.acceptMove = false;
+    }
+
+    if (card == null && this.pickedCards.length == 0 && this.detectPileClick(x, y)) {
+      if (__WEBPACK_IMPORTED_MODULE_1__Constants__["g" /* LOG */]) {
+        console.log('Player picks up');
+      }
+      this.clickedOnPile = true;
+      this.acceptMove = false;
+    }
+
+    if (card != null) {
+      this.pickedCards.push(card);
+    }
+  }
+
+  playCards() {
+    var human = this.players[0];
+    if (this.pickedCards.length > 0) {
+      if (__WEBPACK_IMPORTED_MODULE_1__Constants__["g" /* LOG */]) {
+        console.log('Human player');
+      }
+
+      this.clickedOnDeck = false;
+
+      if (this.validPlay(this.pickedCards, this.pile.topValue())) {
+        this.applyCards(this.pickedCards);
+
+        while (this.deck.isEmpty() == false && human.cardsInHand() < 3) {
+          human.addToHand([this.deck.draw()]);
+        }
+
+        if (human.isDone()) {
+          // winning move
+          this.finished = true;
+          this.render();
+          return;
+        }
+      } else {
+        // invalid play
+        if (__WEBPACK_IMPORTED_MODULE_1__Constants__["g" /* LOG */]) {
+          console.log('Invalid play: ' + this.pickedCards[0].value + ' on ' + this.pile.topValue());
+        }
+        human.addToHand(this.pickedCards);
+        human.addToHand(this.pile.pickUp());
+      }
+      this.render();
+      this.loop();
+    } else if (this.clickedOnPile) {
+      if (__WEBPACK_IMPORTED_MODULE_1__Constants__["g" /* LOG */]) {
+        console.log('Picked up the pile');
+      }
+      human.addToHand(this.pile.pickUp());
+      this.clickedOnPile = false;
+      this.render();
+      this.loop();
+    }
+  }
+
+  detectDeckClick(x, y) {
+    if (x > this.deck.x && x < this.deck.x + __WEBPACK_IMPORTED_MODULE_1__Constants__["b" /* CARD */].WIDTH) {
+      if (y > this.deck.y && y < this.deck.y + __WEBPACK_IMPORTED_MODULE_1__Constants__["b" /* CARD */].HEIGHT) {
+        if (!this.deck.isEmpty()) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  detectPileClick(x, y) {
+    if (x > this.pile.x && x < this.pile.x + __WEBPACK_IMPORTED_MODULE_1__Constants__["b" /* CARD */].WIDTH) {
+      if (y > this.pile.y && y < this.pile.y + __WEBPACK_IMPORTED_MODULE_1__Constants__["b" /* CARD */].HEIGHT) {
+        if (!this.pile.isEmpty()) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  validPlay(cards, topValue) {
+    // make sure all cards are of the same value
+    var value = cards[0].value;
+    for (var i = 1; i < cards.length; i++) {
+      if (cards[i].value != value) {
+        return false;
+      }
+    }
+
+    // played four of a kind
+    if (cards.length == 4) {
+      return true;
+    }
+
+    // nothing on pile
+    if (topValue == null || topValue == 0) {
+      return true;
+    }
+
+    // played a special card
+    if (cards[0].isSpecial()) {
+      return true;
+    }
+
+    // played on top of a two
+    if (topValue == __WEBPACK_IMPORTED_MODULE_1__Constants__["k" /* SPECIAL */].RESET) {
+      return true;
+    }
+
+    // top is a 7
+    if (topValue == __WEBPACK_IMPORTED_MODULE_1__Constants__["k" /* SPECIAL */].REVERSE) {
+      if (cards[0].value <= __WEBPACK_IMPORTED_MODULE_1__Constants__["k" /* SPECIAL */].REVERSE) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    // just compare values
+    return value >= topValue;
+  }
+
+  encodeGame() {
+    var game = {};
+    game.nPlayers = this.players.length;
+    game.deck = this.deck.cardsRemaining();
+    game.pile = this.pile.cardsRemaining();
+    game.players = [];
+    this.players.forEach(p => {
+      game.players.push(p.encode());
+    });
+  }
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (Game);
+
+/***/ }),
 /* 4 */
 /***/ (function(module, exports) {
 
@@ -18060,6 +18060,7 @@ class Card {
     // visual attributes
     this.faceUp = faceUp != null ? faceUp : false;
     this.transparent = transparent != null ? transparent : false;
+    this.highlighted = false;
 
     // name in sprite sheet map
     this.name = this.getName(suit, value);
@@ -18119,6 +18120,11 @@ class Card {
     // in all cases draw the border
     // ctx.fillStyle = CARD.BORDER_COLOR;
     // ctx.strokeRect(this.x, this.y, this.width, this.height);
+
+    if (this.highlighted) {
+      ctx.fillStyle = __WEBPACK_IMPORTED_MODULE_0__Constants__["b" /* CARD */].SELECTED.COLOR;
+      ctx.strokeRect(this.x, this.y, this.width, this.height);
+    }
   }
 
   drawCard(ctx, cardMapName, elementId) {
@@ -18152,6 +18158,11 @@ class Card {
     this.y = y;
   }
 
+  translate(dx, dy) {
+    this.x += dx;
+    this.y += dy;
+  }
+
   compareTo(card) {
     if (card == null) {
       return 1;
@@ -18162,6 +18173,10 @@ class Card {
 
   isSpecial() {
     return this.value == __WEBPACK_IMPORTED_MODULE_0__Constants__["k" /* SPECIAL */].RESET || this.value == __WEBPACK_IMPORTED_MODULE_0__Constants__["k" /* SPECIAL */].INVISIBLE || this.value == __WEBPACK_IMPORTED_MODULE_0__Constants__["k" /* SPECIAL */].BURN;
+  }
+
+  setHighlight(highlighted) {
+    this.highlighted = highlighted;
   }
 }
 
@@ -18603,7 +18618,7 @@ const cardMap = {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Constants__ = __webpack_require__(0);
 
@@ -18654,12 +18669,8 @@ class Player {
   }
 
   addToFaceUps(cards) {
-    for (var i = 0; i < cards.length; i++) {
-      var card = cards[i];
-      card.setFaceUp(true);
-      card.setPosition(this.x + __WEBPACK_IMPORTED_MODULE_1__Constants__["j" /* PLAYER */].CARD_SPREAD * i + __WEBPACK_IMPORTED_MODULE_1__Constants__["j" /* PLAYER */].FACEUP_X_OFF, this.y - (__WEBPACK_IMPORTED_MODULE_1__Constants__["j" /* PLAYER */].FACEUP_DIST - __WEBPACK_IMPORTED_MODULE_1__Constants__["j" /* PLAYER */].FACEUP_Y_OFF));
-      this.faceUpCards.push(card);
-    }
+    this.faceUpCards = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.concat(this.faceUpCards, cards);
+    this.reAlignFaceUps();
   }
 
   addToHand(cards) {
@@ -18691,6 +18702,7 @@ class Player {
   isDone() {
     return this.noFaceDowns() && this.noFaceUps() && this.emptyHand();
   }
+
   play(top) {
     this.pickedCards.total = 0;
 
@@ -18877,6 +18889,13 @@ class Player {
     }
   }
 
+  reAlignFaceUps() {
+    this.faceUpCards.forEach((c, i) => {
+      c.setFaceUp(true);
+      c.setPosition(this.x + __WEBPACK_IMPORTED_MODULE_1__Constants__["j" /* PLAYER */].CARD_SPREAD * i + __WEBPACK_IMPORTED_MODULE_1__Constants__["j" /* PLAYER */].FACEUP_X_OFF, this.y - (__WEBPACK_IMPORTED_MODULE_1__Constants__["j" /* PLAYER */].FACEUP_DIST - __WEBPACK_IMPORTED_MODULE_1__Constants__["j" /* PLAYER */].FACEUP_Y_OFF));
+    });
+  }
+
   clickedCard(x, y, card) {
     if (x > card.x && x < card.x + __WEBPACK_IMPORTED_MODULE_1__Constants__["b" /* CARD */].WIDTH) {
       if (y > card.y && y < card.y + __WEBPACK_IMPORTED_MODULE_1__Constants__["b" /* CARD */].HEIGHT) {
@@ -18927,10 +18946,7 @@ class Player {
     card = this.faceUpCards.splice(faceUpIndex, 1, card);
     this.addToHand(card);
     this.reorderHand();
-
-    // sneaky way to preserve order in among face up cards
-    var temp = this.faceUpCards.splice(0, this.faceUpCards.length);
-    this.addToFaceUps(temp);
+    this.reAlignFaceUps();
   }
 
   getSpecialIndex(cards) {
@@ -18972,6 +18988,149 @@ class Player {
 }
 
 /* harmony default export */ __webpack_exports__["a"] = (Player);
+
+/***/ }),
+/* 10 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__EventListeners__ = __webpack_require__(11);
+
+
+
+class SwapEventListeners extends __WEBPACK_IMPORTED_MODULE_1__EventListeners__["a" /* default */] {
+  constructor(width, height, render, detectHand, detectFaceUp, swapFct) {
+    super(width, height, render, detectHand, detectFaceUp);
+
+    // this.highlighted = {
+    //   hand: null,
+    //   faceUp: null
+    // };
+    this.highlighted = null;
+
+    this.swapFct = swapFct;
+
+    this.selected = null;
+
+    this.lastCursorPosition = null;
+  }
+
+  onMouseDown(e) {
+    var { x, y } = this.getMousePosition(e);
+    var c = this.detectHand(x, y);
+
+    if (c) {
+      this.selected = c;
+      this.lastCursorPosition = { x, y };
+    }
+  }
+
+  onMouseMove(e) {
+    var toRender = false;
+    var { x, y } = this.getMousePosition(e);
+
+    var c = this.detectHand(x, y);
+
+    if (c) {
+      if (this.highlighted) {
+        if (this.highlighted != c) {
+          this.highlighted.setHighlight(false);
+          this.highlighted = null;
+        }
+      }
+      this.highlighted = c;
+      this.highlighted.setHighlight(true);
+      toRender = true;
+    } else if (this.highlighted) {
+      this.highlighted.setHighlight(false);
+      this.highlighted = null;
+      toRender = true;
+    }
+
+    if (this.selected && this.lastCursorPosition) {
+      var dx = x - this.lastCursorPosition.x;
+      var dy = y - this.lastCursorPosition.y;
+      this.selected.translate(dx, dy);
+      this.lastCursorPosition = { x, y };
+      toRender = true;
+    }
+
+    if (toRender) {
+      this.render();
+    }
+  }
+
+  onMouseUp(e) {
+    var { x, y } = this.getMousePosition(e);
+    var c = this.detectFaceUp(x, y);
+
+    if (c) {
+      this.swapFct(this.selected, c);
+    }
+
+    this.selected = null;
+    this.lastCursorPosition = null;
+
+    this.render();
+  }
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (SwapEventListeners);
+
+/***/ }),
+/* 11 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+class EventListeners {
+  constructor(width, height, render, detectHand, detectFaceUp) {
+    this.width = width;
+    this.height = height;
+
+    this.render = render;
+    this.detectHand = detectHand;
+    this.detectFaceUp = detectFaceUp;
+
+    this.getMousePosition = this.getMousePosition.bind(this);
+    this.detectCard = this.detectCard.bind(this);
+    this.onMouseDown = this.onMouseDown.bind(this);
+    this.onMouseMove = this.onMouseMove.bind(this);
+    this.onMouseUp = this.onMouseUp.bind(this);
+  }
+
+  getMousePosition(e) {
+    var x = e.offsetX - this.width / 2;
+    var y = e.offsetY - this.height / 2;
+    return { x, y };
+  }
+
+  detectCard({ x, y }) {
+    var i = this.detectHand(x, y);
+    var type = 'hand';
+
+    if (i >= 0 && i !== null) {
+      return { i, type };
+    }
+
+    i = this.detectFaceUp(x, y);
+    type = 'faceUp';
+    if (i >= 0 && i !== null) {
+      return { i, type };
+    }
+
+    return null;
+  }
+
+  onMouseDown(e) {}
+
+  onMouseMove(e) {}
+
+  onMouseUp(e) {}
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (EventListeners);
 
 /***/ })
 /******/ ]);

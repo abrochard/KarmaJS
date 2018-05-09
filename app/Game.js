@@ -3,6 +3,8 @@ import { GAME, SPECIAL, PILE, CARD, LOG, BOARD, DECK, MESSAGE } from './Constant
 import Deck from './Deck';
 import Player from './Player';
 
+import SwapEventListeners from './SwapEventListeners';
+
 class Game {
   constructor(canvas) {
     this.canvas = canvas;
@@ -25,8 +27,14 @@ class Game {
 
     this.playAI = this.playAI.bind(this);
     this.playAICallback = this.playAICallback.bind(this);
+    this.render = this.render.bind(this);
 
     this.selected = false;
+    this.engaged = false;
+    this.highligted = null;
+    this.lastPosition = {};
+
+    this.swapEL = null;
   }
 
   // EVENT LISTENERS
@@ -165,38 +173,41 @@ class Game {
     this.swapCards = true;
     // this.canvas.addEventListener('mousedown', this.swapDown.bind(this));
 
-    // TEST
-    this.canvas.addEventListener('mousedown', this.selectCard.bind(this));
-    this.canvas.addEventListener('mousemove', this.moveCard.bind(this));
-    this.canvas.addEventListener('mouseup', this.dropCard.bind(this));
+    // NEW
+    var swapFct = (handCard, faceUpCard) => {
+      var human = this.players[0];
+      var handIndex = _.indexOf(human.hand, handCard);
+      var faceUpIndex = _.indexOf(human.faceUpCards, faceUpCard);
+      human.swapCards(handIndex, faceUpIndex);
+    };
 
+    this.swapEL = new SwapEventListeners(
+      this.canvas.width,
+      this.canvas.height,
+      this.render,
+      (x, y) => {
+        var i = this.players[0].selectCard(x, y, 'hand');
+        if (i >= 0 && i !== null) {
+          return this.players[0].hand[i];
+        }
+        return null;
+      },
+      (x, y) => {
+        var i = this.players[0].selectCard(x, y, 'faceup');
+        if (i >= 0 && i !== null) {
+          return this.players[0].faceUpCards[i];
+        }
+        return null;
+      },
+      swapFct
+    );
+
+    this.canvas.addEventListener('mousedown', this.swapEL.onMouseDown);
+    this.canvas.addEventListener('mousemove', this.swapEL.onMouseMove);
+    this.canvas.addEventListener('mouseup', this.swapEL.onMouseUp);
 
     this.render();
   };
-
-  selectCard(e) {
-    var x = e.offsetX - this.canvas.width / 2;
-    var y = e.offsetY - this.canvas.height / 2;
-    var i = this.players[0].selectCard(x, y, 'hand');
-
-    if (i) {
-      this.selected = i;
-    }
-  }
-
-  moveCard(e) {
-    if (this.selected) {
-      console.log(e);
-      var x = e.offsetX - this.canvas.width / 2;
-      var y = e.offsetY - this.canvas.height / 2;
-      this.players[0].hand[this.selected].setPosition(x, y);
-      this.render();
-    }
-  }
-
-  dropCard(e) {
-    this.selected = false;
-  }
 
   loop() {
     // trigger the AI playing loop
@@ -290,9 +301,6 @@ class Game {
                   cards[0].value + ' on ' + top);
     }
 
-    // for (var i = 0; i < cards.length; i++) {
-      // cards[i].setFaceUp(true);
-    // }
     cards.forEach(c => {
       c.setFaceUp(true);
     });
@@ -300,9 +308,6 @@ class Game {
     var value = cards[0].value;
 
     if (value == SPECIAL.INVISIBLE && this.pile.isEmpty() == false) {
-      // for (i = 0; i < cards.length; i++) {
-        // cards[i].setTransparent(true);
-      // }
       cards.forEach(c => {
         c.setTransparent(true);
       });
@@ -357,7 +362,7 @@ class Game {
         MESSAGE.ZONE1.y
       );
       this.ctx.fillText(
-        'Swap cards by clicking them',
+        'Swap cards first',
         MESSAGE.ZONE2.x,
         MESSAGE.ZONE2.y
       );
@@ -369,6 +374,9 @@ class Game {
       // rotate the canvas for each player
       this.ctx.rotate((360 / this.players.length) * Math.PI / 180);
     });
+
+    // HACKY
+    this.players[0].render(this.ctx);
 
     // render picked cards
     this.pickedCards.forEach(c => {
@@ -538,9 +546,6 @@ class Game {
     this.players.forEach(p => {
       game.players.push(p.encode());
     });
-    // for (var i = 0; i < this.players.length; i++) {
-      // game.players.push(this.players[i].encode());
-    // }
   }
 }
 

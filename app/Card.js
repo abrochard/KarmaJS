@@ -16,6 +16,7 @@ class Card {
     // visual attributes
     this.faceUp = faceUp != null ? faceUp : false;
     this.transparent = transparent != null ? transparent : false;
+    this.highlighted = false;
 
     // name in sprite sheet map
     this.name = this.getName(suit, value);
@@ -76,6 +77,11 @@ class Card {
     // in all cases draw the border
     // ctx.fillStyle = CARD.BORDER_COLOR;
     // ctx.strokeRect(this.x, this.y, this.width, this.height);
+
+    if (this.highlighted) {
+      ctx.fillStyle = CARD.SELECTED.COLOR;
+      ctx.strokeRect(this.x, this.y, this.width, this.height);
+    }
   }
 
   drawCard(ctx, cardMapName, elementId) {
@@ -119,6 +125,11 @@ class Card {
     this.y = y;
   }
 
+  translate(dx, dy) {
+    this.x += dx;
+    this.y += dy;
+  }
+
   compareTo(card) {
     if (card == null) {
       return 1;
@@ -131,7 +142,11 @@ class Card {
     return (this.value == SPECIAL.RESET ||
             this.value == SPECIAL.INVISIBLE ||
             this.value == SPECIAL.BURN);
-  };
+  }
+
+  setHighlight(highlighted) {
+    this.highlighted = highlighted;
+  }
 }
 
 export default Card;

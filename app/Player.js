@@ -43,18 +43,11 @@ class Player {
       card.setPosition(this.x + PLAYER.CARD_SPREAD * i, this.y - PLAYER.FACEUP_DIST);
       this.faceDownCards.push(card);
     }
-  };
+  }
 
   addToFaceUps(cards) {
-    for (var i = 0; i < cards.length; i++) {
-      var card = cards[i];
-      card.setFaceUp(true);
-      card.setPosition(
-        this.x + PLAYER.CARD_SPREAD * i + PLAYER.FACEUP_X_OFF,
-        this.y - (PLAYER.FACEUP_DIST - PLAYER.FACEUP_Y_OFF)
-      );
-      this.faceUpCards.push(card);
-    }
+    this.faceUpCards = _.concat(this.faceUpCards, cards);
+    this.reAlignFaceUps();
   };
 
   addToHand(cards) {
@@ -65,27 +58,28 @@ class Player {
       this.hand.push(card);
     }
     this.reorderHand();
-  };
+  }
 
   emptyHand() {
     return this.hand.length == 0;
-  };
+  }
 
   cardsInHand() {
     return this.hand.length;
-  };
+  }
 
   noFaceUps() {
     return this.faceUpCards.length == 0;
-  };
+  }
 
   noFaceDowns() {
     return this.faceDownCards.length == 0;
-  };
+  }
 
   isDone() {
     return (this.noFaceDowns() && this.noFaceUps() && this.emptyHand());
-  };
+  }
+
   play(top) {
     this.pickedCards.total = 0;
 
@@ -104,7 +98,7 @@ class Player {
     }
 
     return this.pickedCards.total;
-  };
+  }
 
   playCallback() {
     var cards = [null];
@@ -115,7 +109,7 @@ class Player {
     } else {
       return cards;
     }
-  };
+  }
 
   playHand(top) {
     var min = null;
@@ -138,7 +132,7 @@ class Player {
     for(var i = 0; i < this.pickedCards.total; i++) {
       this.hand[this.pickedCards.index + i].setFaceUp(true);
     }
-  };
+  }
 
   findAllCardsOfSameValue(cards, value) {
     var indices = [];
@@ -230,7 +224,7 @@ class Player {
       }
     }
     return min.index == null ? null : min;
-  };
+  }
 
   findMinUnder(top, cards) {
     // assume the cards are sorted
@@ -258,7 +252,7 @@ class Player {
       }
     }
     return null;
-  };
+  }
 
   reorderHand() {
     if (this.hand.length == 0) {
@@ -272,7 +266,17 @@ class Player {
     for(var i = 0; i < this.hand.length; i++) {
       this.hand[i].setPosition(this.x + PLAYER.CARD_SPREAD * i + offset, this.y);
     }
-  };
+  }
+
+  reAlignFaceUps() {
+    this.faceUpCards.forEach((c, i) => {
+      c.setFaceUp(true);
+      c.setPosition(
+        this.x + PLAYER.CARD_SPREAD * i + PLAYER.FACEUP_X_OFF,
+        this.y - (PLAYER.FACEUP_DIST - PLAYER.FACEUP_Y_OFF)
+      );
+    });
+  }
 
   clickedCard(x, y, card) {
     if (x > card.x && x < card.x + CARD.WIDTH) {
@@ -293,7 +297,7 @@ class Player {
       cards = this.faceDownCards;
     }
     return cards;
-  };
+  }
 
   pickCard(x, y, type) {
     var index = this.selectCard(x, y, type);
@@ -304,7 +308,7 @@ class Player {
     } else {
       return null;
     }
-  };
+  }
 
   selectCard(x, y, type) {
     var cards = this.getCards(type);
@@ -317,18 +321,15 @@ class Player {
       }
     }
     return index;
-  };
+  }
 
   swapCards(handIndex, faceUpIndex) {
     var card = this.hand.splice(handIndex, 1)[0];
     card = this.faceUpCards.splice(faceUpIndex, 1, card);
     this.addToHand(card);
     this.reorderHand();
-
-    // sneaky way to preserve order in among face up cards
-    var temp = this.faceUpCards.splice(0, this.faceUpCards.length);
-    this.addToFaceUps(temp);
-  };
+    this.reAlignFaceUps();
+  }
 
   getSpecialIndex(cards) {
     for(var i = 0; i < cards.length; i++) {
@@ -357,7 +358,7 @@ class Player {
       }
     }
     this.reorderHand();
-  };
+  }
 
   encode() {
     var p = {};
@@ -365,7 +366,7 @@ class Player {
     p.faceUpCards = this.faceUpCards.length;
     p.faceDownCards = this.faceDownCards.length;
     return p;
-  };
+  }
 }
 
 export default Player;
