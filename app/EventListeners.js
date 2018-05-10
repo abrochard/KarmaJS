@@ -1,11 +1,13 @@
 class EventListeners {
-  constructor(width, height, render, detectHand, detectFaceUp) {
+  constructor(width, height, render, detectHand, detectFaceUp, detectPile, detectDeck) {
     this.width = width;
     this.height = height;
 
     this.render = render;
     this.detectHand = detectHand;
     this.detectFaceUp = detectFaceUp;
+    this.detectPile = detectPile;
+    this.detectDeck = detectDeck;
 
     this.getMousePosition = this.getMousePosition.bind(this);
     this.detectCard = this.detectCard.bind(this);
@@ -21,20 +23,20 @@ class EventListeners {
   }
 
   detectCard({x, y}) {
-    var i = this.detectHand(x, y);
+    var c = this.detectHand(x, y);
     var type = 'hand';
 
-    if (i >= 0 && i !== null) {
-      return {i, type};
+    if (c) {
+      return {c, type};
     }
 
-    i = this.detectFaceUp(x, y);
+    c = this.detectFaceUp(x, y);
     type = 'faceUp';
-    if (i >= 0 && i !== null) {
-      return {i, type};
+    if (c) {
+      return {c, type};
     }
 
-    return null;
+    return {c: null, type: null};
   }
 
   onMouseDown(e) {

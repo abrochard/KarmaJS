@@ -17352,6 +17352,8 @@ class Game {
 
     this.playAI = this.playAI.bind(this);
     this.playAICallback = this.playAICallback.bind(this);
+    this.detectDeckClick = this.detectDeckClick.bind(this);
+    this.detectPileClick = this.detectPileClick.bind(this);
     this.render = this.render.bind(this);
 
     this.selected = false;
@@ -17507,18 +17509,10 @@ class Game {
     };
 
     this.swapEL = new __WEBPACK_IMPORTED_MODULE_4__SwapEventListeners__["a" /* default */](this.canvas.width, this.canvas.height, this.render, (x, y) => {
-      var i = this.players[0].selectCard(x, y, 'hand');
-      if (i >= 0 && i !== null) {
-        return this.players[0].hand[i];
-      }
-      return null;
+      return this.players[0].selectCard(x, y, 'hand');
     }, (x, y) => {
-      var i = this.players[0].selectCard(x, y, 'faceup');
-      if (i >= 0 && i !== null) {
-        return this.players[0].faceUpCards[i];
-      }
-      return null;
-    }, swapFct);
+      return this.players[0].selectCard(x, y, 'faceup');
+    }, this.detectPileClick, this.detectDeckClick, swapFct, this.players[0].reorderHand.bind(this));
 
     this.canvas.addEventListener('mousedown', this.swapEL.onMouseDown);
     this.canvas.addEventListener('mousemove', this.swapEL.onMouseMove);
@@ -18641,6 +18635,8 @@ class Player {
       value: 0,
       collection: null
     };
+
+    this.reorderHand = this.reorderHand.bind(this);
   }
 
   render(ctx) {
@@ -18918,10 +18914,10 @@ class Player {
   }
 
   pickCard(x, y, type) {
-    var index = this.selectCard(x, y, type);
     var cards = this.getCards(type);
-
-    if (index != null) {
+    var card = this.selectCard(x, y, type);
+    if (card) {
+      var index = cards.indexOf(card);
       return cards.splice(index, 1)[0];
     } else {
       return null;
@@ -18930,15 +18926,9 @@ class Player {
 
   selectCard(x, y, type) {
     var cards = this.getCards(type);
-
-    var index = null;
-    for (var i = 0; i < cards.length; i++) {
-      if (this.clickedCard(x, y, cards[i])) {
-        index = i;
-        break;
-      }
-    }
-    return index;
+    return __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.find(cards, c => {
+      return this.clickedCard(x, y, c);
+    });
   }
 
   swapCards(handIndex, faceUpIndex) {
@@ -19001,8 +18991,8 @@ class Player {
 
 
 class SwapEventListeners extends __WEBPACK_IMPORTED_MODULE_1__EventListeners__["a" /* default */] {
-  constructor(width, height, render, detectHand, detectFaceUp, swapFct) {
-    super(width, height, render, detectHand, detectFaceUp);
+  constructor(width, height, render, detectHand, detectFaceUp, detectPile, detectDeck, swapFct, reorderHand) {
+    super(width, height, render, detectHand, detectFaceUp, detectPile, detectDeck);
 
     // this.highlighted = {
     //   hand: null,
@@ -19011,6 +19001,7 @@ class SwapEventListeners extends __WEBPACK_IMPORTED_MODULE_1__EventListeners__["
     this.highlighted = null;
 
     this.swapFct = swapFct;
+    this.reorderHand = reorderHand;
 
     this.selected = null;
 
@@ -19020,9 +19011,14 @@ class SwapEventListeners extends __WEBPACK_IMPORTED_MODULE_1__EventListeners__["
   onMouseDown(e) {
     var { x, y } = this.getMousePosition(e);
     var c = this.detectHand(x, y);
+    var type = 'hand';
+    if (!c) {
+      c = this.detectFaceUp(x, y);
+      type = 'faceup';
+    }
 
     if (c) {
-      this.selected = c;
+      this.selected = { c, type };
       this.lastCursorPosition = { x, y };
     }
   }
@@ -19032,6 +19028,9 @@ class SwapEventListeners extends __WEBPACK_IMPORTED_MODULE_1__EventListeners__["
     var { x, y } = this.getMousePosition(e);
 
     var c = this.detectHand(x, y);
+    if (!c) {
+      c = this.detectFaceUp(x, y);
+    }
 
     if (c) {
       if (this.highlighted) {
@@ -19052,7 +19051,7 @@ class SwapEventListeners extends __WEBPACK_IMPORTED_MODULE_1__EventListeners__["
     if (this.selected && this.lastCursorPosition) {
       var dx = x - this.lastCursorPosition.x;
       var dy = y - this.lastCursorPosition.y;
-      this.selected.translate(dx, dy);
+      this.selected.c.translate(dx, dy);
       this.lastCursorPosition = { x, y };
       toRender = true;
     }
@@ -19063,11 +19062,24 @@ class SwapEventListeners extends __WEBPACK_IMPORTED_MODULE_1__EventListeners__["
   }
 
   onMouseUp(e) {
+    if (!this.selected) {
+      return;
+    }
+
     var { x, y } = this.getMousePosition(e);
     var c = this.detectFaceUp(x, y);
 
-    if (c) {
-      this.swapFct(this.selected, c);
+    if (this.selected.type == 'faceup') {
+      c = this.detectHand(x, y);
+    }
+
+    if (c && this.selected.type == 'hand') {
+      this.swapFct(this.selected.c, c);
+    } else if (c && this.selected.type == 'faceup') {
+      this.swapFct(c, this.selected.c);
+    } else {
+      // just dropped it
+      this.reorderHand();
     }
 
     this.selected = null;
@@ -19085,13 +19097,15 @@ class SwapEventListeners extends __WEBPACK_IMPORTED_MODULE_1__EventListeners__["
 
 "use strict";
 class EventListeners {
-  constructor(width, height, render, detectHand, detectFaceUp) {
+  constructor(width, height, render, detectHand, detectFaceUp, detectPile, detectDeck) {
     this.width = width;
     this.height = height;
 
     this.render = render;
     this.detectHand = detectHand;
     this.detectFaceUp = detectFaceUp;
+    this.detectPile = detectPile;
+    this.detectDeck = detectDeck;
 
     this.getMousePosition = this.getMousePosition.bind(this);
     this.detectCard = this.detectCard.bind(this);
@@ -19107,20 +19121,20 @@ class EventListeners {
   }
 
   detectCard({ x, y }) {
-    var i = this.detectHand(x, y);
+    var c = this.detectHand(x, y);
     var type = 'hand';
 
-    if (i >= 0 && i !== null) {
-      return { i, type };
+    if (c) {
+      return { c, type };
     }
 
-    i = this.detectFaceUp(x, y);
+    c = this.detectFaceUp(x, y);
     type = 'faceUp';
-    if (i >= 0 && i !== null) {
-      return { i, type };
+    if (c) {
+      return { c, type };
     }
 
-    return null;
+    return { c: null, type: null };
   }
 
   onMouseDown(e) {}

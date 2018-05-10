@@ -18,6 +18,8 @@ class Player {
       value: 0,
       collection: null
     };
+
+    this.reorderHand = this.reorderHand.bind(this);
   }
 
   render(ctx) {
@@ -300,10 +302,10 @@ class Player {
   }
 
   pickCard(x, y, type) {
-    var index = this.selectCard(x, y, type);
     var cards = this.getCards(type);
-
-    if (index != null) {
+    var card = this.selectCard(x, y, type);
+    if (card) {
+      var index = cards.indexOf(card);
       return cards.splice(index, 1)[0];
     } else {
       return null;
@@ -312,15 +314,9 @@ class Player {
 
   selectCard(x, y, type) {
     var cards = this.getCards(type);
-
-    var index = null;
-    for(var i = 0; i < cards.length; i++) {
-      if (this.clickedCard(x, y, cards[i])) {
-        index = i;
-        break;
-      }
-    }
-    return index;
+    return _.find(cards, c => {
+      return this.clickedCard(x, y, c);
+    });
   }
 
   swapCards(handIndex, faceUpIndex) {

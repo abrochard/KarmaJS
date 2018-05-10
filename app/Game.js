@@ -27,6 +27,8 @@ class Game {
 
     this.playAI = this.playAI.bind(this);
     this.playAICallback = this.playAICallback.bind(this);
+    this.detectDeckClick = this.detectDeckClick.bind(this);
+    this.detectPileClick = this.detectPileClick.bind(this);
     this.render = this.render.bind(this);
 
     this.selected = false;
@@ -186,20 +188,15 @@ class Game {
       this.canvas.height,
       this.render,
       (x, y) => {
-        var i = this.players[0].selectCard(x, y, 'hand');
-        if (i >= 0 && i !== null) {
-          return this.players[0].hand[i];
-        }
-        return null;
+        return this.players[0].selectCard(x, y, 'hand');
       },
       (x, y) => {
-        var i = this.players[0].selectCard(x, y, 'faceup');
-        if (i >= 0 && i !== null) {
-          return this.players[0].faceUpCards[i];
-        }
-        return null;
+        return this.players[0].selectCard(x, y, 'faceup');
       },
-      swapFct
+      this.detectPileClick,
+      this.detectDeckClick,
+      swapFct,
+      this.players[0].reorderHand.bind(this)
     );
 
     this.canvas.addEventListener('mousedown', this.swapEL.onMouseDown);
