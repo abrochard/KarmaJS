@@ -2,18 +2,14 @@ import _ from 'lodash';
 import EventListeners from './EventListeners';
 
 class SwapEventListeners extends EventListeners {
-  constructor(width, height, render, detectHand, detectFaceUp, detectPile, detectDeck, swapFct, reorderHand) {
+  constructor(width, height, render, detectHand, detectFaceUp, detectPile, detectDeck, swapFct, reorderHand, done) {
     super(width, height, render, detectHand, detectFaceUp, detectPile, detectDeck);
 
-    // this.highlighted = {
-    //   hand: null,
-    //   faceUp: null
-    // };
     this.highlighted = null;
 
     this.swapFct = swapFct;
     this.reorderHand = reorderHand;
-
+    this.done = done;
 
     this.selected = null;
 
@@ -42,6 +38,9 @@ class SwapEventListeners extends EventListeners {
     var c = this.detectHand(x, y);
     if (!c) {
       c = this.detectFaceUp(x, y);
+    }
+    if (!c) {
+      c = this.detectDeck(x, y);
     }
 
     if (c) {
@@ -74,11 +73,18 @@ class SwapEventListeners extends EventListeners {
   }
 
   onMouseUp(e) {
+    var {x, y} = this.getMousePosition(e);
+
+    if (this.detectDeck(x, y)) {
+      this.done();
+      this.render();
+      return;
+    }
+
     if (!this.selected) {
       return;
     }
 
-    var {x, y} = this.getMousePosition(e);
     var c = this.detectFaceUp(x, y);
 
     if (this.selected.type == 'faceup') {
@@ -93,7 +99,6 @@ class SwapEventListeners extends EventListeners {
       // just dropped it
       this.reorderHand();
     }
-
 
     this.selected = null;
     this.lastCursorPosition = null;

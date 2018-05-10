@@ -193,10 +193,21 @@ class Game {
       (x, y) => {
         return this.players[0].selectCard(x, y, 'faceup');
       },
-      this.detectPileClick,
-      this.detectDeckClick,
+      (x, y) => {
+        if (this.detectPileClick(x, y)) {
+          return _.last(this.pile.cards);
+        }
+        return null;
+      },
+      (x, y) => {
+        if (this.detectDeckClick(x, y)) {
+          return _.last(this.deck.cards);
+        }
+        return null;
+      },
       swapFct,
-      this.players[0].reorderHand.bind(this)
+      this.players[0].reorderHand.bind(this),
+      this.doneSwapping.bind(this)
     );
 
     this.canvas.addEventListener('mousedown', this.swapEL.onMouseDown);
@@ -205,6 +216,10 @@ class Game {
 
     this.render();
   };
+
+  doneSwapping() {
+    this.swapCards = false;
+  }
 
   loop() {
     // trigger the AI playing loop

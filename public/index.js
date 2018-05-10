@@ -17512,13 +17512,27 @@ class Game {
       return this.players[0].selectCard(x, y, 'hand');
     }, (x, y) => {
       return this.players[0].selectCard(x, y, 'faceup');
-    }, this.detectPileClick, this.detectDeckClick, swapFct, this.players[0].reorderHand.bind(this));
+    }, (x, y) => {
+      if (this.detectPileClick(x, y)) {
+        return __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.last(this.pile.cards);
+      }
+      return null;
+    }, (x, y) => {
+      if (this.detectDeckClick(x, y)) {
+        return __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.last(this.deck.cards);
+      }
+      return null;
+    }, swapFct, this.players[0].reorderHand.bind(this), this.doneSwapping.bind(this));
 
     this.canvas.addEventListener('mousedown', this.swapEL.onMouseDown);
     this.canvas.addEventListener('mousemove', this.swapEL.onMouseMove);
     this.canvas.addEventListener('mouseup', this.swapEL.onMouseUp);
 
     this.render();
+  }
+
+  doneSwapping() {
+    this.swapCards = false;
   }
 
   loop() {
@@ -18657,11 +18671,10 @@ class Player {
   }
 
   addToFaceDown(cards) {
-    for (var i = 0; i < cards.length; i++) {
-      var card = cards[i];
-      card.setPosition(this.x + __WEBPACK_IMPORTED_MODULE_1__Constants__["j" /* PLAYER */].CARD_SPREAD * i, this.y - __WEBPACK_IMPORTED_MODULE_1__Constants__["j" /* PLAYER */].FACEUP_DIST);
-      this.faceDownCards.push(card);
-    }
+    cards.forEach((c, i) => {
+      c.setPosition(this.x + __WEBPACK_IMPORTED_MODULE_1__Constants__["j" /* PLAYER */].CARD_SPREAD * i, this.y - __WEBPACK_IMPORTED_MODULE_1__Constants__["j" /* PLAYER */].FACEUP_DIST);
+      this.faceDownCards.push(c);
+    });
   }
 
   addToFaceUps(cards) {
@@ -18670,12 +18683,10 @@ class Player {
   }
 
   addToHand(cards) {
-    var card = null;
-    for (var i = 0; i < cards.length; i++) {
-      card = cards[i];
-      card.setFaceUp(this.human || __WEBPACK_IMPORTED_MODULE_1__Constants__["c" /* DEBUG */]);
-      this.hand.push(card);
-    }
+    cards.forEach(c => {
+      c.setFaceUp(this.human || __WEBPACK_IMPORTED_MODULE_1__Constants__["c" /* DEBUG */]);
+      this.hand.push(c);
+    });
     this.reorderHand();
   }
 
@@ -18745,7 +18756,7 @@ class Player {
     } else {
       var index = this.selectSpecial(this.hand);
       this.pickedCards.index = index;
-      this.pickedCards.total = index != null ? 1 : 0;
+      this.pickedCards.total = index ? 1 : 0;
     }
 
     for (var i = 0; i < this.pickedCards.total; i++) {
@@ -18777,7 +18788,7 @@ class Player {
       this.pickedCards.value = min.value;
     } else {
       var special = this.selectSpecial(this.faceUpCards);
-      if (special != null) {
+      if (special) {
         this.pickedCards.index = special;
         this.pickedCards.total = 1;
       } else {
@@ -18863,12 +18874,16 @@ class Player {
   }
 
   selectSpecial(cards) {
-    for (var i = 0; i < cards.length; i++) {
-      if (cards[i].isSpecial()) {
-        return i;
-      }
-    }
-    return null;
+    return __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.find(cards, c => {
+      c.isSpecial();
+    });
+
+    // for(var i = 0; i < cards.length; i++) {
+    //   if (cards[i].isSpecial()) {
+    //     return i;
+    //   }
+    // }
+    // return null;
   }
 
   reorderHand() {
@@ -18991,17 +19006,14 @@ class Player {
 
 
 class SwapEventListeners extends __WEBPACK_IMPORTED_MODULE_1__EventListeners__["a" /* default */] {
-  constructor(width, height, render, detectHand, detectFaceUp, detectPile, detectDeck, swapFct, reorderHand) {
+  constructor(width, height, render, detectHand, detectFaceUp, detectPile, detectDeck, swapFct, reorderHand, done) {
     super(width, height, render, detectHand, detectFaceUp, detectPile, detectDeck);
 
-    // this.highlighted = {
-    //   hand: null,
-    //   faceUp: null
-    // };
     this.highlighted = null;
 
     this.swapFct = swapFct;
     this.reorderHand = reorderHand;
+    this.done = done;
 
     this.selected = null;
 
@@ -19030,6 +19042,9 @@ class SwapEventListeners extends __WEBPACK_IMPORTED_MODULE_1__EventListeners__["
     var c = this.detectHand(x, y);
     if (!c) {
       c = this.detectFaceUp(x, y);
+    }
+    if (!c) {
+      c = this.detectDeck(x, y);
     }
 
     if (c) {
@@ -19062,11 +19077,18 @@ class SwapEventListeners extends __WEBPACK_IMPORTED_MODULE_1__EventListeners__["
   }
 
   onMouseUp(e) {
+    var { x, y } = this.getMousePosition(e);
+
+    if (this.detectDeck(x, y)) {
+      this.done();
+      this.render();
+      return;
+    }
+
     if (!this.selected) {
       return;
     }
 
-    var { x, y } = this.getMousePosition(e);
     var c = this.detectFaceUp(x, y);
 
     if (this.selected.type == 'faceup') {

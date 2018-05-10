@@ -40,11 +40,10 @@ class Player {
   }
 
   addToFaceDown(cards) {
-    for (var i = 0; i < cards.length; i++) {
-      var card = cards[i];
-      card.setPosition(this.x + PLAYER.CARD_SPREAD * i, this.y - PLAYER.FACEUP_DIST);
-      this.faceDownCards.push(card);
-    }
+    cards.forEach((c, i) => {
+      c.setPosition(this.x + PLAYER.CARD_SPREAD * i, this.y - PLAYER.FACEUP_DIST);
+      this.faceDownCards.push(c);
+    });
   }
 
   addToFaceUps(cards) {
@@ -53,12 +52,10 @@ class Player {
   };
 
   addToHand(cards) {
-    var card = null;
-    for (var i = 0; i < cards.length; i++) {
-      card = cards[i];
-      card.setFaceUp(this.human || DEBUG);
-      this.hand.push(card);
-    }
+    cards.forEach(c => {
+      c.setFaceUp(this.human || DEBUG);
+      this.hand.push(c);
+    });
     this.reorderHand();
   }
 
@@ -128,7 +125,7 @@ class Player {
     } else {
       var index = this.selectSpecial(this.hand);
       this.pickedCards.index = index;
-      this.pickedCards.total = index != null ? 1 : 0;
+      this.pickedCards.total = index ? 1 : 0;
     }
 
     for(var i = 0; i < this.pickedCards.total; i++) {
@@ -160,7 +157,7 @@ class Player {
       this.pickedCards.value = min.value;
     } else {
       var special = this.selectSpecial(this.faceUpCards);
-      if (special != null) {
+      if (special) {
         this.pickedCards.index = special;
         this.pickedCards.total = 1;
       } else {
@@ -248,12 +245,16 @@ class Player {
   };
 
   selectSpecial(cards) {
-    for(var i = 0; i < cards.length; i++) {
-      if (cards[i].isSpecial()) {
-        return i;
-      }
-    }
-    return null;
+    return _.find(cards, c => {
+      c.isSpecial();
+    });
+
+    // for(var i = 0; i < cards.length; i++) {
+    //   if (cards[i].isSpecial()) {
+    //     return i;
+    //   }
+    // }
+    // return null;
   }
 
   reorderHand() {
