@@ -1,4 +1,5 @@
-import { SUIT, FACE, SPECIAL } from './Constants';
+import _ from 'lodash';
+import { SUIT, FACE, SPECIAL, CARD} from './Constants';
 import Card from './Card';
 
 class Deck {
@@ -28,6 +29,11 @@ class Deck {
       this.cards[i].setPosition(this.x + 1 * count, this.y + 1 * count);
       this.cards[i].render(ctx);
       count += 1;
+    }
+    if (max == 0) {
+      // still render something
+      ctx.fillStyle = 'black';
+      ctx.strokeRect(this.x, this.y, CARD.WIDTH, CARD.HEIGHT);
     }
   }
 

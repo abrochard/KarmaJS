@@ -1,15 +1,14 @@
 import _ from 'lodash';
 import EventListeners from './EventListeners';
 
-class SwapEventListeners extends EventListeners {
-  constructor(width, height, render, detectCard, done, swapFct, reorderHand) {
+class PlayEventListeners extends EventListeners {
+  constructor(width, height, render, detectCard, playCard, reorderHand) {
     super(width, height, render, detectCard);
 
-    this.highlighted = null;
-
-    this.swapFct = swapFct;
+    this.playCard = playCard;
     this.reorderHand = reorderHand;
-    this.done = done;
+
+    this.highlighted = null;
 
     this.selected = null;
 
@@ -18,9 +17,9 @@ class SwapEventListeners extends EventListeners {
 
   onMouseDown(e) {
     var {x, y} = this.getMousePosition(e);
-    var {c, type} = this.detectCard(x, y);
+    var {c, type} = this.detectCard(x, y, 'hand');
 
-    if (c && (type == 'hand' || type == 'faceup')) {
+    if (c) {
       this.selected = {c, type};
       this.lastCursorPosition = {x, y};
     }
@@ -62,36 +61,11 @@ class SwapEventListeners extends EventListeners {
 
   onMouseUp(e) {
     var {x, y} = this.getMousePosition(e);
-    var {c, type} = this.detectCard(x, y);
+    var {c, type} = this.detectCard(x, y, 'pile');
 
-    if (type == 'deck') {
-      this.done();
-      this.render();
-      return;
-    }
-
-    if (!this.selected) {
-      return;
-    }
-
-    if (this.selected.type == 'hand') {
-      var result = this.detectCard(x, y, 'faceup');
-      c = result.c;
-      type = result.type;
-
-      if (type) {
-        this.swapFct(this.selected.c, c);
-      }
-    } else if (this.selected.type == 'faceup') {
-      var result = this.detectCard(x, y, 'hand');
-      c = result.c;
-      type = result.type;
-
-      if (type) {
-        this.swapFct(c, this.selected.c);
-      }
+    if (type) {
+      this.playCard(this.selected.c);
     } else {
-      // just dropped it
       this.reorderHand();
     }
 
@@ -101,4 +75,4 @@ class SwapEventListeners extends EventListeners {
   }
 }
 
-export default SwapEventListeners;
+export default PlayEventListeners;

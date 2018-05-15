@@ -4,6 +4,7 @@ import Deck from './Deck';
 import Player from './Player';
 
 import SwapEventListeners from './SwapEventListeners';
+import PlayEventListeners from './PlayEventListeners';
 
 class Game {
   constructor(canvas) {
@@ -37,6 +38,7 @@ class Game {
     this.lastPosition = {};
 
     this.swapEL = null;
+    this.playEL = null;
   }
 
   // EVENT LISTENERS
@@ -187,27 +189,10 @@ class Game {
       this.canvas.width,
       this.canvas.height,
       this.render,
-      (x, y) => {
-        return this.players[0].selectCard(x, y, 'hand');
-      },
-      (x, y) => {
-        return this.players[0].selectCard(x, y, 'faceup');
-      },
-      (x, y) => {
-        if (this.detectPileClick(x, y)) {
-          return _.last(this.pile.cards);
-        }
-        return null;
-      },
-      (x, y) => {
-        if (this.detectDeckClick(x, y)) {
-          return _.last(this.deck.cards);
-        }
-        return null;
-      },
+      this.detectCard.bind(this),
+      this.doneSwapping.bind(this),
       swapFct,
-      this.players[0].reorderHand.bind(this),
-      this.doneSwapping.bind(this)
+      this.players[0].reorderHand.bind(this)
     );
 
     this.canvas.addEventListener('mousedown', this.swapEL.onMouseDown);
@@ -217,8 +202,106 @@ class Game {
     this.render();
   };
 
+  detectCard(x, y, type = null) {
+    var human = this.players[0];
+
+    var detectHand = function(x, y) {
+      var type = 'hand';
+      var c = human.selectCard(x, y, type);
+      if (c) {
+        return {c, type};
+      } else {
+        type = null;
+        return {c, type};
+      }
+    };
+
+    var detectFaceUp = function(x, y) {
+      var type = 'faceup';
+      var c = human.selectCard(x, y, type);
+      if (c) {
+        return {c, type};
+      } else {
+        type = null;
+        return {c, type};
+      }
+    };
+
+    var detectPile = function(x, y) {
+      var type = 'pile';
+      var c = null;
+      if (this.detectPileClick(x, y, false)) {
+        c = _.last(this.pile.cards);
+      } else {
+        type = null;
+      }
+      return {c, type};
+    };
+
+    var detectDeck = function(x, y) {
+      var type = 'deck';
+      var c = null;
+      if (this.detectDeckClick(x, y)) {
+        c = _.last(this.deck.cards);
+      } else {
+        type = null;
+      }
+      return {c, type};
+    };
+
+    var detect = {
+      'hand': detectHand.bind(this),
+      'faceup': detectFaceUp.bind(this),
+      'pile': detectPile.bind(this),
+      'deck': detectDeck.bind(this)
+    };
+
+    if (type) {
+      var result = detect[type](x, y);
+      return result;
+    }
+
+    var results = _.map(detect, fct => {
+      return fct(x, y);
+    });
+
+    var r = _.find(results, ({c, type}) => {
+      return type !== null;
+    });
+
+    if (r) {
+      return r;
+    } else {
+      return {c: null, type: null};
+    }
+  }
+
   doneSwapping() {
     this.swapCards = false;
+
+    var playCard = function(c) {
+      this.pickedCards.push(c);
+      this.playCards();
+    };
+
+    this.playEL = new PlayEventListeners(
+      this.canvas.width,
+      this.canvas.height,
+      this.render,
+      this.detectCard.bind(this),
+      playCard.bind(this),
+      this.players[0].reorderHand.bind(this)
+    );
+
+    this.canvas.removeEventListener('mousedown', this.swapEL.onMouseDown);
+    this.canvas.removeEventListener('mousemove', this.swapEL.onMouseMove);
+    this.canvas.removeEventListener('mouseup', this.swapEL.onMouseUp);
+
+    this.canvas.addEventListener('mousedown', this.playEL.onMouseDown);
+    this.canvas.addEventListener('mousemove', this.playEL.onMouseMove);
+    this.canvas.addEventListener('mouseup', this.playEL.onMouseUp);
+
+    this.render();
   }
 
   loop() {
@@ -496,10 +579,14 @@ class Game {
     return false;
   };
 
-  detectPileClick(x, y) {
+  detectPileClick(x, y, careEmpty = true) {
     if (x > this.pile.x && x < this.pile.x + CARD.WIDTH) {
       if (y > this.pile.y && y < this.pile.y + CARD.HEIGHT) {
-        if (!this.pile.isEmpty()) {
+        if (careEmpty) {
+          if (!this.pile.isEmpty()) {
+            return true;
+          }
+        } else {
           return true;
         }
       }

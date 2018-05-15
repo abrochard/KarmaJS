@@ -60,122 +60,11 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-
-const SUIT = {
-  SPADE: 0,
-  DIAMOND: 1,
-  CLOVER: 2,
-  HEART: 3
-};
-/* harmony export (immutable) */ __webpack_exports__["l"] = SUIT;
-
-
-const FACE = {
-  JACK: 11,
-  QUEEN: 12,
-  KING: 13,
-  ACE: 14
-};
-/* harmony export (immutable) */ __webpack_exports__["e"] = FACE;
-
-
-const SPECIAL = {
-  RESET: 2,
-  INVISIBLE: 3,
-  BURN: 10,
-  REVERSE: 7
-};
-/* harmony export (immutable) */ __webpack_exports__["k"] = SPECIAL;
-
-
-const CARD = {
-  HEIGHT: 70,
-  WIDTH: 50,
-  BORDER_COLOR: 'black',
-  INVISIBLE: {
-    COLOR: 'red',
-    OPACITY: 0.3
-  },
-  SELECTED: {
-    COLOR: 'rgb(0,200,0)'
-  }
-};
-/* harmony export (immutable) */ __webpack_exports__["b"] = CARD;
-
-
-const DECK = {
-  MAX_RENDER: 3,
-  X: -50,
-  Y: -35
-};
-/* harmony export (immutable) */ __webpack_exports__["d"] = DECK;
-
-
-const PILE = {
-  MAX_RENDER: 3,
-  X: 10,
-  Y: -35
-};
-/* harmony export (immutable) */ __webpack_exports__["i"] = PILE;
-
-
-const PLAYER = {
-  X: -80,
-  Y: 300,
-  FACEUP_DIST: 100,
-  CARD_SPREAD: 55,
-  FACEUP_X_OFF: 3,
-  FACEUP_Y_OFF: 4
-};
-/* harmony export (immutable) */ __webpack_exports__["j"] = PLAYER;
-
-
-const GAME = {
-  PLAYERS: 4,
-  DELAY: 500,
-  DELAY2: 800
-};
-/* harmony export (immutable) */ __webpack_exports__["f"] = GAME;
-
-
-const BOARD = {
-  COLOR: 'rgb(8, 132, 36)'
-};
-/* harmony export (immutable) */ __webpack_exports__["a"] = BOARD;
-
-
-const MESSAGE = {
-  ZONE1: {
-    x: -120,
-    y: 90
-  },
-  ZONE2: {
-    x: -250,
-    y: 270
-  },
-  FONT: '20px serif',
-  COLOR: 'black'
-};
-/* harmony export (immutable) */ __webpack_exports__["h"] = MESSAGE;
-
-
-const DEBUG = true;
-/* harmony export (immutable) */ __webpack_exports__["c"] = DEBUG;
-
-const LOG = true;
-/* harmony export (immutable) */ __webpack_exports__["g"] = LOG;
-
-
-/***/ }),
-/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -17285,16 +17174,161 @@ const LOG = true;
   }
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4), __webpack_require__(5)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5), __webpack_require__(6)(module)))
+
+/***/ }),
+/* 1 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+
+const SUIT = {
+  SPADE: 0,
+  DIAMOND: 1,
+  CLOVER: 2,
+  HEART: 3
+};
+/* harmony export (immutable) */ __webpack_exports__["l"] = SUIT;
+
+
+const FACE = {
+  JACK: 11,
+  QUEEN: 12,
+  KING: 13,
+  ACE: 14
+};
+/* harmony export (immutable) */ __webpack_exports__["e"] = FACE;
+
+
+const SPECIAL = {
+  RESET: 2,
+  INVISIBLE: 3,
+  BURN: 10,
+  REVERSE: 7
+};
+/* harmony export (immutable) */ __webpack_exports__["k"] = SPECIAL;
+
+
+const CARD = {
+  HEIGHT: 70,
+  WIDTH: 50,
+  BORDER_COLOR: 'black',
+  INVISIBLE: {
+    COLOR: 'red',
+    OPACITY: 0.3
+  },
+  SELECTED: {
+    COLOR: 'rgb(0,200,0)'
+  }
+};
+/* harmony export (immutable) */ __webpack_exports__["b"] = CARD;
+
+
+const DECK = {
+  MAX_RENDER: 3,
+  X: -50,
+  Y: -35
+};
+/* harmony export (immutable) */ __webpack_exports__["d"] = DECK;
+
+
+const PILE = {
+  MAX_RENDER: 3,
+  X: 10,
+  Y: -35
+};
+/* harmony export (immutable) */ __webpack_exports__["i"] = PILE;
+
+
+const PLAYER = {
+  X: -80,
+  Y: 300,
+  FACEUP_DIST: 100,
+  CARD_SPREAD: 55,
+  FACEUP_X_OFF: 3,
+  FACEUP_Y_OFF: 4
+};
+/* harmony export (immutable) */ __webpack_exports__["j"] = PLAYER;
+
+
+const GAME = {
+  PLAYERS: 4,
+  DELAY: 500,
+  DELAY2: 800
+};
+/* harmony export (immutable) */ __webpack_exports__["f"] = GAME;
+
+
+const BOARD = {
+  COLOR: 'rgb(8, 132, 36)'
+};
+/* harmony export (immutable) */ __webpack_exports__["a"] = BOARD;
+
+
+const MESSAGE = {
+  ZONE1: {
+    x: -120,
+    y: 90
+  },
+  ZONE2: {
+    x: -250,
+    y: 270
+  },
+  FONT: '20px serif',
+  COLOR: 'black'
+};
+/* harmony export (immutable) */ __webpack_exports__["h"] = MESSAGE;
+
+
+const DEBUG = true;
+/* harmony export (immutable) */ __webpack_exports__["c"] = DEBUG;
+
+const LOG = true;
+/* harmony export (immutable) */ __webpack_exports__["g"] = LOG;
+
 
 /***/ }),
 /* 2 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+class EventListeners {
+  constructor(width, height, render, detectCard) {
+    this.width = width;
+    this.height = height;
+
+    this.render = render;
+    this.detectCard = detectCard;
+
+    this.getMousePosition = this.getMousePosition.bind(this);
+    this.onMouseDown = this.onMouseDown.bind(this);
+    this.onMouseMove = this.onMouseMove.bind(this);
+    this.onMouseUp = this.onMouseUp.bind(this);
+  }
+
+  getMousePosition(e) {
+    var x = e.offsetX - this.width / 2;
+    var y = e.offsetY - this.height / 2;
+    return { x, y };
+  }
+
+  onMouseDown(e) {}
+
+  onMouseMove(e) {}
+
+  onMouseUp(e) {}
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (EventListeners);
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Game__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Constants__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Game__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Constants__ = __webpack_require__(1);
 
 
 
@@ -17313,16 +17347,18 @@ document.addEventListener("DOMContentLoaded", function (event) {
 });
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Constants__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Deck__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Player__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__SwapEventListeners__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Constants__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Deck__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Player__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__SwapEventListeners__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__PlayEventListeners__ = __webpack_require__(12);
+
 
 
 
@@ -17362,6 +17398,7 @@ class Game {
     this.lastPosition = {};
 
     this.swapEL = null;
+    this.playEL = null;
   }
 
   // EVENT LISTENERS
@@ -17508,21 +17545,7 @@ class Game {
       human.swapCards(handIndex, faceUpIndex);
     };
 
-    this.swapEL = new __WEBPACK_IMPORTED_MODULE_4__SwapEventListeners__["a" /* default */](this.canvas.width, this.canvas.height, this.render, (x, y) => {
-      return this.players[0].selectCard(x, y, 'hand');
-    }, (x, y) => {
-      return this.players[0].selectCard(x, y, 'faceup');
-    }, (x, y) => {
-      if (this.detectPileClick(x, y)) {
-        return __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.last(this.pile.cards);
-      }
-      return null;
-    }, (x, y) => {
-      if (this.detectDeckClick(x, y)) {
-        return __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.last(this.deck.cards);
-      }
-      return null;
-    }, swapFct, this.players[0].reorderHand.bind(this), this.doneSwapping.bind(this));
+    this.swapEL = new __WEBPACK_IMPORTED_MODULE_4__SwapEventListeners__["a" /* default */](this.canvas.width, this.canvas.height, this.render, this.detectCard.bind(this), this.doneSwapping.bind(this), swapFct, this.players[0].reorderHand.bind(this));
 
     this.canvas.addEventListener('mousedown', this.swapEL.onMouseDown);
     this.canvas.addEventListener('mousemove', this.swapEL.onMouseMove);
@@ -17531,8 +17554,99 @@ class Game {
     this.render();
   }
 
+  detectCard(x, y, type = null) {
+    var human = this.players[0];
+
+    var detectHand = function (x, y) {
+      var type = 'hand';
+      var c = human.selectCard(x, y, type);
+      if (c) {
+        return { c, type };
+      } else {
+        type = null;
+        return { c, type };
+      }
+    };
+
+    var detectFaceUp = function (x, y) {
+      var type = 'faceup';
+      var c = human.selectCard(x, y, type);
+      if (c) {
+        return { c, type };
+      } else {
+        type = null;
+        return { c, type };
+      }
+    };
+
+    var detectPile = function (x, y) {
+      var type = 'pile';
+      var c = null;
+      if (this.detectPileClick(x, y, false)) {
+        c = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.last(this.pile.cards);
+      } else {
+        type = null;
+      }
+      return { c, type };
+    };
+
+    var detectDeck = function (x, y) {
+      var type = 'deck';
+      var c = null;
+      if (this.detectDeckClick(x, y)) {
+        c = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.last(this.deck.cards);
+      } else {
+        type = null;
+      }
+      return { c, type };
+    };
+
+    var detect = {
+      'hand': detectHand.bind(this),
+      'faceup': detectFaceUp.bind(this),
+      'pile': detectPile.bind(this),
+      'deck': detectDeck.bind(this)
+    };
+
+    if (type) {
+      var result = detect[type](x, y);
+      return result;
+    }
+
+    var results = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.map(detect, fct => {
+      return fct(x, y);
+    });
+
+    var r = __WEBPACK_IMPORTED_MODULE_0_lodash___default.a.find(results, ({ c, type }) => {
+      return type !== null;
+    });
+
+    if (r) {
+      return r;
+    } else {
+      return { c: null, type: null };
+    }
+  }
+
   doneSwapping() {
     this.swapCards = false;
+
+    var playCard = function (c) {
+      this.pickedCards.push(c);
+      this.playCards();
+    };
+
+    this.playEL = new __WEBPACK_IMPORTED_MODULE_5__PlayEventListeners__["a" /* default */](this.canvas.width, this.canvas.height, this.render, this.detectCard.bind(this), playCard.bind(this), this.players[0].reorderHand.bind(this));
+
+    this.canvas.removeEventListener('mousedown', this.swapEL.onMouseDown);
+    this.canvas.removeEventListener('mousemove', this.swapEL.onMouseMove);
+    this.canvas.removeEventListener('mouseup', this.swapEL.onMouseUp);
+
+    this.canvas.addEventListener('mousedown', this.playEL.onMouseDown);
+    this.canvas.addEventListener('mousemove', this.playEL.onMouseMove);
+    this.canvas.addEventListener('mouseup', this.playEL.onMouseUp);
+
+    this.render();
   }
 
   loop() {
@@ -17783,10 +17897,14 @@ class Game {
     return false;
   }
 
-  detectPileClick(x, y) {
+  detectPileClick(x, y, careEmpty = true) {
     if (x > this.pile.x && x < this.pile.x + __WEBPACK_IMPORTED_MODULE_1__Constants__["b" /* CARD */].WIDTH) {
       if (y > this.pile.y && y < this.pile.y + __WEBPACK_IMPORTED_MODULE_1__Constants__["b" /* CARD */].HEIGHT) {
-        if (!this.pile.isEmpty()) {
+        if (careEmpty) {
+          if (!this.pile.isEmpty()) {
+            return true;
+          }
+        } else {
           return true;
         }
       }
@@ -17851,7 +17969,7 @@ class Game {
 /* harmony default export */ __webpack_exports__["a"] = (Game);
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports) {
 
 var g;
@@ -17878,7 +17996,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -17906,12 +18024,15 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Constants__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Card__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Constants__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Card__ = __webpack_require__(8);
+
 
 
 
@@ -17925,9 +18046,9 @@ class Deck {
 
   generate(faceUp) {
     this.cards = [];
-    for (var suit in __WEBPACK_IMPORTED_MODULE_0__Constants__["l" /* SUIT */]) {
-      for (var value = 2; value < __WEBPACK_IMPORTED_MODULE_0__Constants__["e" /* FACE */].ACE; value++) {
-        this.cards.push(new __WEBPACK_IMPORTED_MODULE_1__Card__["a" /* default */](value, __WEBPACK_IMPORTED_MODULE_0__Constants__["l" /* SUIT */][suit], this.x, this.y, faceUp, false));
+    for (var suit in __WEBPACK_IMPORTED_MODULE_1__Constants__["l" /* SUIT */]) {
+      for (var value = 2; value < __WEBPACK_IMPORTED_MODULE_1__Constants__["e" /* FACE */].ACE; value++) {
+        this.cards.push(new __WEBPACK_IMPORTED_MODULE_2__Card__["a" /* default */](value, __WEBPACK_IMPORTED_MODULE_1__Constants__["l" /* SUIT */][suit], this.x, this.y, faceUp, false));
       }
     }
   }
@@ -17940,6 +18061,11 @@ class Deck {
       this.cards[i].setPosition(this.x + 1 * count, this.y + 1 * count);
       this.cards[i].render(ctx);
       count += 1;
+    }
+    if (max == 0) {
+      // still render something
+      ctx.fillStyle = 'black';
+      ctx.strokeRect(this.x, this.y, __WEBPACK_IMPORTED_MODULE_1__Constants__["b" /* CARD */].WIDTH, __WEBPACK_IMPORTED_MODULE_1__Constants__["b" /* CARD */].HEIGHT);
     }
   }
 
@@ -18008,9 +18134,9 @@ class Deck {
         return false;
       }
 
-      if (this.cards[index].value != __WEBPACK_IMPORTED_MODULE_0__Constants__["k" /* SPECIAL */].INVISIBLE && this.cards[index].value != value) {
+      if (this.cards[index].value != __WEBPACK_IMPORTED_MODULE_1__Constants__["k" /* SPECIAL */].INVISIBLE && this.cards[index].value != value) {
         return false;
-      } else if (this.cards[index].value == __WEBPACK_IMPORTED_MODULE_0__Constants__["k" /* SPECIAL */].INVISIBLE) {
+      } else if (this.cards[index].value == __WEBPACK_IMPORTED_MODULE_1__Constants__["k" /* SPECIAL */].INVISIBLE) {
         total += 1;
       }
     }
@@ -18020,7 +18146,7 @@ class Deck {
   topValue() {
     // gets the top on the pile, excluding INVISIBLE
     var i = this.cards.length - 1;
-    while (i >= 0 && this.cards[i].value == __WEBPACK_IMPORTED_MODULE_0__Constants__["k" /* SPECIAL */].INVISIBLE) {
+    while (i >= 0 && this.cards[i].value == __WEBPACK_IMPORTED_MODULE_1__Constants__["k" /* SPECIAL */].INVISIBLE) {
       i -= 1;
     }
 
@@ -18044,12 +18170,12 @@ class Deck {
 /* harmony default export */ __webpack_exports__["a"] = (Deck);
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Constants__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__CardMap__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Constants__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__CardMap__ = __webpack_require__(9);
 
 
 
@@ -18191,7 +18317,7 @@ class Card {
 /* harmony default export */ __webpack_exports__["a"] = (Card);
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -18622,13 +18748,13 @@ const cardMap = {
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Constants__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Constants__ = __webpack_require__(1);
 
 
 
@@ -18995,19 +19121,19 @@ class Player {
 /* harmony default export */ __webpack_exports__["a"] = (Player);
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__EventListeners__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__EventListeners__ = __webpack_require__(2);
 
 
 
 class SwapEventListeners extends __WEBPACK_IMPORTED_MODULE_1__EventListeners__["a" /* default */] {
-  constructor(width, height, render, detectHand, detectFaceUp, detectPile, detectDeck, swapFct, reorderHand, done) {
-    super(width, height, render, detectHand, detectFaceUp, detectPile, detectDeck);
+  constructor(width, height, render, detectCard, done, swapFct, reorderHand) {
+    super(width, height, render, detectCard);
 
     this.highlighted = null;
 
@@ -19022,14 +19148,9 @@ class SwapEventListeners extends __WEBPACK_IMPORTED_MODULE_1__EventListeners__["
 
   onMouseDown(e) {
     var { x, y } = this.getMousePosition(e);
-    var c = this.detectHand(x, y);
-    var type = 'hand';
-    if (!c) {
-      c = this.detectFaceUp(x, y);
-      type = 'faceup';
-    }
+    var { c, type } = this.detectCard(x, y);
 
-    if (c) {
+    if (c && (type == 'hand' || type == 'faceup')) {
       this.selected = { c, type };
       this.lastCursorPosition = { x, y };
     }
@@ -19038,14 +19159,7 @@ class SwapEventListeners extends __WEBPACK_IMPORTED_MODULE_1__EventListeners__["
   onMouseMove(e) {
     var toRender = false;
     var { x, y } = this.getMousePosition(e);
-
-    var c = this.detectHand(x, y);
-    if (!c) {
-      c = this.detectFaceUp(x, y);
-    }
-    if (!c) {
-      c = this.detectDeck(x, y);
-    }
+    var { c, type } = this.detectCard(x, y);
 
     if (c) {
       if (this.highlighted) {
@@ -19078,8 +19192,9 @@ class SwapEventListeners extends __WEBPACK_IMPORTED_MODULE_1__EventListeners__["
 
   onMouseUp(e) {
     var { x, y } = this.getMousePosition(e);
+    var { c, type } = this.detectCard(x, y);
 
-    if (this.detectDeck(x, y)) {
+    if (type == 'deck') {
       this.done();
       this.render();
       return;
@@ -19089,16 +19204,22 @@ class SwapEventListeners extends __WEBPACK_IMPORTED_MODULE_1__EventListeners__["
       return;
     }
 
-    var c = this.detectFaceUp(x, y);
+    if (this.selected.type == 'hand') {
+      var result = this.detectCard(x, y, 'faceup');
+      c = result.c;
+      type = result.type;
 
-    if (this.selected.type == 'faceup') {
-      c = this.detectHand(x, y);
-    }
+      if (type) {
+        this.swapFct(this.selected.c, c);
+      }
+    } else if (this.selected.type == 'faceup') {
+      var result = this.detectCard(x, y, 'hand');
+      c = result.c;
+      type = result.type;
 
-    if (c && this.selected.type == 'hand') {
-      this.swapFct(this.selected.c, c);
-    } else if (c && this.selected.type == 'faceup') {
-      this.swapFct(c, this.selected.c);
+      if (type) {
+        this.swapFct(c, this.selected.c);
+      }
     } else {
       // just dropped it
       this.reorderHand();
@@ -19106,7 +19227,6 @@ class SwapEventListeners extends __WEBPACK_IMPORTED_MODULE_1__EventListeners__["
 
     this.selected = null;
     this.lastCursorPosition = null;
-
     this.render();
   }
 }
@@ -19114,59 +19234,91 @@ class SwapEventListeners extends __WEBPACK_IMPORTED_MODULE_1__EventListeners__["
 /* harmony default export */ __webpack_exports__["a"] = (SwapEventListeners);
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-class EventListeners {
-  constructor(width, height, render, detectHand, detectFaceUp, detectPile, detectDeck) {
-    this.width = width;
-    this.height = height;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lodash__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__EventListeners__ = __webpack_require__(2);
 
-    this.render = render;
-    this.detectHand = detectHand;
-    this.detectFaceUp = detectFaceUp;
-    this.detectPile = detectPile;
-    this.detectDeck = detectDeck;
 
-    this.getMousePosition = this.getMousePosition.bind(this);
-    this.detectCard = this.detectCard.bind(this);
-    this.onMouseDown = this.onMouseDown.bind(this);
-    this.onMouseMove = this.onMouseMove.bind(this);
-    this.onMouseUp = this.onMouseUp.bind(this);
+
+class PlayEventListeners extends __WEBPACK_IMPORTED_MODULE_1__EventListeners__["a" /* default */] {
+  constructor(width, height, render, detectCard, playCard, reorderHand) {
+    super(width, height, render, detectCard);
+
+    this.playCard = playCard;
+    this.reorderHand = reorderHand;
+
+    this.highlighted = null;
+
+    this.selected = null;
+
+    this.lastCursorPosition = null;
   }
 
-  getMousePosition(e) {
-    var x = e.offsetX - this.width / 2;
-    var y = e.offsetY - this.height / 2;
-    return { x, y };
-  }
-
-  detectCard({ x, y }) {
-    var c = this.detectHand(x, y);
-    var type = 'hand';
+  onMouseDown(e) {
+    var { x, y } = this.getMousePosition(e);
+    var { c, type } = this.detectCard(x, y, 'hand');
 
     if (c) {
-      return { c, type };
+      this.selected = { c, type };
+      this.lastCursorPosition = { x, y };
     }
-
-    c = this.detectFaceUp(x, y);
-    type = 'faceUp';
-    if (c) {
-      return { c, type };
-    }
-
-    return { c: null, type: null };
   }
 
-  onMouseDown(e) {}
+  onMouseMove(e) {
+    var toRender = false;
+    var { x, y } = this.getMousePosition(e);
+    var { c, type } = this.detectCard(x, y);
 
-  onMouseMove(e) {}
+    if (c) {
+      if (this.highlighted) {
+        if (this.highlighted != c) {
+          this.highlighted.setHighlight(false);
+          this.highlighted = null;
+        }
+      }
+      this.highlighted = c;
+      this.highlighted.setHighlight(true);
+      toRender = true;
+    } else if (this.highlighted) {
+      this.highlighted.setHighlight(false);
+      this.highlighted = null;
+      toRender = true;
+    }
 
-  onMouseUp(e) {}
+    if (this.selected && this.lastCursorPosition) {
+      var dx = x - this.lastCursorPosition.x;
+      var dy = y - this.lastCursorPosition.y;
+      this.selected.c.translate(dx, dy);
+      this.lastCursorPosition = { x, y };
+      toRender = true;
+    }
+
+    if (toRender) {
+      this.render();
+    }
+  }
+
+  onMouseUp(e) {
+    var { x, y } = this.getMousePosition(e);
+    var { c, type } = this.detectCard(x, y, 'pile');
+
+    if (type) {
+      this.playCard(this.selected.c);
+    } else {
+      this.reorderHand();
+    }
+
+    this.selected = null;
+    this.lastCursorPosition = null;
+    this.render();
+  }
 }
 
-/* harmony default export */ __webpack_exports__["a"] = (EventListeners);
+/* harmony default export */ __webpack_exports__["a"] = (PlayEventListeners);
 
 /***/ })
 /******/ ]);
