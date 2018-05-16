@@ -68,11 +68,15 @@ class Deck {
   }
 
   place(cards) {
-    for (var i = 0; i < cards.length; i++) {
-      var card = cards[i];
-      card.setPosition(this.x, this.y);
-      this.cards.push(card);
-    }
+    cards.forEach(c => {
+      c.setPosition(this.x, this.y);
+      this.cards.push(c);
+    });
+    // for (var i = 0; i < cards.length; i++) {
+      // var card = cards[i];
+      // card.setPosition(this.x, this.y);
+      // this.cards.push(card);
+    // }
   }
 
   isEmpty() {

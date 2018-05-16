@@ -17632,6 +17632,7 @@ class Game {
     this.swapCards = false;
 
     var playCard = function (c) {
+      this.players[0].removeCard(c, 'hand');
       this.pickedCards.push(c);
       this.playCards();
     };
@@ -17873,6 +17874,7 @@ class Game {
         human.addToHand(this.pickedCards);
         human.addToHand(this.pile.pickUp());
       }
+      this.pickedCards = [];
       this.render();
       this.loop();
     } else if (this.clickedOnPile) {
@@ -18100,11 +18102,15 @@ class Deck {
   }
 
   place(cards) {
-    for (var i = 0; i < cards.length; i++) {
-      var card = cards[i];
-      card.setPosition(this.x, this.y);
-      this.cards.push(card);
-    }
+    cards.forEach(c => {
+      c.setPosition(this.x, this.y);
+      this.cards.push(c);
+    });
+    // for (var i = 0; i < cards.length; i++) {
+    // var card = cards[i];
+    // card.setPosition(this.x, this.y);
+    // this.cards.push(card);
+    // }
   }
 
   isEmpty() {
@@ -19063,6 +19069,12 @@ class Player {
     } else {
       return null;
     }
+  }
+
+  removeCard(card, type) {
+    var cards = this.getCards(type);
+    var index = cards.indexOf(card);
+    return cards.splice(index, 1)[0];
   }
 
   selectCard(x, y, type) {

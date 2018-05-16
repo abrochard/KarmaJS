@@ -313,6 +313,12 @@ class Player {
     }
   }
 
+  removeCard(card, type) {
+    var cards = this.getCards(type);
+    var index = cards.indexOf(card);
+    return cards.splice(index, 1)[0];
+  }
+
   selectCard(x, y, type) {
     var cards = this.getCards(type);
     return _.find(cards, c => {

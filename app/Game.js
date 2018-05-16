@@ -280,6 +280,7 @@ class Game {
     this.swapCards = false;
 
     var playCard = function(c) {
+      this.players[0].removeCard(c, 'hand');
       this.pickedCards.push(c);
       this.playCards();
     };
@@ -555,6 +556,7 @@ class Game {
         human.addToHand(this.pickedCards);
         human.addToHand(this.pile.pickUp());
       }
+      this.pickedCards = [];
       this.render();
       this.loop();
     } else if (this.clickedOnPile) {
