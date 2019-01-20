@@ -1,11 +1,17 @@
 module.exports = {
-  entry: __dirname + '/../app/index.js',
+  mode: 'development',
+  entry: __dirname + '/../app/index.ts',
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loader: 'babel-loader'
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env']
+          }
+        }
       },
       {
         test: /\.css$/,
@@ -22,8 +28,16 @@ module.exports = {
         }, {
           loader: "css-loader" // translates CSS into CommonJS
         }]
+      },
+      {
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        loader: 'ts-loader'
       }
     ]
+  },
+  resolve: {
+    extensions: [ '.ts', '.js' ]
   },
   output: {
     filename: 'index.js',
