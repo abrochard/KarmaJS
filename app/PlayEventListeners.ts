@@ -72,7 +72,7 @@ class PlayEventListeners extends EventListeners {
 
     onMouseUp(e: any) {
         var { x, y } = this.getMousePosition(e);
-        var { c, type } = this.detectCard(x, y, "pile");
+        var { type } = this.detectCard(x, y, "pile");
 
         if (type) {
             this.playCard(this.selected.c);

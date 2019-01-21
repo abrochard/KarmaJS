@@ -2,6 +2,8 @@ import * as _ from 'lodash';
 import { PLAYER, DEBUG, CARD, SPECIAL } from './Constants';
 import Card from './Card';
 
+import { Animation } from './Animation';
+
 class Player {
     faceDownCards: Card[];
     faceUpCards: Card[];
@@ -10,6 +12,7 @@ class Player {
     y: number;
     human: boolean;
     pickedCards: any;
+    animations: Animation[];
     constructor(human: boolean) {
         this.faceDownCards = [];
         this.faceUpCards = [];
@@ -27,10 +30,12 @@ class Player {
             collection: null
         };
 
+        this.animations = [];
+
         this.reorderHand = this.reorderHand.bind(this);
     }
 
-    render(ctx: CanvasRenderingContext2D) {
+    render(ctx: CanvasRenderingContext2D): boolean {
         let r = (c: Card) => {
             c.render(ctx);
         };
@@ -45,6 +50,11 @@ class Player {
 
         // render hand
         this.hand.forEach(r);
+
+        this.animations = _.filter(this.animations, anim => {
+            return !anim(ctx);
+        });
+        return _.isEmpty(this.animations);
     }
 
     addToFaceDown(cards: Card[]) {
@@ -119,7 +129,7 @@ class Player {
     }
 
     playHand(top: any) {
-        var min: any = null;
+        let min: any = null;
         if (top == SPECIAL.REVERSE) {
             min = this.findMinUnder(top, this.hand);
         } else {
@@ -131,7 +141,7 @@ class Player {
             this.pickedCards.total = min.total;
             this.pickedCards.value = min.value;
         } else {
-            var index = this.selectSpecial(this.hand);
+            let index = this.selectSpecial(this.hand);
             this.pickedCards.index = index;
             this.pickedCards.total = index ? 1 : 0;
         }
@@ -142,7 +152,7 @@ class Player {
     }
 
     findAllCardsOfSameValue(cards: Card[], value: number) {
-        var indices = [];
+        let indices = [];
         for (var i = 0; i < cards.length; i++) {
             if (cards[i].value == value) {
                 indices.push(i);
@@ -152,7 +162,7 @@ class Player {
     }
 
     playFaceUp(top: number) {
-        var min: any = null;
+        let min: any = null;
 
         if (top == SPECIAL.REVERSE) {
             min = this.findMinUnder(top, this.faceUpCards);
@@ -164,7 +174,7 @@ class Player {
             this.pickedCards.total = min.total;
             this.pickedCards.value = min.value;
         } else {
-            var special = this.selectSpecial(this.faceUpCards);
+            let special = this.selectSpecial(this.faceUpCards);
             if (special) {
                 this.pickedCards.index = special;
                 this.pickedCards.total = 1;
@@ -176,46 +186,9 @@ class Player {
         }
     }
 
-    // this.playFaceUp = function(top) {
-    //     var min = null;
-    //     var indices = [];
-    //     var i = 0;
-    //     var cards = [];
-    //     var c = null;
-
-    //     if (top == SPECIAL.REVERSE) {
-    //         min = this.findMinUnder(top, this.faceUpCards);
-    //     } else {
-    //         min = this.findMinAbove(top, this.faceUpCards);
-    //     }
-    //     if (min != null) {
-    //         indices = findAllCardsOfSameValue(this.faceUpCards, min.value);
-    //         cards = [];
-    //         for(i = indices.length - 1; i >= 0; i--) {
-    //             c = this.faceUpCards.splice(indices[i], 1)[0];
-    //             cards.push(c);
-    //         }
-    //         return cards;
-    //     } else {
-    //         var special = this.selectSpecial(this.faceUpCards);
-    //         if (special[0] != null) {
-    //             special = special[0];
-    //             indices = findAllCardsOfSameValue(this.faceUpCards, special.value);
-    //             cards = [special];
-    //             for(i = 0; i < indices.length; i++) {
-    //                 c = this.faceUpCards.splice(indices[i], 1)[0];
-    //                 cards.push(c);
-    //             }
-    //             return cards;
-    //         } else {
-    //             return [this.faceUpCards.pop()]; // just pick one
-    //         }
-    //     }
-    // }
-
     findMinAbove(top: number, cards: Card[]) {
         // assume the cards are sorted
-        var min: any = { index: null };
+        let min: any = { index: null };
         for (var i = 0; i < cards.length; i++) {
             if (cards[i].value >= top && !cards[i].isSpecial()) {
                 if (min.index == null) {
@@ -234,7 +207,7 @@ class Player {
 
     findMinUnder(top: number, cards: Card[]) {
         // assume the cards are sorted
-        var min: any = { index: null };
+        let min: any = { index: null };
         for (var i = 0; i < cards.length; i++) {
             if (cards[i].value <= top && !cards[i].isSpecial()) {
                 if (min.index == null) {
@@ -265,7 +238,7 @@ class Player {
         this.hand.sort(function(a, b) {
             return a.compareTo(b);
         });
-        var offset = (this.hand.length - 3) / 2 * PLAYER.CARD_SPREAD * (-1);
+        let offset = (this.hand.length - 3) / 2 * PLAYER.CARD_SPREAD * (-1);
         for (var i = 0; i < this.hand.length; i++) {
             this.hand[i].setPosition(this.x + PLAYER.CARD_SPREAD * i + offset, this.y);
         }
@@ -291,7 +264,7 @@ class Player {
     }
 
     getCards(type: string) {
-        var cards: Card[] = [];
+        let cards: Card[] = [];
         if (type == 'hand') {
             cards = this.hand;
         } else if (type == 'faceup') {
@@ -303,10 +276,10 @@ class Player {
     }
 
     pickCard(x: number, y: number, type: any) {
-        var cards = this.getCards(type);
-        var card = this.selectCard(x, y, type);
+        let cards = this.getCards(type);
+        let card = this.selectCard(x, y, type);
         if (card) {
-            var index = cards.indexOf(card);
+            let index = cards.indexOf(card);
             return cards.splice(index, 1)[0];
         } else {
             return null;
@@ -314,13 +287,13 @@ class Player {
     }
 
     removeCard(card: Card, type: string) {
-        var cards = this.getCards(type);
-        var index = cards.indexOf(card);
+        let cards = this.getCards(type);
+        let index = cards.indexOf(card);
         return cards.splice(index, 1)[0];
     }
 
     selectCard(x: number, y: number, type: string) {
-        var cards = this.getCards(type);
+        let cards = this.getCards(type);
         return _.find(cards, c => {
             return this.clickedCard(x, y, c);
         });
@@ -347,7 +320,7 @@ class Player {
         // tries to make the best swap possible,
         // with special and high cards ending up as face up
         this.reorderHand();
-        var specialInHand = this.getSpecialIndex(this.hand);
+        let specialInHand = this.getSpecialIndex(this.hand);
         for (var i = 0; i < this.faceUpCards.length; i++) {
             if (this.faceUpCards[i].isSpecial() == false) {
                 if (specialInHand >= 0) {

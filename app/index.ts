@@ -6,8 +6,7 @@ function Karma() {
     canvas.height = document.body.clientHeight;
     if (canvas.getContext) {
         var game = new Game(canvas);
-        game.initAnim();
-        // game.init();
+        game.init();
     }
 }
 

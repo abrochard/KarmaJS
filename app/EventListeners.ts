@@ -17,8 +17,8 @@ class EventListeners {
     }
 
     getMousePosition(e: any) {
-        var x = e.offsetX - this.width / 2;
-        var y = e.offsetY - this.height / 2;
+        let x = e.offsetX - this.width / 2;
+        let y = e.offsetY - this.height / 2;
         return { x, y };
     }
 

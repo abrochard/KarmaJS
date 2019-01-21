@@ -7,7 +7,8 @@ import {
     LOG,
     BOARD,
     DECK,
-    MESSAGE
+    MESSAGE,
+    PLAYER
 } from "./Constants";
 import Deck from "./Deck";
 import Player from "./Player";
@@ -16,6 +17,9 @@ import Card from "./Card";
 
 import SwapEventListeners from "./SwapEventListeners";
 import PlayEventListeners from "./PlayEventListeners";
+
+import { Animation, cardDrawAnimation, Type } from './Animation';
+import { EventType, EventHandler } from './Event';
 
 class Game {
     canvas: any;
@@ -39,6 +43,8 @@ class Game {
     lastPosition: any;
     swapEL: any;
     playEL: any;
+    animations: Animation[];
+    eventHandler: EventHandler;
     constructor(canvas: any) {
         this.canvas = canvas;
         this.ctx = null;
@@ -71,99 +77,13 @@ class Game {
 
         this.swapEL = null;
         this.playEL = null;
+
+        this.animations = [];
+
+        this.eventHandler = new EventHandler(canvas);
     }
 
-    // EVENT LISTENERS
-    pickDown(e: any) {
-        if (this.acceptInput) {
-            // start listening for hovering
-            this.acceptMove = true;
-
-            // determines which cards can be picked
-            var human = this.players[0];
-            if (human.emptyHand() == false) {
-                // detect hand cards
-                this.inputType = "hand";
-            } else if (human.noFaceUps() == false) {
-                // detect face up cards
-                this.inputType = "faceup";
-            } else {
-                // detect facedown
-                this.inputType = "facedown";
-            }
-
-            // add the card clicked on
-            var x = e.offsetX - this.canvas.width / 2;
-            var y = e.offsetY - this.canvas.height / 2;
-            this.detectSelection(x, y);
-
-            if (this.inputType == "facedown") {
-                // can only play one facedown card per turn
-                this.acceptMove = false;
-                this.playCards();
-                this.pickedCards = [];
-            }
-        }
-    }
-
-    pickMove(e: any) {
-        if (this.acceptMove) {
-            // detects what cards are being hovered over
-            var x = e.offsetX - this.canvas.width / 2;
-            var y = e.offsetY - this.canvas.height / 2;
-            this.detectSelection(x, y);
-        }
-    }
-
-    pickUp() {
-        if (this.acceptMove || this.clickedOnPile || this.clickedOnDeck) {
-            // stop listening for hovering and play cards
-            this.acceptMove = false;
-            this.playCards();
-            this.pickedCards = [];
-        }
-    }
-
-    swapDown(e: any) {
-        if (this.swapCards == false) {
-            return;
-        }
-
-        var human = this.players[0];
-        var x = e.offsetX - this.canvas.width / 2;
-        var y = e.offsetY - this.canvas.height / 2;
-
-        if (this.detectDeckClick(x, y)) {
-            // start the game
-            this.swapCards = false;
-            this.canvas.removeEventListener("mousedown", this.swapDown.bind(this));
-            this.canvas.addEventListener("mousedown", this.pickDown.bind(this));
-            this.canvas.addEventListener("mousemove", this.pickMove.bind(this));
-            this.canvas.addEventListener("mouseup", this.pickUp.bind(this));
-            this.render();
-        } else {
-            // swap cards
-            var indices = [];
-            indices.push(human.selectCard(x, y, "hand"));
-            indices.push(human.selectCard(x, y, "faceup"));
-
-            for (var i = 0; i < indices.length; i++) {
-                var index = indices[i];
-                if (index != null) {
-                    this.selectedCards.push(index);
-                    break;
-                }
-            }
-
-            if (this.selectedCards.length == 2) {
-                human.swapCards(this.selectedCards[1], this.selectedCards[0]);
-                this.selectedCards = [];
-                this.render();
-            }
-        }
-    }
-
-    initAnim(nPlayers = GAME.PLAYERS) {
+    init(nPlayers = GAME.PLAYERS) {
         this.ctx = this.canvas.getContext("2d");
 
         // DECK
@@ -174,124 +94,102 @@ class Game {
         // PILE
         this.pile = new Deck(PILE.X, PILE.Y, PILE.MAX_RENDER);
 
-        let animations: any = [];
-        _.range(nPlayers).forEach(i => {
-            _.range(9).forEach(() => {
-                animations.push({
-                    card: new Card(1, 0, 50, 50, false, false),
-                    x: 500,
-                    y: 250 + i * 30
-                });
-            });
-        });
-
-        log(animations);
-        this.animateCards(animations, 30, () => {
-            log("done");
-            this.init();
-        });
-    }
-
-    init(nPlayers = GAME.PLAYERS) {
-        // this.ctx = this.canvas.getContext('2d');
-
-        // // DECK
-        // this.deck = new Deck(DECK.X, DECK.Y, DECK.MAX_RENDER);
-        // this.deck.generate(false);
-        // this.deck.shuffle();
-
         // PLAYERS
         this.players = [];
         _.range(nPlayers).forEach(i => {
             var p = new Player(i == 0);
 
-            var faceDowns: Card[] = [];
-            var faceUps: Card[] = [];
-            var hand: Card[] = [];
             _.range(3).forEach(() => {
-                faceDowns.push(this.deck.draw());
+                let faceDown = this.deck.draw();
+                p.animations.push(cardDrawAnimation(p, Type.Hand, faceDown))
 
-                var c = this.deck.draw();
-                c.flip();
-                faceUps.push(c);
+                let faceUp = this.deck.draw();
+                faceUp.flip();
+                p.animations.push(cardDrawAnimation(p, Type.FaceUp, faceUp));
 
-                hand.push(this.deck.draw());
+                let h = this.deck.draw();
+                p.animations.push(cardDrawAnimation(p, Type.FaceDown, h));
             });
-
-            p.addToFaceDown(faceDowns);
-            p.addToFaceUps(faceUps);
-            p.addToHand(hand);
-
-            // AI swap cards
-            if (i > 0) {
-                p.autoSwapCards();
-            }
 
             this.players.push(p);
         });
 
-        // PILE
-        // this.pile = new Deck(PILE.X, PILE.Y, PILE.MAX_RENDER);
-
-        // CARD SWAPPING
-        this.acceptInput = true;
-        this.swapCards = true;
-        // this.canvas.addEventListener('mousedown', this.swapDown.bind(this));
-
-        // NEW
-        var swapFct = (handCard: Card, faceUpCard: Card) => {
-            var human = this.players[0];
-            var handIndex = _.indexOf(human.hand, handCard);
-            var faceUpIndex = _.indexOf(human.faceUpCards, faceUpCard);
-            human.swapCards(handIndex, faceUpIndex);
-        };
-
-        this.swapEL = new SwapEventListeners(
-            this.canvas.width,
-            this.canvas.height,
-            this.render,
-            this.detectCard.bind(this),
-            this.doneSwapping.bind(this),
-            swapFct,
-            this.players[0].reorderHand.bind(this)
-        );
-
-        this.canvas.addEventListener("mousedown", this.swapEL.onMouseDown);
-        this.canvas.addEventListener("mousemove", this.swapEL.onMouseMove);
-        this.canvas.addEventListener("mouseup", this.swapEL.onMouseUp);
-
-        this.render();
-
-        // let animations = [
-        //     { card: new Card(1, 0, 0, 0, false, false), x: 500, y: 250 },
-        //     { card: new Card(1, 0, 0, 0, false, false), x: 500, y: 350 },
-        //     { card: new Card(1, 0, 0, 0, false, false), x: 500, y: 450 },
-        //     { card: new Card(1, 0, 0, 0, false, false), x: 500, y: 550 }
-        // ];
-        // this.animateCards(animations, 30, () => {log('done');});
-        // this.moveCardTo(card, 500, 150, 10, () => {log('done');});
+        // animate card dealing and then start swapping
+        this.render(() => {
+            this.initSwap();
+        });
     }
 
-    animateCards(animations: any, v: number, done: any) {
-        // animations = [{card, x, y}]
-        let arrived = _.every(
-            _.map(animations, anim => {
-                return anim.card.moveTo(anim.x, anim.y, v);
-            })
-        );
-
-        this.render();
-        _.forEach(animations, anim => {
-            anim.card.render(this.ctx);
+    initSwap() {
+        // auto swap the AIs first
+        this.players.forEach(p => {
+            if (!p.human) {
+                p.autoSwapCards();
+            }
+            p.reorderHand();
         });
 
-        if (arrived) {
-            return done();
-        }
+        let card = this.players[0].hand[0];
+        this.eventHandler.register(
+            card,
+            EventType.Click,
+            (x, y, _) => {
+                log(x, y);
+            }
+        );
 
-        let self = this;
-        window.requestAnimationFrame(() => {
-            self.animateCards(animations, v, done);
+        this.eventHandler.register(
+            card,
+            EventType.Drag,
+            (dx, dy, _) => {
+                card.translate(dx, dy);
+                this.render();
+            }
+        );
+
+        this.eventHandler.register(
+            card,
+            EventType.Drop,
+            (x, y, _) => {
+                log(x, y);
+            }
+        )
+
+        this.eventHandler.register(
+            card,
+            EventType.Hover,
+            (x, y, active) => {
+                card.setHighlight(active);
+                this.render();
+            }
+        )
+
+        this.eventHandler.listen();
+
+        // var swapFct = (handCard: Card, faceUpCard: Card) => {
+        //     var human = this.players[0];
+        //     var handIndex = _.indexOf(human.hand, handCard);
+        //     var faceUpIndex = _.indexOf(human.faceUpCards, faceUpCard);
+        //     human.swapCards(handIndex, faceUpIndex);
+        // };
+
+        // this.swapEL = new SwapEventListeners(
+        //     this.canvas.width,
+        //     this.canvas.height,
+        //     this.render,
+        //     this.detectCard.bind(this),
+        //     this.doneSwapping.bind(this),
+        //     swapFct,
+        //     this.players[0].reorderHand.bind(this)
+        // );
+
+        // this.canvas.addEventListener("mousedown", this.swapEL.onMouseDown);
+        // this.canvas.addEventListener("mousemove", this.swapEL.onMouseMove);
+        // this.canvas.addEventListener("mouseup", this.swapEL.onMouseUp);
+
+        this.render(() => {
+            this.acceptInput = true;
+            this.swapCards = true;
         });
     }
 
@@ -433,7 +331,7 @@ class Game {
             delay = 0; // don't wait and just pick up the card
         }
 
-        game.render(game.ctx);
+        game.render();
         window.setTimeout(this.playAICallback, delay, game, index);
     }
 
@@ -523,7 +421,7 @@ class Game {
         }
     }
 
-    render() {
+    render(done?: () => void) {
         // recenter
         this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
         // clear the board
@@ -559,14 +457,15 @@ class Game {
         }
 
         // render all players
+        let panimDone = true;
         this.players.forEach(p => {
-            p.render(this.ctx);
+            panimDone = panimDone && p.render(this.ctx);
             // rotate the canvas for each player
             this.ctx.rotate(((360 / this.players.length) * Math.PI) / 180);
         });
 
         // HACKY
-        // this.players[0].render(this.ctx);
+        this.players[0].render(this.ctx);
 
         // render picked cards
         this.pickedCards.forEach(c => {
@@ -585,7 +484,26 @@ class Game {
             );
         }
 
+        // render animations
+        this.animations = _.filter(this.animations, animate => {
+            return !animate(this.ctx);
+        })
+        let arrived = _.isEmpty(this.animations);
+
+        // re-center board
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+        if (arrived && panimDone) {
+            if (done) {
+                return done();
+            }
+            return;
+        }
+
+        let self = this;
+        window.requestAnimationFrame(() => {
+            self.render(done);
+        })
     }
 
     detectSelection(x: number, y: number) {
@@ -751,7 +669,7 @@ class Game {
     }
 }
 
-function log(str: any) {
+function log(...str: any) {
     console.log(str);
 }
 

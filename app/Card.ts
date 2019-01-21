@@ -40,7 +40,7 @@ class Card {
     }
 
     getName(suit: number, value: number) {
-        var name = "";
+        let name = "";
         switch (suit) {
             case SUIT.SPADE:
                 name += "Spades";
@@ -101,16 +101,16 @@ class Card {
     }
 
     drawCard(ctx: any, cardMapName: string, elementId: string) {
-        var position = cardMap[cardMapName];
-        var sx = position.x;
-        var sy = position.y;
-        var sWidth = position.width;
-        var sHeight = position.height;
+        let position = cardMap[cardMapName];
+        let sx = position.x;
+        let sy = position.y;
+        let sWidth = position.width;
+        let sHeight = position.height;
 
-        var dx = this.x;
-        var dy = this.y;
-        var dWidth = this.width;
-        var dHeight = this.height;
+        let dx = this.x;
+        let dy = this.y;
+        let dWidth = this.width;
+        let dHeight = this.height;
         ctx.drawImage(
             document.getElementById(elementId),
             sx,

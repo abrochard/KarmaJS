@@ -25,8 +25,8 @@ class Deck {
     }
 
     render(ctx: CanvasRenderingContext2D) {
-        var count = 0;
-        var max = Math.max(0, this.cards.length - this.maxRender);
+        let count = 0;
+        let max = Math.max(0, this.cards.length - this.maxRender);
         for (var i = max; i < this.cards.length; i++) {
             // offset the top cards
             this.cards[i].setPosition(this.x + 1 * count, this.y + 1 * count);
@@ -41,9 +41,9 @@ class Deck {
     }
 
     shuffle() {
-        var currentIndex = this.cards.length;
-        var temporaryValue;
-        var randomIndex;
+        let currentIndex = this.cards.length;
+        let temporaryValue;
+        let randomIndex;
 
         while (0 !== currentIndex) {
             randomIndex = Math.floor(Math.random() * currentIndex);
@@ -59,7 +59,7 @@ class Deck {
     }
 
     pickUp() {
-        var cards = this.cards;
+        let cards = this.cards;
         this.cards = [];
 
         // because nobody wants to pick up transparent cards
@@ -96,10 +96,10 @@ class Deck {
             return false;
         }
 
-        var total = 4;
-        var value = this.cards[this.cards.length - 1].value;
+        let total = 4;
+        let value = this.cards[this.cards.length - 1].value;
         for (var i = 1; i < total; i++) {
-            var index = this.cards.length - 1 - i;
+            let index = this.cards.length - 1 - i;
             if (index < 0) {
                 return false;
             }
@@ -116,7 +116,7 @@ class Deck {
 
     topValue() {
         // gets the top on the pile, excluding INVISIBLE
-        var i = this.cards.length - 1;
+        let i = this.cards.length - 1;
         while (i >= 0 && this.cards[i].value == SPECIAL.INVISIBLE) {
             i -= 1;
         }
