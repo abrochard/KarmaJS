@@ -126,6 +126,8 @@ class Card {
 
     flip() {
         this.faceUp = !this.faceUp;
+
+        return this;
     }
 
     setFaceUp(faceUp: boolean) {

@@ -58,9 +58,9 @@ class Player {
     }
 
     addToFaceDown(cards: Card[]) {
-        cards.forEach((c, i) => {
+        this.faceDownCards = _.concat(this.faceDownCards, cards);
+        this.faceDownCards.forEach((c, i) => {
             c.setPosition(this.x + PLAYER.CARD_SPREAD * i, this.y - PLAYER.FACEUP_DIST);
-            this.faceDownCards.push(c);
         });
     }
 

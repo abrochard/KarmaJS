@@ -37,7 +37,6 @@ class Game {
     clickedOnPile: boolean;
     clickedOnDeck: boolean;
     finished: boolean;
-    selected: boolean;
     engaged: any;
     highligted: any;
     lastPosition: any;
@@ -70,7 +69,6 @@ class Game {
         this.detectPileClick = this.detectPileClick.bind(this);
         this.render = this.render.bind(this);
 
-        this.selected = false;
         this.engaged = false;
         this.highligted = null;
         this.lastPosition = {};
@@ -129,40 +127,17 @@ class Game {
             p.reorderHand();
         });
 
-        let card = this.players[0].hand[0];
+        let human = this.players[0];
+        human.hand.forEach(this.registerSwapCard);
+
+
         this.eventHandler.register(
-            card,
+            this.deck,
             EventType.Click,
             (x, y, _) => {
-                log(x, y);
+                log('deck click');
             }
         );
-
-        this.eventHandler.register(
-            card,
-            EventType.Drag,
-            (dx, dy, _) => {
-                card.translate(dx, dy);
-                this.render();
-            }
-        );
-
-        this.eventHandler.register(
-            card,
-            EventType.Drop,
-            (x, y, _) => {
-                log(x, y);
-            }
-        )
-
-        this.eventHandler.register(
-            card,
-            EventType.Hover,
-            (x, y, active) => {
-                card.setHighlight(active);
-                this.render();
-            }
-        )
 
         this.eventHandler.listen();
 
@@ -191,6 +166,43 @@ class Game {
             this.acceptInput = true;
             this.swapCards = true;
         });
+    }
+
+    registerSwapCard(card: Card) {
+        this.eventHandler.register(card, EventType.Click, (x, y, _) => { });
+        this.eventHandler.register(card, EventType.Drag, (x, y, _) => {
+            card.translate(x, y);
+            this.render();
+        });
+        this.eventHandler.register(card, EventType.Hover, (x, y, active) => {
+            card.setHighlight(active);
+            this.render();
+        });
+        this.eventHandler.register(card, EventType.Drop, this.swapFunction(card).bind(this));
+    }
+
+    swapFunction(card: Card): (x: number, y: number, active: boolean) => void {
+        return (x: number, y: number, active: boolean) => {
+            let human = this.players[0];
+            let c = human.selectCard(x, y, 'faceup');
+            if (!c) {
+                return;
+            }
+
+            human.removeCard(c, 'faceup');
+            human.removeCard(card, 'hand');
+            human.addToFaceUps([card]);
+            human.addToHand([c]);
+
+            this.eventHandler.deregister(card, EventType.Click);
+            this.eventHandler.deregister(card, EventType.Hover);
+            this.eventHandler.deregister(card, EventType.Drag);
+            this.eventHandler.deregister(card, EventType.Drop);
+
+            this.registerSwapCard(c);
+
+            this.render();
+        };
     }
 
     detectCard(x: number, y: number, type: any = null) {

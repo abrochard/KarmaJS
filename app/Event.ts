@@ -176,7 +176,7 @@ export class EventHandler {
             })
             if (i >= 0) {
                 listener.fct(x, y, true);
-                _.remove(this.clickedOn, listener);
+                this.clickedOn.splice(i, 1);
             }
         });
     }

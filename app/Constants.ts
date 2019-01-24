@@ -1,3 +1,14 @@
+export const enum CardType {
+    FaceUp,
+    FaceDown,
+    Hand
+};
+
+export const enum CardState {
+    Default,
+    Playable,
+    Invalid
+};
 
 export const SUIT: any = {
     SPADE: 0,

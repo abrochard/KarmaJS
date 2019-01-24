@@ -4,6 +4,8 @@ import Card from './Card';
 class Deck {
     x: number;
     y: number;
+    width: number;
+    height: number;
     cards: Card[];
     maxRender: number;
     constructor(x: number, y: number, maxRender: number) {
@@ -11,6 +13,9 @@ class Deck {
         this.y = y;
         this.cards = [];
         this.maxRender = maxRender;
+
+        this.width = CARD.WIDTH;
+        this.height = CARD.HEIGHT;
     }
 
     generate(faceUp: boolean) {
