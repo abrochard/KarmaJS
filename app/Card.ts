@@ -4,14 +4,18 @@ import { FRONT_SPRITE, BACK_SPRITE, BACK_NAME, cardMap } from "./CardMap";
 class Card {
     value: number;
     suit: number;
+    name: string;
+
     x: number;
     y: number;
-    faceUp: boolean;
-    transparent: boolean;
+
     height: number;
     width: number;
+
+    faceUp: boolean;
+    transparent: boolean;
     highlighted: boolean;
-    name: string;
+    selected: boolean;
     constructor(
         value: number,
         suit: number,
@@ -78,7 +82,7 @@ class Card {
     render(ctx: CanvasRenderingContext2D) {
         if (this.faceUp == false) {
             // render back of card
-            this.drawCard(ctx, BACK_NAME, BACK_SPRITE);
+            this.draw(ctx, BACK_NAME, BACK_SPRITE);
         } else if (this.transparent == true) {
             // render as transparent
             ctx.globalAlpha = CARD.INVISIBLE.OPACITY;
@@ -87,7 +91,7 @@ class Card {
             ctx.globalAlpha = 1;
         } else {
             // normal face up card
-            this.drawCard(ctx, this.name, FRONT_SPRITE);
+            this.draw(ctx, this.name, FRONT_SPRITE);
         }
 
         // in all cases draw the border
@@ -100,7 +104,7 @@ class Card {
         }
     }
 
-    drawCard(ctx: any, cardMapName: string, elementId: string) {
+    draw(ctx: any, cardMapName: string, elementId: string) {
         let position = cardMap[cardMapName];
         let sx = position.x;
         let sy = position.y;
@@ -126,16 +130,7 @@ class Card {
 
     flip() {
         this.faceUp = !this.faceUp;
-
         return this;
-    }
-
-    setFaceUp(faceUp: boolean) {
-        this.faceUp = faceUp;
-    }
-
-    setTransparent(transparent: boolean) {
-        this.transparent = transparent;
     }
 
     setPosition(x: number, y: number) {
@@ -152,7 +147,7 @@ class Card {
         return this.x == x && this.y == y;
     }
 
-    moveTo(x: number, y: number, v: number) {
+    moveTo(x: number, y: number, v: number): boolean {
         if (this.isAt(x, y)) {
             return true;
         }
@@ -182,10 +177,6 @@ class Card {
             this.value == SPECIAL.INVISIBLE ||
             this.value == SPECIAL.BURN
         );
-    }
-
-    setHighlight(highlighted: boolean) {
-        this.highlighted = highlighted;
     }
 }
 
