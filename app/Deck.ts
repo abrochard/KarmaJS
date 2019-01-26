@@ -69,7 +69,7 @@ class Deck {
 
         // because nobody wants to pick up transparent cards
         for (var i = 0; i < cards.length; i++) {
-            cards[i].setTransparent(false);
+            cards[i].transparent = false;
         }
 
         return cards;

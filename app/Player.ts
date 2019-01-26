@@ -8,12 +8,15 @@ class Player {
     faceDownCards: Card[];
     faceUpCards: Card[];
     hand: Card[];
+
     x: number;
     y: number;
-    human: boolean;
+
     pickedCards: any;
     animations: Animation[];
-    constructor(human: boolean) {
+    selected: Card[];
+    highlighted: Card;
+    constructor() {
         this.faceDownCards = [];
         this.faceUpCards = [];
         this.hand = [];
@@ -21,14 +24,15 @@ class Player {
         this.x = PLAYER.X;
         this.y = PLAYER.Y;
 
-        this.human = human;
-
         this.pickedCards = {
             index: 0,
             total: 0,
             value: 0,
             collection: null
         };
+
+        this.selected = [];
+        this.highlighted = null;
 
         this.animations = [];
 
@@ -51,9 +55,13 @@ class Player {
         // render hand
         this.hand.forEach(r);
 
+        // render animations
         this.animations = _.filter(this.animations, anim => {
             return !anim(ctx);
         });
+        // _.remove(this.animations, anim => {
+        // return !anim(ctx);
+        // });
         return _.isEmpty(this.animations);
     }
 
@@ -71,7 +79,7 @@ class Player {
 
     addToHand(cards: Card[]) {
         cards.forEach(c => {
-            c.setFaceUp(this.human || DEBUG);
+            c.faceUp = DEBUG;
             this.hand.push(c);
         });
         this.reorderHand();
@@ -111,7 +119,7 @@ class Player {
             this.pickedCards.total = 1;
             this.pickedCards.index = 0;
 
-            this.faceDownCards[0].setFaceUp(true);
+            this.faceDownCards[0].faceUp = true;
         }
 
         return this.pickedCards.total;
@@ -147,7 +155,7 @@ class Player {
         }
 
         for (var i = 0; i < this.pickedCards.total; i++) {
-            this.hand[this.pickedCards.index + i].setFaceUp(true);
+            this.hand[this.pickedCards.index + i].faceUp = true;
         }
     }
 
@@ -246,7 +254,7 @@ class Player {
 
     reAlignFaceUps() {
         this.faceUpCards.forEach((c, i) => {
-            c.setFaceUp(true);
+            c.faceUp = true;
             c.setPosition(
                 this.x + PLAYER.CARD_SPREAD * i + PLAYER.FACEUP_X_OFF,
                 this.y - (PLAYER.FACEUP_DIST - PLAYER.FACEUP_Y_OFF)

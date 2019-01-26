@@ -39,8 +39,11 @@ export const CARD: any = {
         COLOR: 'red',
         OPACITY: 0.3
     },
-    SELECTED: {
+    HOVER: {
         COLOR: 'rgb(0,200,0)'
+    },
+    SELECTED: {
+        COLOR: 'rgb(139,0,0)'
     }
 };
 

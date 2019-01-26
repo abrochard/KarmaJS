@@ -13,16 +13,19 @@ import {
 } from "./Constants";
 import Deck from "./Deck";
 import Player from "./Player";
+import AIPlayer from './AIPlayer';
+import HumanPlayer from './HumanPlayer';
 import Card from "./Card";
 import { Animation, cardDrawAnimation } from './Animation';
 
 class Game {
     ctx: CanvasRenderingContext2D;
-    players: Player[];
-    human: Player;
+    aiPlayers: AIPlayer[];
+    human: HumanPlayer;
     deck: Deck;
     pile: Deck;
     animations: Animation[];
+    lastCursorPosition: { x: number, y: number };
     constructor(canvas: HTMLCanvasElement, nPlayers = GAME.PLAYERS) {
         this.ctx = canvas.getContext('2d');
 
@@ -32,34 +35,99 @@ class Game {
 
         this.pile = new Deck(PILE.X, PILE.Y, PILE.MAX_RENDER);
 
-        this.players = [];
-        _.range(nPlayers).forEach(i => {
-            var p = new Player(i == 0);
+        this.human = new HumanPlayer(
+            this.detector(this.deck),
+            this.detector(this.pile),
+            (cards: Card[]) => { console.log(cards); },
+            () => { console.log('deck flip'); }
+        );
+        this.setupPlayer(this.human);
 
-            _.range(3).forEach(() => {
-                p.animations.push(cardDrawAnimation(p, CardType.FaceDown, this.deck.draw()))
-            });
+        this.aiPlayers = [];
+        _.range(nPlayers - 1).forEach(i => {
+            var p = new AIPlayer();
 
-            _.range(3).forEach(() => {
-                p.animations.push(cardDrawAnimation(p, CardType.FaceUp, this.deck.draw().flip()));
-            });
+            this.setupPlayer(p);
 
-            _.range(3).forEach(() => {
-                p.animations.push(cardDrawAnimation(p, CardType.Hand, this.deck.draw()));
-            })
-
-            this.players.push(p);
+            this.aiPlayers.push(p);
         });
 
+
+        this.lastCursorPosition = null;
+
+        this.temp();
+
         this.render(() => {
-            this.players.forEach(p => {
-                if (!p.human) {
-                    p.autoSwapCards();
-                }
+            this.aiPlayers.forEach(p => {
+                p.autoSwapCards();
             })
             this.render(() => {
                 console.log('done');
             })
+        })
+    }
+
+    detector(d: Deck): (x: number, y: number) => boolean {
+        return (x: number, y: number) => {
+            if (x > d.x && x < d.x + CARD.WIDTH) {
+                if (y > d.y && y < d.y + CARD.HEIGHT) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    setupPlayer(p: Player) {
+        _.range(3).forEach(() => {
+            p.animations.push(cardDrawAnimation(p, CardType.FaceDown, this.deck.draw()))
+        });
+
+        _.range(3).forEach(() => {
+            p.animations.push(cardDrawAnimation(p, CardType.FaceUp, this.deck.draw().flip()));
+        });
+
+        _.range(3).forEach(() => {
+            p.animations.push(cardDrawAnimation(p, CardType.Hand, this.deck.draw()));
+        })
+    }
+
+    getPosition(e: MouseEvent): { x: number, y: number } {
+        let x = e.offsetX - this.ctx.canvas.offsetWidth / 2;
+        let y = e.offsetY - this.ctx.canvas.offsetHeight / 2;
+        return { x, y };
+    }
+
+    temp() {
+        this.ctx.canvas.addEventListener('mousemove', e => {
+            let toRender = false;
+            let { x, y } = this.getPosition(e);
+            toRender = toRender || this.human.onHover(x, y);
+
+            if (this.lastCursorPosition) {
+                toRender = toRender || this.human.onDrag(x, y, x - this.lastCursorPosition.x, y - this.lastCursorPosition.y);
+                this.lastCursorPosition = { x, y };
+            }
+
+            if (toRender) {
+                this.render();
+            }
+        })
+
+        this.ctx.canvas.addEventListener('mouseup', e => {
+            let { x, y } = this.getPosition(e);
+            this.lastCursorPosition = null;
+            if (this.human.onDrop(x, y)) {
+                this.render();
+            }
+        });
+
+        this.ctx.canvas.addEventListener('mousedown', e => {
+            let { x, y } = this.getPosition(e);
+            this.lastCursorPosition = { x, y };
+            if (this.human.onClick(x, y)) {
+                this.render();
+            }
         })
     }
 
@@ -98,16 +166,18 @@ class Game {
         //     this.ctx.fillText("Swap cards first", MESSAGE.ZONE2.x, MESSAGE.ZONE2.y);
         // }
 
-        // render all players
+        // render AI players
         let panimDone = true;
-        this.players.forEach(p => {
-            panimDone = panimDone && p.render(this.ctx);
+        _.forEach(this.aiPlayers, p => {
             // rotate the canvas for each player
-            this.ctx.rotate(((360 / this.players.length) * Math.PI) / 180);
+            this.ctx.rotate(((360 / (this.aiPlayers.length + 1)) * Math.PI) / 180);
+            panimDone = panimDone && p.render(this.ctx);
         });
+        this.ctx.rotate(Math.PI / 2);
 
-        // HACKY
-        this.players[0].render(this.ctx);
+
+        // render human player
+        this.human.render(this.ctx);
 
         // render picked cards
         // this.pickedCards.forEach(c => {
@@ -127,9 +197,9 @@ class Game {
         // }
 
         // render animations
-        this.animations = _.filter(this.animations, animate => {
+        _.remove(this.animations, animate => {
             return !animate(this.ctx);
-        })
+        });
         let arrived = _.isEmpty(this.animations);
 
         // re-center board

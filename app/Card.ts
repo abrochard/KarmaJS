@@ -99,6 +99,11 @@ class Card {
         // ctx.strokeRect(this.x, this.y, this.width, this.height);
 
         if (this.highlighted) {
+            ctx.fillStyle = CARD.HOVER.COLOR;
+            ctx.strokeRect(this.x, this.y, this.width, this.height);
+        }
+
+        if (this.selected) {
             ctx.fillStyle = CARD.SELECTED.COLOR;
             ctx.strokeRect(this.x, this.y, this.width, this.height);
         }
@@ -177,6 +182,15 @@ class Card {
             this.value == SPECIAL.INVISIBLE ||
             this.value == SPECIAL.BURN
         );
+    }
+
+    inBound(x: number, y: number): boolean {
+        if (x > this.x && x < this.x + this.width) {
+            if (y > this.y && y < this.y + this.height) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 
