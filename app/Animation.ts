@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import Player from './Player';
 import Card from './Card';
 import { CardType, DECK, PLAYER } from './Constants';
@@ -30,15 +31,16 @@ export function cardDrawAnimation(player: Player, t: CardType, card: Card): Anim
     }
 }
 
-export function cardPlayAnimation(card: Card): Animation {
+export function cardPlayAnimation(cards: Card[]): Animation {
     return ctx => {
-        let arrived = card.moveTo(DECK.X, DECK.Y, 10);
-        card.render(ctx);
+        // let arrived = cards[0].moveTo(DECK.X, DECK.Y, 1);
+        // cards[0].render(ctx);
+        // return arrived;
 
-        if (arrived) {
-
-        }
-
-        return arrived;
+        return _.every(cards, card => {
+            let arrived = card.moveTo(DECK.X, DECK.Y, 5);
+            card.render(ctx);
+            return arrived;
+        });
     }
 }

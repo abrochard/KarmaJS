@@ -16,7 +16,7 @@ import Player from "./Player";
 import AIPlayer from './AIPlayer';
 import HumanPlayer from './HumanPlayer';
 import Card from "./Card";
-import { Animation, cardDrawAnimation } from './Animation';
+import { Animation, cardDrawAnimation, cardPlayAnimation } from './Animation';
 
 class Game {
     ctx: CanvasRenderingContext2D;
@@ -38,13 +38,13 @@ class Game {
         this.human = new HumanPlayer(
             this.detector(this.deck),
             this.detector(this.pile),
-            (cards: Card[]) => { console.log(cards); },
+            this.playHuman.bind(this),
             () => { console.log('deck flip'); }
         );
         this.setupPlayer(this.human);
 
         this.aiPlayers = [];
-        _.range(nPlayers - 1).forEach(i => {
+        _.range(nPlayers - 1).forEach(() => {
             var p = new AIPlayer();
 
             this.setupPlayer(p);
@@ -96,6 +96,133 @@ class Game {
         let x = e.offsetX - this.ctx.canvas.offsetWidth / 2;
         let y = e.offsetY - this.ctx.canvas.offsetHeight / 2;
         return { x, y };
+    }
+
+    playHuman(cards: Card[]) {
+        if (this.validPlay(cards, this.pile.topValue())) {
+            this.applyCards(cards);
+        } else {
+            this.human.addToHand(_.concat(cards, this.pile.pickUp()));
+        }
+
+        this.render(() => {
+            this.loop();
+        });
+    }
+
+    loop(index = 0) {
+        let self = this;
+        window.setTimeout(() => {
+            self.playAI(index);
+        }, GAME.DELAY);
+    }
+
+    playAI(index: number) {
+        let p = this.aiPlayers[index];
+
+        if (p.isDone()) {
+            if (index >= this.aiPlayers.length) {
+                // accept input
+                return;
+            }
+
+            this.loop(index + 1);
+            return;
+        }
+
+        let cards = p.play(this.pile.topValue());
+        if (_.isEmpty(cards)) {
+            // TODO flip top card
+
+            p.addToHand(this.pile.pickUp());
+            this.render();
+            this.loop(index + 1);
+            return;
+        }
+
+        p.animations.push(cardPlayAnimation(cards));
+        // this.applyCards(cards);
+
+        this.render();
+    }
+
+    validPlay(cards: Card[], topValue: number) {
+        if (_.isEmpty(cards)) {
+            return false;
+        }
+
+        // make sure all cards are of the same value
+        let allSame = _.every(cards, card => {
+            return card.value == cards[0].value;
+        });
+        if (!allSame) {
+            return false;
+        }
+
+        // played four of a kind
+        if (cards.length == 4) {
+            return true;
+        }
+
+        // nothing on pile
+        if (topValue == null || topValue == 0) {
+            return true;
+        }
+
+        // played a special card
+        if (cards[0].isSpecial()) {
+            return true;
+        }
+
+        // played on top of a two
+        if (topValue == SPECIAL.RESET) {
+            return true;
+        }
+
+        // top is a 7
+        if (topValue == SPECIAL.REVERSE) {
+            if (cards[0].value <= SPECIAL.REVERSE) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        // just compare values
+        return cards[0].value >= topValue;
+    }
+
+    applyCards(cards: Card[]) {
+        if (LOG) {
+            var top = this.pile.isEmpty() ? "nothing" : this.pile.peek().value;
+            console.log("Played " + cards.length + " " + cards[0].value + " on " + top);
+        }
+
+        cards.forEach(c => {
+            c.faceUp = true;
+        });
+
+        var value = cards[0].value;
+
+        if (value == SPECIAL.INVISIBLE && this.pile.isEmpty() == false) {
+            cards.forEach(c => {
+                c.transparent = true;
+            });
+        }
+
+        this.pile.place(cards);
+
+        if (this.pile.peek().value == SPECIAL.BURN) {
+            this.pile.pickUp(); // discard the pile
+        }
+
+        if (cards.length == 4) {
+            this.pile.pickUp(); // discard the pile
+        }
+
+        if (this.pile.sameLastFour()) {
+            this.pile.pickUp(); // discard the pile
+        }
     }
 
     temp() {
@@ -167,12 +294,11 @@ class Game {
         // }
 
         // render AI players
-        let panimDone = true;
-        _.forEach(this.aiPlayers, p => {
-            // rotate the canvas for each player
+        let panimDone = _.every(_.map(this.aiPlayers, p => {
             this.ctx.rotate(((360 / (this.aiPlayers.length + 1)) * Math.PI) / 180);
-            panimDone = panimDone && p.render(this.ctx);
-        });
+            return p.render(this.ctx);
+        }));
+
         this.ctx.rotate(Math.PI / 2);
 
 

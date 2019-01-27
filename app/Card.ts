@@ -163,7 +163,13 @@ class Card {
         let dx = (a / d) * v;
         let dy = (b / d) * v;
 
-        this.translate(Math.min(dx, a), Math.min(dy, b));
+        if (Math.abs(dx) > Math.abs(a)) {
+            dx = a;
+        }
+        if (Math.abs(dy) > Math.abs(b)) {
+            dy = b;
+        }
+        this.translate(dx, dy);
 
         return this.isAt(x, y);
     }

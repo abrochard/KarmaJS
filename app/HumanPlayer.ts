@@ -95,7 +95,10 @@ class HumanPlayer extends Player {
 
     onDrop(x: number, y: number): boolean {
         if (this.detectPile(x, y)) {
-            this.playCards(this.selected);
+            _.pullAll(this.hand, this.selected);
+            if (!_.isEmpty(this.selected)) {
+                this.playCards(this.selected);
+            }
         } else {
             this.reorderHand();
         }

@@ -96,7 +96,7 @@ class Deck {
         }
     }
 
-    sameLastFour() {
+    sameLastFour(): boolean {
         if (this.cards.length < 4) {
             return false;
         }
@@ -119,7 +119,7 @@ class Deck {
         return true;
     }
 
-    topValue() {
+    topValue(): number {
         // gets the top on the pile, excluding INVISIBLE
         let i = this.cards.length - 1;
         while (i >= 0 && this.cards[i].value == SPECIAL.INVISIBLE) {
