@@ -16,7 +16,9 @@ import Player from "./Player";
 import AIPlayer from './AIPlayer';
 import HumanPlayer from './HumanPlayer';
 import Card from "./Card";
+import { ValidPlay } from './Rules';
 import { Animation, cardDrawAnimation, cardPlayAnimation } from './Animation';
+import { EventHandler } from './Event';
 
 class Game {
     ctx: CanvasRenderingContext2D;
@@ -25,7 +27,7 @@ class Game {
     deck: Deck;
     pile: Deck;
     animations: Animation[];
-    lastCursorPosition: { x: number, y: number };
+    eventHandler: EventHandler;
     constructor(canvas: HTMLCanvasElement, nPlayers = GAME.PLAYERS) {
         this.ctx = canvas.getContext('2d');
 
@@ -53,9 +55,7 @@ class Game {
         });
 
 
-        this.lastCursorPosition = null;
-
-        this.temp();
+        this.registerEventHandler();
 
         this.render(() => {
             this.aiPlayers.forEach(p => {
@@ -92,14 +92,8 @@ class Game {
         })
     }
 
-    getPosition(e: MouseEvent): { x: number, y: number } {
-        let x = e.offsetX - this.ctx.canvas.offsetWidth / 2;
-        let y = e.offsetY - this.ctx.canvas.offsetHeight / 2;
-        return { x, y };
-    }
-
     playHuman(cards: Card[]) {
-        if (this.validPlay(cards, this.pile.topValue())) {
+        if (ValidPlay(cards, this.pile.topValue())) {
             this.applyCards(cards);
         } else {
             this.human.addToHand(_.concat(cards, this.pile.pickUp()));
@@ -146,52 +140,6 @@ class Game {
         this.render();
     }
 
-    validPlay(cards: Card[], topValue: number) {
-        if (_.isEmpty(cards)) {
-            return false;
-        }
-
-        // make sure all cards are of the same value
-        let allSame = _.every(cards, card => {
-            return card.value == cards[0].value;
-        });
-        if (!allSame) {
-            return false;
-        }
-
-        // played four of a kind
-        if (cards.length == 4) {
-            return true;
-        }
-
-        // nothing on pile
-        if (topValue == null || topValue == 0) {
-            return true;
-        }
-
-        // played a special card
-        if (cards[0].isSpecial()) {
-            return true;
-        }
-
-        // played on top of a two
-        if (topValue == SPECIAL.RESET) {
-            return true;
-        }
-
-        // top is a 7
-        if (topValue == SPECIAL.REVERSE) {
-            if (cards[0].value <= SPECIAL.REVERSE) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        // just compare values
-        return cards[0].value >= topValue;
-    }
-
     applyCards(cards: Card[]) {
         if (LOG) {
             var top = this.pile.isEmpty() ? "nothing" : this.pile.peek().value;
@@ -225,37 +173,33 @@ class Game {
         }
     }
 
-    temp() {
-        this.ctx.canvas.addEventListener('mousemove', e => {
-            let toRender = false;
-            let { x, y } = this.getPosition(e);
-            toRender = toRender || this.human.onHover(x, y);
-
-            if (this.lastCursorPosition) {
-                toRender = toRender || this.human.onDrag(x, y, x - this.lastCursorPosition.x, y - this.lastCursorPosition.y);
-                this.lastCursorPosition = { x, y };
-            }
-
-            if (toRender) {
+    registerEventHandler() {
+        let onHover = function(x: number, y: number) {
+            if (this.human.onHover(x, y)) {
                 this.render();
             }
-        })
+        }.bind(this);
 
-        this.ctx.canvas.addEventListener('mouseup', e => {
-            let { x, y } = this.getPosition(e);
-            this.lastCursorPosition = null;
-            if (this.human.onDrop(x, y)) {
-                this.render();
-            }
-        });
-
-        this.ctx.canvas.addEventListener('mousedown', e => {
-            let { x, y } = this.getPosition(e);
-            this.lastCursorPosition = { x, y };
+        let onClick = function(x: number, y: number) {
             if (this.human.onClick(x, y)) {
                 this.render();
             }
-        })
+        }.bind(this);
+
+        let onDrag = function(x: number, y: number, dx: number, dy: number) {
+            if (this.human.onDrag(x, y, dx, dy)) {
+                this.render();
+            }
+        }.bind(this);
+
+        let onDrop = function(x: number, y: number) {
+            if (this.human.onDrop(x, y)) {
+                this.render();
+            }
+        }.bind(this);
+
+        this.eventHandler = new EventHandler(this.ctx.canvas, { onHover, onClick, onDrag, onDrop });
+        this.eventHandler.listen();
     }
 
     render(done?: () => void) {

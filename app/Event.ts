@@ -1,66 +1,27 @@
 import * as _ from 'lodash';
 
-interface Element {
-    x: number,
-    y: number,
-    width: number,
-    height: number
+interface EventListeners {
+    onHover: (x: number, y: number) => void;
+    onClick: (x: number, y: number) => void;
+    onDrag: (x: number, y: number, dx: number, dy: number) => void;
+    onDrop: (x: number, y: number) => void;
 }
-
-interface Callback {
-    (x: number, y: number, active: boolean): void
-}
-
-export enum EventType {
-    Click,
-    Hover,
-    Drag,
-    Drop
-}
-
-interface Listener {
-    element: Element,
-    fct: Callback,
-    eventType: EventType
-}
-
-function inBound(element: Element, x: number, y: number): Boolean {
-    if (x > element.x && x < element.x + element.width) {
-        if (y > element.y && y < element.y + element.height) {
-            return true;
-        }
-    }
-    return false;
-}
-
-function isEventType(eventType: EventType): (listener: Listener) => boolean {
-    return (listener: Listener): boolean => {
-        return listener.eventType == eventType;
-    }
-}
-
 
 export class EventHandler {
     canvas: HTMLElement;
+    listeners: EventListeners;
     acceptInput: boolean;
-    listeners: Listener[];
-    clickedOn: Listener[];
-    hoveredOn: Listener[];
     lastCursorPosition: { x: number, y: number };
-    constructor(canvas: HTMLElement) {
+    constructor(canvas: HTMLElement, listeners: EventListeners) {
         this.canvas = canvas;
+        this.listeners = listeners;
+
         this.acceptInput = false;
-
-        this.listeners = [];
-        this.clickedOn = []
-        this.hoveredOn = [];
-
         this.lastCursorPosition = null;
 
-        this.canvas.addEventListener('mousedown', this.onClick.bind(this));
-        this.canvas.addEventListener('mousemove', this.onHover.bind(this));
-        this.canvas.addEventListener('mousemove', this.onDrag.bind(this));
-        this.canvas.addEventListener('mouseup', this.onDrop.bind(this));
+        this.canvas.addEventListener('mousedown', this.onMouseDown.bind(this));
+        this.canvas.addEventListener('mousemove', this.onMouseMove.bind(this));
+        this.canvas.addEventListener('mouseup', this.onMouseUp.bind(this));
     }
 
     listen() {
@@ -77,107 +38,38 @@ export class EventHandler {
         return { x, y };
     }
 
-    register(element: Element, eventType: EventType, fct: Callback) {
-        this.listeners.push({ element, fct, eventType });
-    }
-
-    deregister(element: Element, eventType: EventType) {
-        _.remove(this.listeners, listener => {
-            return !(listener.element == element && listener.eventType == eventType);
-        })
-    }
-
-    onClick(e: MouseEvent) {
+    onMouseDown(e: MouseEvent) {
         if (!this.acceptInput) {
             return;
         }
 
         let { x, y } = this.getMousePosition(e);
-        _.filter(this.listeners, isEventType(EventType.Click)).forEach(listener => {
-            if (inBound(listener.element, x, y)) {
-                listener.fct(x, y, true);
-                this.clickedOn.push(listener);
-                this.lastCursorPosition = { x, y };
-            }
-        });
+        this.lastCursorPosition = { x, y };
+        this.listeners.onClick(x, y);
     }
 
-
-    onHover(e: MouseEvent) {
+    onMouseMove(e: MouseEvent) {
         if (!this.acceptInput) {
             return;
         }
 
         let { x, y } = this.getMousePosition(e);
+        this.listeners.onHover(x, y);
 
-        let hoveringOn = this.listeners.filter(({ element, eventType }) => {
-            if (eventType !== EventType.Hover) {
-                return false;
-            }
-
-            return inBound(element, x, y);
-        })
-
-
-        let notHoveringAnymore = _.filter(this.hoveredOn, listener => {
-            return !_.includes(hoveringOn, listener);
-        });
-        let newHovers = _.filter(hoveringOn, listener => {
-            return !_.includes(this.hoveredOn, listener);
-        })
-
-        notHoveringAnymore.forEach((listener) => {
-            listener.fct(x, y, false);
-        })
-
-        newHovers.forEach((listener) => {
-            listener.fct(x, y, true);
-        })
-
-        this.hoveredOn = hoveringOn;
+        if (this.lastCursorPosition) {
+            this.listeners.onDrag(x, y, x - this.lastCursorPosition.x, y - this.lastCursorPosition.y);
+            this.lastCursorPosition = { x, y };
+        }
     }
 
-    onDrag(e: MouseEvent) {
+
+    onMouseUp(e: MouseEvent) {
         if (!this.acceptInput) {
             return;
         }
 
-        if (_.isEmpty(this.clickedOn)) {
-            return;
-        }
-
         let { x, y } = this.getMousePosition(e);
-        _.filter(this.listeners, isEventType(EventType.Drag)).forEach(listener => {
-            let i = _.findIndex(this.clickedOn, ({ element }) => {
-                return element == listener.element;
-            })
-            if (i >= 0) {
-                let dx = x - this.lastCursorPosition.x;
-                let dy = y - this.lastCursorPosition.y;
-                this.lastCursorPosition = { x, y };
-                listener.fct(dx, dy, true);
-            }
-        });
-    }
-
-    onDrop(e: MouseEvent) {
-        if (!this.acceptInput) {
-            return;
-        }
-
-        if (_.isEmpty(this.clickedOn)) {
-            return;
-        }
-
-        let { x, y } = this.getMousePosition(e);
-        _.filter(this.listeners, isEventType(EventType.Drop)).forEach(listener => {
-            let i = _.findIndex(this.clickedOn, ({ element }) => {
-                return element == listener.element;
-            })
-            if (i >= 0) {
-                listener.fct(x, y, true);
-                this.clickedOn.splice(i, 1);
-            }
-        });
+        this.lastCursorPosition = null;
+        this.listeners.onDrop(x, y);
     }
 }

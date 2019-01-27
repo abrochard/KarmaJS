@@ -33,14 +33,10 @@ export function cardDrawAnimation(player: Player, t: CardType, card: Card): Anim
 
 export function cardPlayAnimation(cards: Card[]): Animation {
     return ctx => {
-        // let arrived = cards[0].moveTo(DECK.X, DECK.Y, 1);
-        // cards[0].render(ctx);
-        // return arrived;
-
-        return _.every(cards, card => {
+        return _.every(_.map(cards, card => {
             let arrived = card.moveTo(DECK.X, DECK.Y, 5);
             card.render(ctx);
             return arrived;
-        });
+        }));
     }
 }
