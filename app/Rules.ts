@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import { SPECIAL } from './Constants';
 import Card from './Card';
+import Deck from './Deck';
 
 export function ValidPlay(cards: Card[], topValue: number) {
     if (_.isEmpty(cards)) {
@@ -46,4 +47,32 @@ export function ValidPlay(cards: Card[], topValue: number) {
 
     // just compare values
     return cards[0].value >= topValue;
+}
+
+export function ApplyCards(cards: Card[], pile: Deck) {
+    cards.forEach(c => {
+        c.faceUp = true;
+    });
+
+    let value = cards[0].value;
+
+    if (value == SPECIAL.INVISIBLE && pile.isEmpty() == false) {
+        cards.forEach(c => {
+            c.transparent = true;
+        });
+    }
+
+    pile.place(cards);
+
+    if (pile.peek().value == SPECIAL.BURN) {
+        pile.pickUp(); // discard the pile
+    }
+
+    if (cards.length == 4) {
+        pile.pickUp(); // discard the pile
+    }
+
+    if (pile.sameLastFour()) {
+        pile.pickUp(); // discard the pile
+    }
 }

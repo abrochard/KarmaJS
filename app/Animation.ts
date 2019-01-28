@@ -32,9 +32,13 @@ export function cardDrawAnimation(player: Player, t: CardType, card: Card): Anim
 }
 
 export function cardPlayAnimation(cards: Card[]): Animation {
+    _.forEach(cards, card => {
+        card.faceUp = true;
+    });
+
     return ctx => {
         return _.every(_.map(cards, card => {
-            let arrived = card.moveTo(DECK.X, DECK.Y, 5);
+            let arrived = card.moveTo(DECK.X, DECK.Y, 15);
             card.render(ctx);
             return arrived;
         }));

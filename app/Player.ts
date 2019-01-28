@@ -55,9 +55,10 @@ class Player {
         // render hand
         this.hand.forEach(r);
 
-        // render animations
-        this.animations = _.filter(this.animations, anim => {
-            return !anim(ctx);
+        // render animations and
+        // remove all those which are done
+        _.remove(this.animations, anim => {
+            return anim(ctx);
         });
         // _.remove(this.animations, anim => {
         // return !anim(ctx);

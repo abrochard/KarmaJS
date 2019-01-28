@@ -16,7 +16,7 @@ import Player from "./Player";
 import AIPlayer from './AIPlayer';
 import HumanPlayer from './HumanPlayer';
 import Card from "./Card";
-import { ValidPlay } from './Rules';
+import { ValidPlay, ApplyCards } from './Rules';
 import { Animation, cardDrawAnimation, cardPlayAnimation } from './Animation';
 import { EventHandler } from './Event';
 
@@ -62,7 +62,7 @@ class Game {
                 p.autoSwapCards();
             })
             this.render(() => {
-                console.log('done');
+                this.eventHandler.listen();
             })
         })
     }
@@ -135,42 +135,20 @@ class Game {
         }
 
         p.animations.push(cardPlayAnimation(cards));
-        // this.applyCards(cards);
 
-        this.render();
+        this.render(() => {
+            this.applyCards(cards);
+        });
     }
 
     applyCards(cards: Card[]) {
         if (LOG) {
-            var top = this.pile.isEmpty() ? "nothing" : this.pile.peek().value;
-            console.log("Played " + cards.length + " " + cards[0].value + " on " + top);
+            console.log("Played [" + _.join(_.map(cards, 'value')) + "] on " + (this.pile.isEmpty() ? "nothing" : this.pile.peek().value));
         }
 
-        cards.forEach(c => {
-            c.faceUp = true;
-        });
+        ApplyCards(cards, this.pile);
 
-        var value = cards[0].value;
-
-        if (value == SPECIAL.INVISIBLE && this.pile.isEmpty() == false) {
-            cards.forEach(c => {
-                c.transparent = true;
-            });
-        }
-
-        this.pile.place(cards);
-
-        if (this.pile.peek().value == SPECIAL.BURN) {
-            this.pile.pickUp(); // discard the pile
-        }
-
-        if (cards.length == 4) {
-            this.pile.pickUp(); // discard the pile
-        }
-
-        if (this.pile.sameLastFour()) {
-            this.pile.pickUp(); // discard the pile
-        }
+        this.render();
     }
 
     registerEventHandler() {
@@ -199,7 +177,6 @@ class Game {
         }.bind(this);
 
         this.eventHandler = new EventHandler(this.ctx.canvas, { onHover, onClick, onDrag, onDrop });
-        this.eventHandler.listen();
     }
 
     render(done?: () => void) {
@@ -238,7 +215,7 @@ class Game {
         // }
 
         // render AI players
-        let panimDone = _.every(_.map(this.aiPlayers, p => {
+        let aiAnimsDone = _.every(_.map(this.aiPlayers, p => {
             this.ctx.rotate(((360 / (this.aiPlayers.length + 1)) * Math.PI) / 180);
             return p.render(this.ctx);
         }));
@@ -268,14 +245,14 @@ class Game {
 
         // render animations
         _.remove(this.animations, animate => {
-            return !animate(this.ctx);
+            return animate(this.ctx);
         });
-        let arrived = _.isEmpty(this.animations);
+        let humanAnimsDone = _.isEmpty(this.animations);
 
         // re-center board
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
 
-        if (arrived && panimDone) {
+        if (humanAnimsDone && aiAnimsDone) {
             if (done) {
                 return done();
             }
