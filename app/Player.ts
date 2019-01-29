@@ -90,7 +90,7 @@ class Player {
         return this.hand.length == 0;
     }
 
-    cardsInHand() {
+    cardsInHand(): number {
         return this.hand.length;
     }
 

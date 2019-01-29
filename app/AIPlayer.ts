@@ -23,6 +23,7 @@ class AIPlayer extends Player {
 
     playHand(top: number): Card[] {
         let min: Card = null;
+
         if (top == SPECIAL.REVERSE) {
             min = this.findMinUnder(top, this.hand);
         } else {
@@ -31,7 +32,13 @@ class AIPlayer extends Player {
 
         // could not find a suitable card to play
         if (!min) {
-            return [];
+            let special = this.findSpecial(this.hand);
+            if (!special) {
+                // no special card to swoop in
+                return [];
+            }
+
+            min = special;
         }
 
 
@@ -61,6 +68,12 @@ class AIPlayer extends Player {
         return _.filter(cards, card => {
             return card.value == value;
         })
+    }
+
+    findSpecial(cards: Card[]): Card {
+        return _.find(cards, card => {
+            return card.isSpecial();
+        });
     }
 }
 

@@ -95,9 +95,16 @@ class Game {
     playHuman(cards: Card[]) {
         if (ValidPlay(cards, this.pile.topValue())) {
             this.applyCards(cards);
+
+            while (!this.deck.isEmpty() && this.human.cardsInHand() < 3) {
+                this.human.addToHand([this.deck.draw()]);
+            }
+
         } else {
             this.human.addToHand(_.concat(cards, this.pile.pickUp()));
         }
+
+        this.human.reorderHand();
 
         this.eventHandler.pause();
         this.render(() => {
@@ -139,6 +146,11 @@ class Game {
 
         this.render(() => {
             this.applyCards(cards);
+
+            while (!this.deck.isEmpty() && p.cardsInHand() < 3) {
+                p.addToHand([this.deck.draw()]);
+            }
+
             this.render(() => {
                 this.loop(index + 1);
             });
