@@ -29,28 +29,16 @@ class AIPlayer extends Player {
             min = this.findMinAbove(top, this.hand);
         }
 
+        // could not find a suitable card to play
         if (!min) {
             return [];
         }
 
-        _.remove(this.hand, min);
 
-        return [min];
+        let toPlay = this.findAllCardsOfSameValue(min.value, this.hand);
+        _.pullAll(this.hand, toPlay);
 
-        // if (min != null) {
-        //     this.pickedCards.index = min.index;
-        //     this.pickedCards.total = min.total;
-        //     this.pickedCards.value = min.value;
-        // } else {
-        //     let index = this.selectSpecial(this.hand);
-        //     this.pickedCards.index = index;
-        //     this.pickedCards.total = index ? 1 : 0;
-        // }
-
-        // for (var i = 0; i < this.pickedCards.total; i++) {
-        //     this.hand[this.pickedCards.index + i].faceUp = true;
-        // }
-        return [];
+        return toPlay;
     }
 
     playFaceUp(top: number): Card[] {
@@ -67,6 +55,12 @@ class AIPlayer extends Player {
         return _.minBy(_.filter(cards, card => {
             return card.value <= top;
         }), 'value');
+    }
+
+    findAllCardsOfSameValue(value: number, cards: Card[]): Card[] {
+        return _.filter(cards, card => {
+            return card.value == value;
+        })
     }
 }
 

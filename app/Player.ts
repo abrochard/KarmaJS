@@ -160,16 +160,6 @@ class Player {
         }
     }
 
-    findAllCardsOfSameValue(cards: Card[], value: number) {
-        let indices = [];
-        for (var i = 0; i < cards.length; i++) {
-            if (cards[i].value == value) {
-                indices.push(i);
-            }
-        }
-        return indices;
-    }
-
     playFaceUp(top: number) {
         let min: any = null;
 
