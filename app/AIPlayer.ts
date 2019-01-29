@@ -29,6 +29,12 @@ class AIPlayer extends Player {
             min = this.findMinAbove(top, this.hand);
         }
 
+        if (!min) {
+            return [];
+        }
+
+        _.remove(this.hand, min);
+
         return [min];
 
         // if (min != null) {
@@ -52,49 +58,15 @@ class AIPlayer extends Player {
     }
 
     findMinAbove(top: number, cards: Card[]): Card {
-        return _.minBy(cards, card => {
-            return card.value >= top ? card.value : 1000;
-        });
-
-        // assumes the cards are sorted
-        let min: any = { index: null };
-        for (var i = 0; i < cards.length; i++) {
-            if (cards[i].value >= top && !cards[i].isSpecial()) {
-                if (min.index == null) {
-                    min.index = i;
-                    min.value = cards[i].value;
-                    min.total = 1;
-                } else if (cards[i].value == min.value) {
-                    min.total += 1;
-                } else {
-                    return min;
-                }
-            }
-        }
-        return min.index == null ? null : min;
+        return _.minBy(_.filter(cards, card => {
+            return card.value >= top;
+        }), 'value');
     }
 
     findMinUnder(top: number, cards: Card[]) {
-        return _.minBy(cards, card => {
-            return card.value <= top ? card.value : 1000;
-        });
-
-        // assumes the cards are sorted
-        let min: any = { index: null };
-        for (var i = 0; i < cards.length; i++) {
-            if (cards[i].value <= top && !cards[i].isSpecial()) {
-                if (min.index == null) {
-                    min.index = i;
-                    min.value = cards[i].value;
-                    min.total = 1;
-                } else if (cards[i].value == min.value) {
-                    min.total += 1;
-                } else {
-                    return min;
-                }
-            }
-        }
-        return min.index == null ? null : min;
+        return _.minBy(_.filter(cards, card => {
+            return card.value <= top;
+        }), 'value');
     }
 }
 

@@ -99,12 +99,18 @@ class Game {
             this.human.addToHand(_.concat(cards, this.pile.pickUp()));
         }
 
+        this.eventHandler.pause();
         this.render(() => {
             this.loop();
         });
     }
 
     loop(index = 0) {
+        if (index >= this.aiPlayers.length) {
+            this.eventHandler.listen();
+            return;
+        }
+
         let self = this;
         window.setTimeout(() => {
             self.playAI(index);
@@ -115,11 +121,6 @@ class Game {
         let p = this.aiPlayers[index];
 
         if (p.isDone()) {
-            if (index >= this.aiPlayers.length) {
-                // accept input
-                return;
-            }
-
             this.loop(index + 1);
             return;
         }
@@ -138,6 +139,9 @@ class Game {
 
         this.render(() => {
             this.applyCards(cards);
+            this.render(() => {
+                this.loop(index + 1);
+            });
         });
     }
 
@@ -147,8 +151,6 @@ class Game {
         }
 
         ApplyCards(cards, this.pile);
-
-        this.render();
     }
 
     registerEventHandler() {
@@ -222,14 +224,8 @@ class Game {
 
         this.ctx.rotate(Math.PI / 2);
 
-
         // render human player
         this.human.render(this.ctx);
-
-        // render picked cards
-        // this.pickedCards.forEach(c => {
-        // c.render(this.ctx);
-        // });
 
         // show scoreboard
         // if (this.finished) {
