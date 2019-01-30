@@ -22,17 +22,32 @@ class AIPlayer extends Player {
     }
 
     playHand(top: number): Card[] {
+        return this.playFrom(this.hand, top);
+    }
+
+    playFaceUp(top: number): Card[] {
+        let toPlay = this.playFrom(this.faceUpCards, top);
+        if (_.isEmpty(toPlay)) {
+            // just pick one
+            // TODO better picking
+            toPlay = [this.faceUpCards.pop()];
+        }
+
+        return toPlay;
+    }
+
+    playFrom(cards: Card[], top: number): Card[] {
         let min: Card = null;
 
         if (top == SPECIAL.REVERSE) {
-            min = this.findMinUnder(top, this.hand);
+            min = this.findMinUnder(top, cards);
         } else {
-            min = this.findMinAbove(top, this.hand);
+            min = this.findMinAbove(top, cards);
         }
 
         // could not find a suitable card to play
         if (!min) {
-            let special = this.findSpecial(this.hand);
+            let special = this.findSpecial(cards);
             if (!special) {
                 // no special card to swoop in
                 return [];
@@ -42,14 +57,10 @@ class AIPlayer extends Player {
         }
 
 
-        let toPlay = this.findAllCardsOfSameValue(min.value, this.hand);
-        _.pullAll(this.hand, toPlay);
+        let toPlay = this.findAllCardsOfSameValue(min.value, cards);
+        _.pullAll(cards, toPlay);
 
         return toPlay;
-    }
-
-    playFaceUp(top: number): Card[] {
-        return [];
     }
 
     findMinAbove(top: number, cards: Card[]): Card {

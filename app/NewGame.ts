@@ -142,7 +142,7 @@ class Game {
         }
 
         let cards = p.play(this.pile.topValue());
-        if (_.isEmpty(cards)) {
+        if (_.isEmpty(cards) || !ValidPlay(cards, this.pile.topValue())) {
             // TODO flip top card
 
             _.forEach(this.pile.pickUp(), card => {
