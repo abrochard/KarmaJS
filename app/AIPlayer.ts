@@ -54,13 +54,13 @@ class AIPlayer extends Player {
 
     findMinAbove(top: number, cards: Card[]): Card {
         return _.minBy(_.filter(cards, card => {
-            return card.value >= top;
+            return card.value >= top && !card.isSpecial();
         }), 'value');
     }
 
     findMinUnder(top: number, cards: Card[]) {
         return _.minBy(_.filter(cards, card => {
-            return card.value <= top;
+            return card.value <= top && !card.isSpecial();
         }), 'value');
     }
 
