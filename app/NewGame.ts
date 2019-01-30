@@ -113,6 +113,10 @@ class Game {
     }
 
     humanDeckFlip() {
+        if (this.deck.isEmpty()) {
+            return;
+        }
+
         let cards = [this.deck.draw().flip()];
         this.playHuman(cards);
     }
