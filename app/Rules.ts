@@ -76,3 +76,7 @@ export function ApplyCards(cards: Card[], pile: Deck) {
         pile.pickUp(); // discard the pile
     }
 }
+
+export function TotalToDraw(hand: number, deck: Deck): number {
+    return Math.min(Math.max(0, 3 - hand), Math.min(3, deck.total()));
+}

@@ -16,7 +16,7 @@ import Player from "./Player";
 import AIPlayer from './AIPlayer';
 import HumanPlayer from './HumanPlayer';
 import Card from "./Card";
-import { ValidPlay, ApplyCards } from './Rules';
+import { ValidPlay, ApplyCards, TotalToDraw } from './Rules';
 import { Animation, cardDrawAnimation, cardPlayAnimation } from './Animation';
 import { EventHandler } from './Event';
 
@@ -96,15 +96,15 @@ class Game {
         if (ValidPlay(cards, this.pile.topValue())) {
             this.applyCards(cards);
 
-            while (!this.deck.isEmpty() && this.human.cardsInHand() < 3) {
-                this.human.addToHand([this.deck.draw()]);
-            }
-
+            let total = TotalToDraw(this.human.cardsInHand(), this.deck);
+            _.forEach(_.range(total), () => {
+                let card = this.deck.draw();
+                card.faceUp = true;
+                this.human.animations.push(cardDrawAnimation(this.human, CardType.Hand, card, 8));
+            });
         } else {
             this.human.addToHand(_.concat(cards, this.pile.pickUp()));
         }
-
-        this.human.reorderHand();
 
         this.eventHandler.pause();
         this.render(() => {
@@ -136,9 +136,17 @@ class Game {
         if (_.isEmpty(cards)) {
             // TODO flip top card
 
-            p.addToHand(this.pile.pickUp());
-            this.render();
-            this.loop(index + 1);
+            _.forEach(this.pile.pickUp(), card => {
+                p.animations.push(cardDrawAnimation(p, CardType.Hand, card));
+            });
+
+            this.render(() => {
+                // one more rendering for hand re-ordering
+                this.render(() => {
+                    this.loop(index + 1);
+                });
+            });
+
             return;
         }
 
@@ -147,12 +155,15 @@ class Game {
         this.render(() => {
             this.applyCards(cards);
 
-            while (!this.deck.isEmpty() && p.cardsInHand() < 3) {
-                p.addToHand([this.deck.draw()]);
-            }
+            let total = TotalToDraw(p.cardsInHand(), this.deck);
+            _.forEach(_.range(total), () => {
+                p.animations.push(cardDrawAnimation(p, CardType.Hand, this.deck.draw()));
+            });
 
             this.render(() => {
-                this.loop(index + 1);
+                this.render(() => {
+                    this.loop(index + 1);
+                });
             });
         });
     }
@@ -237,7 +248,7 @@ class Game {
         this.ctx.rotate(Math.PI / 2);
 
         // render human player
-        this.human.render(this.ctx);
+        let humanAnimsDone = this.human.render(this.ctx);
 
         // show scoreboard
         // if (this.finished) {
@@ -255,12 +266,12 @@ class Game {
         _.remove(this.animations, animate => {
             return animate(this.ctx);
         });
-        let humanAnimsDone = _.isEmpty(this.animations);
+        let globalAnimsDone = _.isEmpty(this.animations);
 
         // re-center board
         this.ctx.setTransform(1, 0, 0, 1, 0, 0);
 
-        if (humanAnimsDone && aiAnimsDone) {
+        if (humanAnimsDone && aiAnimsDone && globalAnimsDone) {
             if (done) {
                 return done();
             }

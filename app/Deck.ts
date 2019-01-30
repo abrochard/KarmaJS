@@ -140,6 +140,10 @@ class Deck {
     flipTop() {
         this.cards[this.cards.length - 1].flip();
     }
+
+    total(): number {
+        return this.cards.length;
+    }
 }
 
 export default Deck;

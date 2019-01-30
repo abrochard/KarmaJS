@@ -7,14 +7,14 @@ export interface Animation {
     (ctx: CanvasRenderingContext2D): boolean
 }
 
-export function cardDrawAnimation(player: Player, t: CardType, card: Card): Animation {
-    card.setPosition(DECK.X, DECK.Y);
+export function cardDrawAnimation(player: Player, t: CardType, card: Card, speed = 17): Animation {
+    // card.setPosition(DECK.X, DECK.Y);
 
     let destination: { x: number, y: number } = { x: PLAYER.X, y: PLAYER.Y };
     destination.x += Math.round(Math.random() * 150);
 
     return ctx => {
-        let arrived = card.moveTo(destination.x, destination.y, 17);
+        let arrived = card.moveTo(destination.x, destination.y, speed);
         card.render(ctx);
 
         if (arrived) {
