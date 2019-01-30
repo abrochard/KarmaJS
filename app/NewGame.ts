@@ -41,7 +41,7 @@ class Game {
             this.detector(this.deck),
             this.detector(this.pile),
             this.playHuman.bind(this),
-            () => { console.log('deck flip'); }
+            this.humanDeckFlip.bind(this)
         );
         this.setupPlayer(this.human);
 
@@ -112,6 +112,11 @@ class Game {
         });
     }
 
+    humanDeckFlip() {
+        let cards = [this.deck.draw().flip()];
+        this.playHuman(cards);
+    }
+
     loop(index = 0) {
         if (index >= this.aiPlayers.length) {
             this.eventHandler.listen();
@@ -142,6 +147,7 @@ class Game {
 
             this.render(() => {
                 // one more rendering for hand re-ordering
+                p.reorderHand();
                 this.render(() => {
                     this.loop(index + 1);
                 });
@@ -161,6 +167,7 @@ class Game {
             });
 
             this.render(() => {
+                p.reorderHand();
                 this.render(() => {
                     this.loop(index + 1);
                 });
