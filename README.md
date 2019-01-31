@@ -1,8 +1,8 @@
 # KarmaJS
-Javascript based Karma card game
+Typescript based Karma card game
 
 ## Demo
-Latest version playable at [https://abrochard.github.io/](https://abrochard.github.io/)
+Latest version playable at [https://abrochard.com/KarmaJS](https://abrochard.com/KarmaJS)
 
 ## How to play
 For rules see below.
@@ -71,3 +71,5 @@ There are a few special rules and cards.
   * invisible card duplicate rendering bug?
   * AI not picking best faceup value
   * visual select for card swapping
+  * playable cards highlighting
+  * force to play when player can play

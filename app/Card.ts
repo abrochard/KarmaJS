@@ -79,6 +79,7 @@ class Card {
         return name;
     }
 
+    // TODO render shadow when in motion?
     render(ctx: CanvasRenderingContext2D) {
         if (this.faceUp == false) {
             // render back of card

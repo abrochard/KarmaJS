@@ -31,8 +31,20 @@ class HumanPlayer extends Player {
         this.flipDeck = flipDeck;
     }
 
+    activeCollection(): Card[] {
+        if (this.hand.length > 0) {
+            return this.hand;
+        }
+
+        if (this.faceUpCards.length > 0) {
+            return this.faceUpCards;
+        }
+
+        return this.faceDownCards;
+    }
+
     onHover(x: number, y: number): boolean {
-        let card = _.find(this.hand, card => {
+        let card = _.find(this.activeCollection(), card => {
             return card.inBound(x, y);
         });
 
@@ -63,7 +75,7 @@ class HumanPlayer extends Player {
             return true;
         }
 
-        let card = _.find(this.hand, card => {
+        let card = _.find(this.activeCollection(), card => {
             return card.inBound(x, y);
         });
 
@@ -77,7 +89,7 @@ class HumanPlayer extends Player {
     }
 
     onDrag(x: number, y: number, dx: number, dy: number): boolean {
-        let temp = _.filter(this.hand, card => {
+        let temp = _.filter(this.activeCollection(), card => {
             return card.inBound(x, y);
         });
         _.forEach(temp, card => {
@@ -95,13 +107,13 @@ class HumanPlayer extends Player {
 
     onDrop(x: number, y: number): boolean {
         if (this.detectPile(x, y)) {
-            _.pullAll(this.hand, this.selected);
+            _.pullAll(this.activeCollection(), this.selected);
             if (!_.isEmpty(this.selected)) {
                 this.playCards(this.selected);
             }
-        } else {
-            this.reorderHand();
         }
+
+        this.reorderHand();
 
         _.forEach(this.selected, card => {
             card.selected = false;
