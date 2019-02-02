@@ -28,6 +28,7 @@ class Game {
     pile: Deck;
     animations: Animation[];
     eventHandler: EventHandler;
+    winners: string[];
     constructor(canvas: HTMLCanvasElement, nPlayers = GAME.PLAYERS) {
         this.ctx = canvas.getContext('2d');
 
@@ -54,6 +55,7 @@ class Game {
             this.aiPlayers.push(p);
         });
 
+        this.winners = [];
 
         this.registerEventHandler();
 
@@ -104,6 +106,10 @@ class Game {
             });
         } else {
             this.human.addToHand(_.concat(cards, this.pile.pickUp()));
+        }
+
+        if (this.human.isDone()) { // winning move
+            this.winners.push('Player');
         }
 
         this.eventHandler.pause();
@@ -162,6 +168,10 @@ class Game {
 
         p.animations.push(cardPlayAnimation(cards));
 
+        if (p.isDone()) { // winning move
+            this.winners.push('AI #' + (index + 1));
+        }
+
         this.render(() => {
             this.applyCards(cards);
 
@@ -185,6 +195,10 @@ class Game {
         }
 
         ApplyCards(cards, this.pile);
+    }
+
+    gameover(): boolean {
+        return this.winners.length == (this.aiPlayers.length + 1);
     }
 
     registerEventHandler() {
@@ -262,16 +276,16 @@ class Game {
         let humanAnimsDone = this.human.render(this.ctx);
 
         // show scoreboard
-        // if (this.finished) {
-        //     var position = this.winners.length + 1;
-        //     this.ctx.fillStyle = BOARD.MESSAGECOLOR;
-        //     this.ctx.font = BOARD.MESSAGEFONT;
-        //     this.ctx.fillText(
-        //         "Congrats you finished #" + position,
-        //         MESSAGE.ZONE1.x,
-        //         MESSAGE.ZONE1.y
-        //     );
-        // }
+        if (this.gameover()) {
+            var position = _.indexOf(this.winners, 'Player');
+            this.ctx.fillStyle = BOARD.MESSAGECOLOR;
+            this.ctx.font = BOARD.MESSAGEFONT;
+            this.ctx.fillText(
+                "Congrats you finished #" + position,
+                MESSAGE.ZONE1.x,
+                MESSAGE.ZONE1.y
+            );
+        }
 
         // render animations
         _.remove(this.animations, animate => {
