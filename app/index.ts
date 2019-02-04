@@ -1,4 +1,4 @@
-import Game from './NewGame';
+import Game from './Game';
 
 function Karma() {
     let canvas: any = document.getElementById('board');
