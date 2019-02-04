@@ -2,14 +2,12 @@ import * as _ from 'lodash';
 import {
     CardType,
     GAME,
-    SPECIAL,
     PILE,
     CARD,
     LOG,
     BOARD,
     DECK,
-    MESSAGE,
-    PLAYER
+    MESSAGE
 } from "./Constants";
 import Deck from "./Deck";
 import Player from "./Player";
@@ -203,7 +201,7 @@ class Game {
     }
 
     gameover(): boolean {
-        return this.winners.length == (this.aiPlayers.length + 1);
+        return (this.winners.length == (this.aiPlayers.length + 1)) || _.indexOf(this.winners, 'Player') >= 0;
     }
 
     registerEventHandler() {
@@ -282,7 +280,7 @@ class Game {
 
         // show scoreboard
         if (this.gameover()) {
-            var position = _.indexOf(this.winners, 'Player');
+            var position = _.indexOf(this.winners, 'Player') + 1;
             this.ctx.fillStyle = BOARD.MESSAGECOLOR;
             this.ctx.font = BOARD.MESSAGEFONT;
             this.ctx.fillText(
