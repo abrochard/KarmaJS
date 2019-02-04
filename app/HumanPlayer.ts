@@ -8,27 +8,39 @@ interface DetectDeck {
 interface PlayCards {
     (cards: Card[]): void;
 }
-interface FlipDeck {
+interface ClickDeck {
     (): void;
 }
+
+enum PlayerState {
+    Swap,
+    Play
+};
 
 class HumanPlayer extends Player {
     detectDeck: DetectDeck;
     detectPile: DetectDeck;
     playCards: PlayCards;
-    flipDeck: FlipDeck;
+    clickDeck: ClickDeck;
+    state: PlayerState;
     constructor(
         detectDeck: DetectDeck,
         detectPile: DetectDeck,
         playCards: PlayCards,
-        flipDeck: FlipDeck
+        clickDeck: ClickDeck
     ) {
         super();
 
         this.detectDeck = detectDeck;
         this.detectPile = detectPile;
         this.playCards = playCards;
-        this.flipDeck = flipDeck;
+        this.clickDeck = clickDeck;
+
+        this.state = PlayerState.Swap;
+    }
+
+    switchPlayState() {
+        this.state = PlayerState.Play;
     }
 
     activeCollection(): Card[] {
@@ -71,7 +83,7 @@ class HumanPlayer extends Player {
 
     onClick(x: number, y: number): boolean {
         if (this.detectDeck(x, y)) {
-            this.flipDeck();
+            this.clickDeck();
             return true;
         }
 
@@ -89,9 +101,34 @@ class HumanPlayer extends Player {
     }
 
     onDrag(x: number, y: number, dx: number, dy: number): boolean {
+        if (this.state == PlayerState.Swap) {
+            return this.swapOnDrag(x, y, dx, dy);
+        }
+
+        return this.playOnDrag(x, y, dx, dy);
+    }
+
+    swapOnDrag(x: number, y: number, dx: number, dy: number): boolean {
+        if (_.isEmpty(this.selected)) {
+            return false;
+        }
+
+        _.forEach(this.selected, card => {
+            card.translate(dx, dy);
+        });
+
+        return true;
+    }
+
+    playOnDrag(x: number, y: number, dx: number, dy: number): boolean {
         let temp = _.filter(this.activeCollection(), card => {
             return card.inBound(x, y);
         });
+
+        if (_.isEmpty(temp) && _.isEmpty(this.selected)) {
+            return false;
+        }
+
         _.forEach(temp, card => {
             if (!_.includes(this.selected, card)) {
                 this.selected.push(card);
@@ -106,6 +143,45 @@ class HumanPlayer extends Player {
     }
 
     onDrop(x: number, y: number): boolean {
+        if (this.state == PlayerState.Swap) {
+            return this.swapOnDrop(x, y);
+        }
+
+        return this.playOnDrop(x, y);
+    }
+
+    swapOnDrop(x: number, y: number): boolean {
+        if (_.isEmpty(this.selected)) {
+            return false;
+        }
+
+        let faceUpIndex = _.findIndex(this.faceUpCards, card => {
+            return card.inBound(x, y);
+        });
+
+        if (faceUpIndex < 0) {
+            this.reorderHand();
+            _.forEach(this.selected, card => {
+                card.selected = false;
+            });
+            this.selected = [];
+
+            return true;
+        }
+
+        let handIndex = _.indexOf(this.hand, this.selected[0]);
+
+        this.swapCards(handIndex, faceUpIndex);
+
+        _.forEach(this.selected, card => {
+            card.selected = false;
+        });
+        this.selected = [];
+
+        return true;
+    }
+
+    playOnDrop(x: number, y: number): boolean {
         if (this.detectPile(x, y)) {
             _.pullAll(this.activeCollection(), this.selected);
             if (!_.isEmpty(this.selected)) {

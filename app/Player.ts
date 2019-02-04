@@ -60,9 +60,10 @@ class Player {
         _.remove(this.animations, anim => {
             return anim(ctx);
         });
-        // _.remove(this.animations, anim => {
-        // return !anim(ctx);
-        // });
+
+        // render the selected cards so they appear on top
+        this.selected.forEach(r);
+
         return _.isEmpty(this.animations);
     }
 
@@ -298,7 +299,7 @@ class Player {
         });
     }
 
-    swapCards(handIndex: any, faceUpIndex: any) {
+    swapCards(handIndex: number, faceUpIndex: number) {
         let card: any = this.hand.splice(handIndex, 1)[0];
         card = this.faceUpCards.splice(faceUpIndex, 1, card);
         this.addToHand(card);

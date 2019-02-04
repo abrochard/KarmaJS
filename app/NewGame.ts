@@ -42,7 +42,7 @@ class Game {
             this.detector(this.deck),
             this.detector(this.pile),
             this.playHuman.bind(this),
-            this.humanDeckFlip.bind(this)
+            this.triggerPlayPhase.bind(this)
         );
         this.setupPlayer(this.human);
 
@@ -67,6 +67,11 @@ class Game {
                 this.eventHandler.listen();
             })
         })
+    }
+
+    triggerPlayPhase() {
+        this.human.switchPlayState();
+        this.human.clickDeck = this.humanDeckFlip.bind(this);
     }
 
     detector(d: Deck): (x: number, y: number) => boolean {
