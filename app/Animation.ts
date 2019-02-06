@@ -44,3 +44,32 @@ export function cardPlayAnimation(cards: Card[]): Animation {
         }));
     }
 }
+
+export function bannerAnimation(text: string, speed = 12): Animation {
+    let x = 0;
+    let textOffset = -text.length * 15;
+
+    let BANNER_WIDTH = 120;
+    let top = BANNER_WIDTH / 2 + 5;
+
+    return ctx => {
+        let width = ctx.canvas.width / 2;
+
+        // background
+        ctx.fillStyle = 'black';
+        ctx.fillRect(-width, -top, 2 * width, BANNER_WIDTH);
+
+        // loading bar
+        ctx.fillStyle = 'red';
+        ctx.fillRect(-width, -top, x, BANNER_WIDTH);
+
+        // text
+        ctx.fillStyle = 'white';
+        ctx.font = '80px serif';
+        ctx.fillText(text, textOffset, 10);
+
+        x += speed;
+
+        return x > 2.5 * width;
+    };
+};

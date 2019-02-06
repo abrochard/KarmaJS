@@ -30,6 +30,7 @@ export class EventHandler {
 
     pause() {
         this.acceptInput = false;
+        this.lastCursorPosition = null;
     }
 
     getMousePosition(e: MouseEvent): { x: number, y: number } {

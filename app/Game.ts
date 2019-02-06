@@ -15,7 +15,7 @@ import AIPlayer from './AIPlayer';
 import HumanPlayer from './HumanPlayer';
 import Card from "./Card";
 import { ValidPlay, ApplyCards, TotalToDraw } from './Rules';
-import { Animation, cardDrawAnimation, cardPlayAnimation } from './Animation';
+import { Animation, cardDrawAnimation, cardPlayAnimation, bannerAnimation } from './Animation';
 import { EventHandler } from './Event';
 
 class Game {
@@ -53,14 +53,17 @@ class Game {
             this.aiPlayers.push(p);
         });
 
+        this.animations = [];
+        this.registerEventHandler();
         this.winners = [];
 
-        this.registerEventHandler();
+        this.animations.push(bannerAnimation('Swap Phase', 25));
 
         this.render(() => {
             this.aiPlayers.forEach(p => {
                 p.autoSwapCards();
             })
+
             this.render(() => {
                 this.eventHandler.listen();
             })
@@ -70,6 +73,8 @@ class Game {
     triggerPlayPhase() {
         this.human.switchPlayState();
         this.human.clickDeck = this.humanDeckFlip.bind(this);
+
+        this.animations.push(bannerAnimation('Play Phase'));
     }
 
     detector(d: Deck): (x: number, y: number) => boolean {
