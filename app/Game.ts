@@ -126,8 +126,16 @@ class Game {
             return;
         }
 
-        let cards = [this.deck.draw().flip()];
-        this.playHuman(cards);
+        this.eventHandler.pause();
+        this.deck.flipTop();
+        this.render();
+
+
+        let self = this;
+        window.setTimeout(() => {
+            let cards = [self.deck.draw().flip()];
+            self.playHuman(cards);
+        }, 500);
     }
 
     loop(index = 0) {
