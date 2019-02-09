@@ -14,6 +14,7 @@ import Player from "./Player";
 import AIPlayer from './AIPlayer';
 import HumanPlayer from './HumanPlayer';
 import Card from "./Card";
+import Panel from './Panel';
 import { ValidPlay, ApplyCards, TotalToDraw } from './Rules';
 import { Animation, cardDrawAnimation, cardPlayAnimation, bannerAnimation } from './Animation';
 import { EventHandler } from './Event';
@@ -24,6 +25,7 @@ class Game {
     human: HumanPlayer;
     deck: Deck;
     pile: Deck;
+    panels: Panel[];
     animations: Animation[];
     eventHandler: EventHandler;
     winners: string[];
@@ -53,6 +55,7 @@ class Game {
             this.aiPlayers.push(p);
         });
 
+        this.panels = [];
         this.animations = [];
         this.registerEventHandler();
         this.winners = [];
@@ -63,6 +66,10 @@ class Game {
             this.aiPlayers.forEach(p => {
                 p.autoSwapCards();
             })
+
+            const msg = 'Swap cards between your hand and\nyour face ups by dragging them.\nHint: you want the powerful cards as face ups.';
+            this.panels.push(new Panel(this.human.x + 280, this.human.y - 100, msg));
+            this.panels.push(new Panel(this.deck.x + 90, this.deck.y + 10, 'Click on the deck\nwhen you are ready '));
 
             this.render(() => {
                 this.eventHandler.listen();
@@ -75,6 +82,8 @@ class Game {
         this.human.clickDeck = this.humanDeckFlip.bind(this);
 
         this.animations.push(bannerAnimation('Play Phase'));
+
+        this.panels = [];
     }
 
     detector(d: Deck): (x: number, y: number) => boolean {
@@ -302,6 +311,10 @@ class Game {
                 MESSAGE.ZONE1.y
             );
         }
+
+        _.forEach(this.panels, panel => {
+            panel.render(this.ctx);
+        });
 
         // render animations
         _.remove(this.animations, animate => {
