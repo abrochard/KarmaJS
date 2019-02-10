@@ -73,3 +73,4 @@ There are a few special rules and cards.
   * visual select for card swapping
   * playable cards highlighting
   * force to play when player can play
+  * fix the drop face up/face down where cards don't go back to their place

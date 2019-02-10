@@ -84,6 +84,7 @@ class Game {
         this.animations.push(bannerAnimation('Play Phase'));
 
         this.panels = [];
+        this.panels.push(new Panel(this.human.x + 280, this.human.y - 100, 'You can play multiple cards at \nonce by dragging them together  '));
     }
 
     detector(d: Deck): (x: number, y: number) => boolean {
@@ -112,6 +113,8 @@ class Game {
     }
 
     playHuman(cards: Card[]) {
+        this.panels = [];
+
         if (ValidPlay(cards, this.pile.topValue())) {
             this.applyCards(cards);
 

@@ -91,5 +91,5 @@ export const MESSAGE: any = {
     COLOR: 'black'
 };
 
-export const DEBUG = true;
+export const DEBUG = false;
 export const LOG = true;

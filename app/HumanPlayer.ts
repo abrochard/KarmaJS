@@ -39,6 +39,14 @@ class HumanPlayer extends Player {
         this.state = PlayerState.Swap;
     }
 
+    addToHand(cards: Card[]) {
+        cards.forEach(c => {
+            c.faceUp = true;
+            this.hand.push(c);
+        });
+        this.reorderHand();
+    }
+
     switchPlayState() {
         this.state = PlayerState.Play;
     }
