@@ -79,8 +79,12 @@ class Card {
         return name;
     }
 
-    // TODO render shadow when in motion?
     render(ctx: CanvasRenderingContext2D) {
+        ctx.save();
+
+        ctx.shadowColor = 'black';
+        ctx.shadowBlur = 4;
+
         if (this.faceUp == false) {
             // render back of card
             this.draw(ctx, BACK_NAME, BACK_SPRITE);
@@ -95,10 +99,6 @@ class Card {
             this.draw(ctx, this.name, FRONT_SPRITE);
         }
 
-        // in all cases draw the border
-        // ctx.fillStyle = CARD.BORDER_COLOR;
-        // ctx.strokeRect(this.x, this.y, this.width, this.height);
-
         if (this.highlighted) {
             ctx.fillStyle = CARD.HOVER.COLOR;
             ctx.strokeRect(this.x, this.y, this.width, this.height);
@@ -108,6 +108,8 @@ class Card {
             ctx.fillStyle = CARD.SELECTED.COLOR;
             ctx.strokeRect(this.x, this.y, this.width, this.height);
         }
+
+        ctx.restore();
     }
 
     draw(ctx: any, cardMapName: string, elementId: string) {
