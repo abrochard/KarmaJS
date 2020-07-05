@@ -19,8 +19,11 @@ export class EventHandler {
         this.acceptInput = false;
         this.lastCursorPosition = null;
 
+        this.canvas.addEventListener('touchstart', this.onTouchStart.bind(this));
         this.canvas.addEventListener('mousedown', this.onMouseDown.bind(this));
+        this.canvas.addEventListener('touchmove', this.onTouchMove.bind(this));
         this.canvas.addEventListener('mousemove', this.onMouseMove.bind(this));
+        this.canvas.addEventListener('touchend', this.onTouchEnd.bind(this));
         this.canvas.addEventListener('mouseup', this.onMouseUp.bind(this));
     }
 
@@ -39,14 +42,49 @@ export class EventHandler {
         return { x, y };
     }
 
+    getTouchPosition(e: TouchEvent): { x: number, y: number } {
+        if (e.touches.length == 0) {
+            // this is a touchend event, need to send last coordinates
+            return this.lastCursorPosition;
+        }
+
+        const x = e.touches[0].clientX - this.canvas.offsetWidth / 2;
+        const y = e.touches[0].clientY - this.canvas.offsetHeight / 2;
+        return { x, y };
+    }
+
+    onTouchStart(e: TouchEvent) {
+        e.preventDefault();
+        if (!this.acceptInput) {
+            return;
+        }
+
+        let { x, y } = this.getTouchPosition(e);
+        this.down(x, y);
+    }
+
     onMouseDown(e: MouseEvent) {
         if (!this.acceptInput) {
             return;
         }
 
         let { x, y } = this.getMousePosition(e);
+        this.down(x, y);
+    }
+
+    down(x: number, y: number) {
         this.lastCursorPosition = { x, y };
         this.listeners.onClick(x, y);
+    }
+
+    onTouchMove(e: TouchEvent) {
+        e.preventDefault()
+        if (!this.acceptInput) {
+            return;
+        }
+
+        let { x, y } = this.getTouchPosition(e);
+        this.move(x, y);
     }
 
     onMouseMove(e: MouseEvent) {
@@ -55,6 +93,10 @@ export class EventHandler {
         }
 
         let { x, y } = this.getMousePosition(e);
+        this.move(x, y);
+    }
+
+    move(x: number, y: number) {
         this.listeners.onHover(x, y);
 
         if (this.lastCursorPosition) {
@@ -63,6 +105,15 @@ export class EventHandler {
         }
     }
 
+    onTouchEnd(e: TouchEvent) {
+        e.preventDefault()
+        if (!this.acceptInput) {
+            return;
+        }
+
+        let { x, y } = this.getTouchPosition(e);
+        this.up(x, y);
+    }
 
     onMouseUp(e: MouseEvent) {
         if (!this.acceptInput) {
@@ -70,7 +121,12 @@ export class EventHandler {
         }
 
         let { x, y } = this.getMousePosition(e);
+        this.up(x, y);
+    }
+
+    up(x: number, y: number) {
         this.lastCursorPosition = null;
         this.listeners.onDrop(x, y);
+
     }
 }
