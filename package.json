@@ -11,7 +11,7 @@
   "author": "abrochard",
   "dependencies": {
     "@types/lodash": "^4.14.120",
-    "lodash": "^4.17.13",
+    "lodash": "^4.17.19",
     "webpack-cli": "^3.2.1"
   },
   "devDependencies": {
